@@ -13,9 +13,7 @@ namespace Test
 	public class DexApiClient
 	{
 		public IAgent Agent { get; }
-
 		public Principal CanisterId { get; }
-
 		public CandidConverter? Converter { get; }
 
 		public DexApiClient(IAgent agent, Principal canisterId, CandidConverter? converter = default)

@@ -10,9 +10,7 @@ namespace Test
 	public class AnonymousTuplesApiClient
 	{
 		public IAgent Agent { get; }
-
 		public Principal CanisterId { get; }
-
 		public CandidConverter Converter { get; }
 
 		public AnonymousTuplesApiClient(IAgent agent, Principal canisterId, CandidConverter converter = default)

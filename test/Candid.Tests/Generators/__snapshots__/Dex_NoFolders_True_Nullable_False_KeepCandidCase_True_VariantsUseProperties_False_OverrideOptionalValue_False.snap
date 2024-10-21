@@ -13,9 +13,7 @@ namespace Test
 	public class DexApiClient
 	{
 		public IAgent Agent { get; }
-
 		public Principal CanisterId { get; }
-
 		public CandidConverter Converter { get; }
 
 		public DexApiClient(IAgent agent, Principal canisterId, CandidConverter converter = default)
@@ -292,15 +290,10 @@ namespace Test
 	public class Order
 	{
 		public Token from { get; set; }
-
 		public UnboundedUInt fromAmount { get; set; }
-
 		public OrderId id { get; set; }
-
 		public Principal owner { get; set; }
-
 		public Token to { get; set; }
-
 		public UnboundedUInt toAmount { get; set; }
 
 		public Order(Token from, UnboundedUInt fromAmount, OrderId id, Principal owner, Token to, UnboundedUInt toAmount)
@@ -483,9 +476,7 @@ namespace Test
 	public class Balance
 	{
 		public UnboundedUInt amount { get; set; }
-
 		public Principal owner { get; set; }
-
 		public Token token { get; set; }
 
 		public Balance(UnboundedUInt amount, Principal owner, Token token)

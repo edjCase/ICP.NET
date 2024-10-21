@@ -11,9 +11,7 @@ namespace Test
 	public class GovernanceApiClient
 	{
 		public IAgent Agent { get; }
-
 		public Principal CanisterId { get; }
-
 		public CandidConverter? Converter { get; }
 
 		public GovernanceApiClient(IAgent agent, Principal canisterId, CandidConverter? converter = default)
@@ -455,7 +453,6 @@ namespace Test
 	public class Ballot
 	{
 		public int vote { get; set; }
-
 		public ulong voting_power { get; set; }
 
 		public Ballot(int vote, ulong votingPower)
@@ -679,7 +676,6 @@ namespace Test
 	{
 		[CandidOptional]
 		public Principal? controller { get; set; }
-
 		public ulong memo { get; set; }
 
 		public ClaimOrRefreshNeuronFromAccount(Principal? controller, ulong memo)
@@ -1342,14 +1338,11 @@ namespace Test
 	public class DisburseToNeuron
 	{
 		public ulong dissolve_delay_seconds { get; set; }
-
 		public bool kyc_verified { get; set; }
-
 		public ulong amount_e8s { get; set; }
 
 		[CandidOptional]
 		public Principal? new_controller { get; set; }
-
 		public ulong nonce { get; set; }
 
 		public DisburseToNeuron(ulong dissolveDelaySeconds, bool kycVerified, ulong amountE8s, Principal? newController, ulong nonce)
@@ -1441,7 +1434,6 @@ namespace Test
 	public class ExecuteNnsFunction
 	{
 		public int nns_function { get; set; }
-
 		public List<byte> payload { get; set; }
 
 		public ExecuteNnsFunction(int nnsFunction, List<byte> payload)
@@ -1466,7 +1458,6 @@ namespace Test
 	public class Follow
 	{
 		public int topic { get; set; }
-
 		public List<NeuronId> followees { get; set; }
 
 		public Follow(int topic, List<NeuronId> followees)
@@ -1514,12 +1505,10 @@ namespace Test
 	public class Governance
 	{
 		public Dictionary<int, Followees> default_followees { get; set; }
-
 		public ulong wait_for_quiet_threshold_seconds { get; set; }
 
 		[CandidOptional]
 		public GovernanceCachedMetrics? metrics { get; set; }
-
 		public List<NodeProvider> node_providers { get; set; }
 
 		[CandidOptional]
@@ -1527,17 +1516,11 @@ namespace Test
 
 		[CandidOptional]
 		public RewardEvent? latest_reward_event { get; set; }
-
 		public List<NeuronStakeTransfer> to_claim_transfers { get; set; }
-
 		public ulong short_voting_period_seconds { get; set; }
-
 		public Dictionary<ulong, ProposalData> proposals { get; set; }
-
 		public Dictionary<ulong, NeuronInFlightCommand> in_flight_commands { get; set; }
-
 		public Dictionary<ulong, Neuron> neurons { get; set; }
-
 		public ulong genesis_timestamp_seconds { get; set; }
 
 		public Governance(Dictionary<int, Followees> defaultFollowees, ulong waitForQuietThresholdSeconds, GovernanceCachedMetrics? metrics, List<NodeProvider> nodeProviders, NetworkEconomics? economics, RewardEvent? latestRewardEvent, List<NeuronStakeTransfer> toClaimTransfers, ulong shortVotingPeriodSeconds, Dictionary<ulong, ProposalData> proposals, Dictionary<ulong, NeuronInFlightCommand> inFlightCommands, Dictionary<ulong, Neuron> neurons, ulong genesisTimestampSeconds)
@@ -1571,35 +1554,20 @@ namespace Test
 	public class GovernanceCachedMetrics
 	{
 		public Dictionary<ulong, double> not_dissolving_neurons_e8s_buckets { get; set; }
-
 		public ulong garbage_collectable_neurons_count { get; set; }
-
 		public ulong neurons_with_invalid_stake_count { get; set; }
-
 		public Dictionary<ulong, ulong> not_dissolving_neurons_count_buckets { get; set; }
-
 		public ulong total_supply_icp { get; set; }
-
 		public ulong neurons_with_less_than_6_months_dissolve_delay_count { get; set; }
-
 		public ulong dissolved_neurons_count { get; set; }
-
 		public ulong total_staked_e8s { get; set; }
-
 		public ulong not_dissolving_neurons_count { get; set; }
-
 		public ulong dissolved_neurons_e8s { get; set; }
-
 		public ulong neurons_with_less_than_6_months_dissolve_delay_e8s { get; set; }
-
 		public Dictionary<ulong, ulong> dissolving_neurons_count_buckets { get; set; }
-
 		public ulong dissolving_neurons_count { get; set; }
-
 		public Dictionary<ulong, double> dissolving_neurons_e8s_buckets { get; set; }
-
 		public ulong community_fund_total_staked_e8s { get; set; }
-
 		public ulong timestamp_seconds { get; set; }
 
 		public GovernanceCachedMetrics(Dictionary<ulong, double> notDissolvingNeuronsE8sBuckets, ulong garbageCollectableNeuronsCount, ulong neuronsWithInvalidStakeCount, Dictionary<ulong, ulong> notDissolvingNeuronsCountBuckets, ulong totalSupplyIcp, ulong neuronsWithLessThan6MonthsDissolveDelayCount, ulong dissolvedNeuronsCount, ulong totalStakedE8s, ulong notDissolvingNeuronsCount, ulong dissolvedNeuronsE8s, ulong neuronsWithLessThan6MonthsDissolveDelayE8s, Dictionary<ulong, ulong> dissolvingNeuronsCountBuckets, ulong dissolvingNeuronsCount, Dictionary<ulong, double> dissolvingNeuronsE8sBuckets, ulong communityFundTotalStakedE8s, ulong timestampSeconds)
@@ -1635,7 +1603,6 @@ namespace Test
 	public class GovernanceError
 	{
 		public string error_message { get; set; }
-
 		public int error_type { get; set; }
 
 		public GovernanceError(string errorMessage, int errorType)
@@ -1752,7 +1719,6 @@ namespace Test
 	public class ListNeurons
 	{
 		public List<ulong> neuron_ids { get; set; }
-
 		public bool include_neurons_readable_by_caller { get; set; }
 
 		public ListNeurons(List<ulong> neuronIds, bool includeNeuronsReadableByCaller)
@@ -1777,7 +1743,6 @@ namespace Test
 	public class ListNeuronsResponse
 	{
 		public Dictionary<ulong, NeuronInfo> neuron_infos { get; set; }
-
 		public List<Neuron> full_neurons { get; set; }
 
 		public ListNeuronsResponse(Dictionary<ulong, NeuronInfo> neuronInfos, List<Neuron> fullNeurons)
@@ -1828,11 +1793,8 @@ namespace Test
 
 		[CandidOptional]
 		public NeuronId? before_proposal { get; set; }
-
 		public uint limit { get; set; }
-
 		public List<int> exclude_topic { get; set; }
-
 		public List<int> include_status { get; set; }
 
 		public ListProposalInfo(List<int> includeRewardStatus, NeuronId? beforeProposal, uint limit, List<int> excludeTopic, List<int> includeStatus)
@@ -1998,7 +1960,6 @@ namespace Test
 	public class MergeMaturityResponse
 	{
 		public ulong merged_maturity_e8s { get; set; }
-
 		public ulong new_stake_e8s { get; set; }
 
 		public MergeMaturityResponse(ulong mergedMaturityE8s, ulong newStakeE8s)
@@ -2039,19 +2000,12 @@ namespace Test
 	public class NetworkEconomics
 	{
 		public ulong neuron_minimum_stake_e8s { get; set; }
-
 		public uint max_proposals_to_keep_per_topic { get; set; }
-
 		public ulong neuron_management_fee_per_proposal_e8s { get; set; }
-
 		public ulong reject_cost_e8s { get; set; }
-
 		public ulong transaction_fee_e8s { get; set; }
-
 		public ulong neuron_spawn_dissolve_delay_seconds { get; set; }
-
 		public ulong minimum_icp_xdr_rate { get; set; }
-
 		public ulong maximum_node_provider_rewards_e8s { get; set; }
 
 		public NetworkEconomics(ulong neuronMinimumStakeE8s, uint maxProposalsToKeepPerTopic, ulong neuronManagementFeePerProposalE8s, ulong rejectCostE8s, ulong transactionFeeE8s, ulong neuronSpawnDissolveDelaySeconds, ulong minimumIcpXdrRate, ulong maximumNodeProviderRewardsE8s)
@@ -2088,23 +2042,14 @@ namespace Test
 
 		[CandidOptional]
 		public Principal? controller { get; set; }
-
 		public List<BallotInfo> recent_ballots { get; set; }
-
 		public bool kyc_verified { get; set; }
-
 		public bool not_for_profit { get; set; }
-
 		public ulong maturity_e8s_equivalent { get; set; }
-
 		public ulong cached_neuron_stake_e8s { get; set; }
-
 		public ulong created_timestamp_seconds { get; set; }
-
 		public ulong aging_since_timestamp_seconds { get; set; }
-
 		public List<Principal> hot_keys { get; set; }
-
 		public List<byte> account { get; set; }
 
 		[CandidOptional]
@@ -2112,9 +2057,7 @@ namespace Test
 
 		[CandidOptional]
 		public DissolveState? dissolve_state { get; set; }
-
 		public Dictionary<int, Followees> followees { get; set; }
-
 		public ulong neuron_fees_e8s { get; set; }
 
 		[CandidOptional]
@@ -2246,7 +2189,6 @@ namespace Test
 	{
 		[CandidOptional]
 		public Command_2? command { get; set; }
-
 		public ulong timestamp { get; set; }
 
 		public NeuronInFlightCommand(Command_2? command, ulong timestamp)
@@ -2272,25 +2214,18 @@ namespace Test
 	public class NeuronInfo
 	{
 		public ulong dissolve_delay_seconds { get; set; }
-
 		public List<BallotInfo> recent_ballots { get; set; }
-
 		public ulong created_timestamp_seconds { get; set; }
-
 		public int state { get; set; }
-
 		public ulong stake_e8s { get; set; }
 
 		[CandidOptional]
 		public ulong? joined_community_fund_timestamp_seconds { get; set; }
-
 		public ulong retrieved_at_timestamp_seconds { get; set; }
 
 		[CandidOptional]
 		public KnownNeuronData? known_neuron_data { get; set; }
-
 		public ulong voting_power { get; set; }
-
 		public ulong age_seconds { get; set; }
 
 		public NeuronInfo(ulong dissolveDelaySeconds, List<BallotInfo> recentBallots, ulong createdTimestampSeconds, int state, ulong stakeE8s, ulong? joinedCommunityFundTimestampSeconds, ulong retrievedAtTimestampSeconds, KnownNeuronData? knownNeuronData, ulong votingPower, ulong ageSeconds)
@@ -2324,18 +2259,13 @@ namespace Test
 	public class NeuronStakeTransfer
 	{
 		public List<byte> to_subaccount { get; set; }
-
 		public ulong neuron_stake_e8s { get; set; }
 
 		[CandidOptional]
 		public Principal? from { get; set; }
-
 		public ulong memo { get; set; }
-
 		public List<byte> from_subaccount { get; set; }
-
 		public ulong transfer_timestamp { get; set; }
-
 		public ulong block_height { get; set; }
 
 		public NeuronStakeTransfer(List<byte> toSubaccount, ulong neuronStakeE8s, Principal? from, ulong memo, List<byte> fromSubaccount, ulong transferTimestamp, ulong blockHeight)
@@ -2545,7 +2475,6 @@ namespace Test
 
 		[CandidOptional]
 		public Action? action { get; set; }
-
 		public string summary { get; set; }
 
 		public Proposal(string url, string? title, Action? action, string summary)
@@ -2577,20 +2506,14 @@ namespace Test
 
 		[CandidOptional]
 		public GovernanceError? failure_reason { get; set; }
-
 		public Dictionary<ulong, Ballot> ballots { get; set; }
-
 		public ulong proposal_timestamp_seconds { get; set; }
-
 		public ulong reward_event_round { get; set; }
-
 		public ulong failed_timestamp_seconds { get; set; }
-
 		public ulong reject_cost_e8s { get; set; }
 
 		[CandidOptional]
 		public Tally? latest_tally { get; set; }
-
 		public ulong decided_timestamp_seconds { get; set; }
 
 		[CandidOptional]
@@ -2601,7 +2524,6 @@ namespace Test
 
 		[CandidOptional]
 		public WaitForQuietState? wait_for_quiet_state { get; set; }
-
 		public ulong executed_timestamp_seconds { get; set; }
 
 		public ProposalData(NeuronId? id, GovernanceError? failureReason, Dictionary<ulong, Ballot> ballots, ulong proposalTimestampSeconds, ulong rewardEventRound, ulong failedTimestampSeconds, ulong rejectCostE8s, Tally? latestTally, ulong decidedTimestampSeconds, Proposal? proposal, NeuronId? proposer, WaitForQuietState? waitForQuietState, ulong executedTimestampSeconds)
@@ -2639,32 +2561,23 @@ namespace Test
 	{
 		[CandidOptional]
 		public NeuronId? id { get; set; }
-
 		public int status { get; set; }
-
 		public int topic { get; set; }
 
 		[CandidOptional]
 		public GovernanceError? failure_reason { get; set; }
-
 		public Dictionary<ulong, Ballot> ballots { get; set; }
-
 		public ulong proposal_timestamp_seconds { get; set; }
-
 		public ulong reward_event_round { get; set; }
 
 		[CandidOptional]
 		public ulong? deadline_timestamp_seconds { get; set; }
-
 		public ulong failed_timestamp_seconds { get; set; }
-
 		public ulong reject_cost_e8s { get; set; }
 
 		[CandidOptional]
 		public Tally? latest_tally { get; set; }
-
 		public int reward_status { get; set; }
-
 		public ulong decided_timestamp_seconds { get; set; }
 
 		[CandidOptional]
@@ -2672,7 +2585,6 @@ namespace Test
 
 		[CandidOptional]
 		public NeuronId? proposer { get; set; }
-
 		public ulong executed_timestamp_seconds { get; set; }
 
 		public ProposalInfo(NeuronId? id, int status, int topic, GovernanceError? failureReason, Dictionary<ulong, Ballot> ballots, ulong proposalTimestampSeconds, ulong rewardEventRound, ulong? deadlineTimestampSeconds, ulong failedTimestampSeconds, ulong rejectCostE8s, Tally? latestTally, int rewardStatus, ulong decidedTimestampSeconds, Proposal? proposal, NeuronId? proposer, ulong executedTimestampSeconds)
@@ -3144,11 +3056,8 @@ namespace Test
 	public class RewardEvent
 	{
 		public ulong day_after_genesis { get; set; }
-
 		public ulong actual_timestamp_seconds { get; set; }
-
 		public ulong distributed_e8s_equivalent { get; set; }
-
 		public List<NeuronId> settled_proposals { get; set; }
 
 		public RewardEvent(ulong dayAfterGenesis, ulong actualTimestampSeconds, ulong distributedE8sEquivalent, List<NeuronId> settledProposals)
@@ -3244,7 +3153,6 @@ namespace Test
 
 		[CandidOptional]
 		public RewardMode? reward_mode { get; set; }
-
 		public ulong amount_e8s { get; set; }
 
 		public RewardNodeProvider(NodeProvider? nodeProvider, RewardMode? rewardMode, ulong amountE8s)
@@ -3272,7 +3180,6 @@ namespace Test
 	{
 		[CandidOptional]
 		public bool? use_registry_derived_rewards { get; set; }
-
 		public List<RewardNodeProvider> rewards { get; set; }
 
 		public RewardNodeProviders(bool? useRegistryDerivedRewards, List<RewardNodeProvider> rewards)
@@ -3450,11 +3357,8 @@ namespace Test
 	public class Tally
 	{
 		public ulong no { get; set; }
-
 		public ulong yes { get; set; }
-
 		public ulong total { get; set; }
-
 		public ulong timestamp_seconds { get; set; }
 
 		public Tally(ulong no, ulong yes, ulong total, ulong timestampSeconds)

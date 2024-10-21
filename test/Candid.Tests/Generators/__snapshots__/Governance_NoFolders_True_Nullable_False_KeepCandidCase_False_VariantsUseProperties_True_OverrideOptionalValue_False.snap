@@ -11,9 +11,7 @@ namespace Test
 	public class GovernanceApiClient
 	{
 		public IAgent Agent { get; }
-
 		public Principal CanisterId { get; }
-
 		public CandidConverter Converter { get; }
 
 		public GovernanceApiClient(IAgent agent, Principal canisterId, CandidConverter converter = default)
@@ -217,25 +215,15 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public KnownNeuron RegisterKnownNeuron { get => this.Tag == ActionTag.RegisterKnownNeuron ? (KnownNeuron)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.RegisterKnownNeuron, value); }
-
 		public ManageNeuron ManageNeuron { get => this.Tag == ActionTag.ManageNeuron ? (ManageNeuron)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.ManageNeuron, value); }
-
 		public ExecuteNnsFunction ExecuteNnsFunction { get => this.Tag == ActionTag.ExecuteNnsFunction ? (ExecuteNnsFunction)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.ExecuteNnsFunction, value); }
-
 		public RewardNodeProvider RewardNodeProvider { get => this.Tag == ActionTag.RewardNodeProvider ? (RewardNodeProvider)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.RewardNodeProvider, value); }
-
 		public SetDefaultFollowees SetDefaultFollowees { get => this.Tag == ActionTag.SetDefaultFollowees ? (SetDefaultFollowees)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.SetDefaultFollowees, value); }
-
 		public RewardNodeProviders RewardNodeProviders { get => this.Tag == ActionTag.RewardNodeProviders ? (RewardNodeProviders)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.RewardNodeProviders, value); }
-
 		public NetworkEconomics ManageNetworkEconomics { get => this.Tag == ActionTag.ManageNetworkEconomics ? (NetworkEconomics)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.ManageNetworkEconomics, value); }
-
 		public ApproveGenesisKyc ApproveGenesisKyc { get => this.Tag == ActionTag.ApproveGenesisKyc ? (ApproveGenesisKyc)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.ApproveGenesisKyc, value); }
-
 		public AddOrRemoveNodeProvider AddOrRemoveNodeProvider { get => this.Tag == ActionTag.AddOrRemoveNodeProvider ? (AddOrRemoveNodeProvider)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.AddOrRemoveNodeProvider, value); }
-
 		public Motion Motion { get => this.Tag == ActionTag.Motion ? (Motion)this.Value! : default; set => (this.Tag, this.Value) = (ActionTag.Motion, value); }
 
 		public Action(ActionTag tag, object value)
@@ -426,11 +414,8 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public By.NeuronIdOrSubaccountInfo NeuronIdOrSubaccount { get => this.Tag == ByTag.NeuronIdOrSubaccount ? (By.NeuronIdOrSubaccountInfo)this.Value! : default; set => (this.Tag, this.Value) = (ByTag.NeuronIdOrSubaccount, value); }
-
 		public ClaimOrRefreshNeuronFromAccount MemoAndController { get => this.Tag == ByTag.MemoAndController ? (ClaimOrRefreshNeuronFromAccount)this.Value! : default; set => (this.Tag, this.Value) = (ByTag.MemoAndController, value); }
-
 		public ulong? Memo { get => this.Tag == ByTag.Memo ? (ulong)this.Value! : default; set => (this.Tag, this.Value) = (ByTag.Memo, value); }
 
 		public By(ByTag tag, object value)
@@ -474,9 +459,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public NodeProvider ToRemove { get => this.Tag == ChangeTag.ToRemove ? (NodeProvider)this.Value! : default; set => (this.Tag, this.Value) = (ChangeTag.ToRemove, value); }
-
 		public NodeProvider ToAdd { get => this.Tag == ChangeTag.ToAdd ? (NodeProvider)this.Value! : default; set => (this.Tag, this.Value) = (ChangeTag.ToAdd, value); }
 
 		public Change(ChangeTag tag, object value)
@@ -611,27 +594,16 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public Spawn Spawn { get => this.Tag == CommandTag.Spawn ? (Spawn)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.Spawn, value); }
-
 		public Split Split { get => this.Tag == CommandTag.Split ? (Split)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.Split, value); }
-
 		public Follow Follow { get => this.Tag == CommandTag.Follow ? (Follow)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.Follow, value); }
-
 		public ClaimOrRefresh ClaimOrRefresh { get => this.Tag == CommandTag.ClaimOrRefresh ? (ClaimOrRefresh)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.ClaimOrRefresh, value); }
-
 		public Configure Configure { get => this.Tag == CommandTag.Configure ? (Configure)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.Configure, value); }
-
 		public RegisterVote RegisterVote { get => this.Tag == CommandTag.RegisterVote ? (RegisterVote)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.RegisterVote, value); }
-
 		public Merge Merge { get => this.Tag == CommandTag.Merge ? (Merge)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.Merge, value); }
-
 		public DisburseToNeuron DisburseToNeuron { get => this.Tag == CommandTag.DisburseToNeuron ? (DisburseToNeuron)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.DisburseToNeuron, value); }
-
 		public Proposal MakeProposal { get => this.Tag == CommandTag.MakeProposal ? (Proposal)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.MakeProposal, value); }
-
 		public MergeMaturity MergeMaturity { get => this.Tag == CommandTag.MergeMaturity ? (MergeMaturity)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.MergeMaturity, value); }
-
 		public Disburse Disburse { get => this.Tag == CommandTag.Disburse ? (Disburse)this.Value! : default; set => (this.Tag, this.Value) = (CommandTag.Disburse, value); }
 
 		public Command(CommandTag tag, object value)
@@ -676,29 +648,17 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public GovernanceError Error { get => this.Tag == Command1Tag.Error ? (GovernanceError)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.Error, value); }
-
 		public SpawnResponse Spawn { get => this.Tag == Command1Tag.Spawn ? (SpawnResponse)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.Spawn, value); }
-
 		public SpawnResponse Split { get => this.Tag == Command1Tag.Split ? (SpawnResponse)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.Split, value); }
-
 		public Command1.FollowInfo Follow { get => this.Tag == Command1Tag.Follow ? (Command1.FollowInfo)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.Follow, value); }
-
 		public ClaimOrRefreshResponse ClaimOrRefresh { get => this.Tag == Command1Tag.ClaimOrRefresh ? (ClaimOrRefreshResponse)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.ClaimOrRefresh, value); }
-
 		public Command1.ConfigureInfo Configure { get => this.Tag == Command1Tag.Configure ? (Command1.ConfigureInfo)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.Configure, value); }
-
 		public Command1.RegisterVoteInfo RegisterVote { get => this.Tag == Command1Tag.RegisterVote ? (Command1.RegisterVoteInfo)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.RegisterVote, value); }
-
 		public Command1.MergeInfo Merge { get => this.Tag == Command1Tag.Merge ? (Command1.MergeInfo)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.Merge, value); }
-
 		public SpawnResponse DisburseToNeuron { get => this.Tag == Command1Tag.DisburseToNeuron ? (SpawnResponse)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.DisburseToNeuron, value); }
-
 		public MakeProposalResponse MakeProposal { get => this.Tag == Command1Tag.MakeProposal ? (MakeProposalResponse)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.MakeProposal, value); }
-
 		public MergeMaturityResponse MergeMaturity { get => this.Tag == Command1Tag.MergeMaturity ? (MergeMaturityResponse)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.MergeMaturity, value); }
-
 		public DisburseResponse Disburse { get => this.Tag == Command1Tag.Disburse ? (DisburseResponse)this.Value! : default; set => (this.Tag, this.Value) = (Command1Tag.Disburse, value); }
 
 		public Command1(Command1Tag tag, object value)
@@ -772,21 +732,13 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public Spawn Spawn { get => this.Tag == Command2Tag.Spawn ? (Spawn)this.Value! : default; set => (this.Tag, this.Value) = (Command2Tag.Spawn, value); }
-
 		public Split Split { get => this.Tag == Command2Tag.Split ? (Split)this.Value! : default; set => (this.Tag, this.Value) = (Command2Tag.Split, value); }
-
 		public Configure Configure { get => this.Tag == Command2Tag.Configure ? (Configure)this.Value! : default; set => (this.Tag, this.Value) = (Command2Tag.Configure, value); }
-
 		public Merge Merge { get => this.Tag == Command2Tag.Merge ? (Merge)this.Value! : default; set => (this.Tag, this.Value) = (Command2Tag.Merge, value); }
-
 		public DisburseToNeuron DisburseToNeuron { get => this.Tag == Command2Tag.DisburseToNeuron ? (DisburseToNeuron)this.Value! : default; set => (this.Tag, this.Value) = (Command2Tag.DisburseToNeuron, value); }
-
 		public ClaimOrRefresh ClaimOrRefreshNeuron { get => this.Tag == Command2Tag.ClaimOrRefreshNeuron ? (ClaimOrRefresh)this.Value! : default; set => (this.Tag, this.Value) = (Command2Tag.ClaimOrRefreshNeuron, value); }
-
 		public MergeMaturity MergeMaturity { get => this.Tag == Command2Tag.MergeMaturity ? (MergeMaturity)this.Value! : default; set => (this.Tag, this.Value) = (Command2Tag.MergeMaturity, value); }
-
 		public Disburse Disburse { get => this.Tag == Command2Tag.Disburse ? (Disburse)this.Value! : default; set => (this.Tag, this.Value) = (Command2Tag.Disburse, value); }
 
 		public Command2(Command2Tag tag, object value)
@@ -941,9 +893,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public ulong? DissolveDelaySeconds { get => this.Tag == DissolveStateTag.DissolveDelaySeconds ? (ulong)this.Value! : default; set => (this.Tag, this.Value) = (DissolveStateTag.DissolveDelaySeconds, value); }
-
 		public ulong? WhenDissolvedTimestampSeconds { get => this.Tag == DissolveStateTag.WhenDissolvedTimestampSeconds ? (ulong)this.Value! : default; set => (this.Tag, this.Value) = (DissolveStateTag.WhenDissolvedTimestampSeconds, value); }
 
 		public DissolveState(DissolveStateTag tag, object value)
@@ -1817,9 +1767,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public List<byte> Subaccount { get => this.Tag == NeuronIdOrSubaccountTag.Subaccount ? (List<byte>)this.Value! : default; set => (this.Tag, this.Value) = (NeuronIdOrSubaccountTag.Subaccount, value); }
-
 		public NeuronId NeuronId { get => this.Tag == NeuronIdOrSubaccountTag.NeuronId ? (NeuronId)this.Value! : default; set => (this.Tag, this.Value) = (NeuronIdOrSubaccountTag.NeuronId, value); }
 
 		public NeuronIdOrSubaccount(NeuronIdOrSubaccountTag tag, object value)
@@ -2020,19 +1968,12 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public RemoveHotKey RemoveHotKey { get => this.Tag == OperationTag.RemoveHotKey ? (RemoveHotKey)this.Value! : default; set => (this.Tag, this.Value) = (OperationTag.RemoveHotKey, value); }
-
 		public AddHotKey AddHotKey { get => this.Tag == OperationTag.AddHotKey ? (AddHotKey)this.Value! : default; set => (this.Tag, this.Value) = (OperationTag.AddHotKey, value); }
-
 		public Operation.StopDissolvingInfo StopDissolving { get => this.Tag == OperationTag.StopDissolving ? (Operation.StopDissolvingInfo)this.Value! : default; set => (this.Tag, this.Value) = (OperationTag.StopDissolving, value); }
-
 		public Operation.StartDissolvingInfo StartDissolving { get => this.Tag == OperationTag.StartDissolving ? (Operation.StartDissolvingInfo)this.Value! : default; set => (this.Tag, this.Value) = (OperationTag.StartDissolving, value); }
-
 		public IncreaseDissolveDelay IncreaseDissolveDelay { get => this.Tag == OperationTag.IncreaseDissolveDelay ? (IncreaseDissolveDelay)this.Value! : default; set => (this.Tag, this.Value) = (OperationTag.IncreaseDissolveDelay, value); }
-
 		public Operation.JoinCommunityFundInfo JoinCommunityFund { get => this.Tag == OperationTag.JoinCommunityFund ? (Operation.JoinCommunityFundInfo)this.Value! : default; set => (this.Tag, this.Value) = (OperationTag.JoinCommunityFund, value); }
-
 		public SetDissolveTimestamp SetDissolveTimestamp { get => this.Tag == OperationTag.SetDissolveTimestamp ? (SetDissolveTimestamp)this.Value! : default; set => (this.Tag, this.Value) = (OperationTag.SetDissolveTimestamp, value); }
 
 		public Operation(OperationTag tag, object value)
@@ -2339,7 +2280,6 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public GovernanceError Err { get => this.Tag == ResultTag.Err ? (GovernanceError)this.Value! : default; set => (this.Tag, this.Value) = (ResultTag.Err, value); }
 
 		public Result(ResultTag tag, object value)
@@ -2375,9 +2315,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public GovernanceError Error { get => this.Tag == Result1Tag.Error ? (GovernanceError)this.Value! : default; set => (this.Tag, this.Value) = (Result1Tag.Error, value); }
-
 		public NeuronId NeuronId { get => this.Tag == Result1Tag.NeuronId ? (NeuronId)this.Value! : default; set => (this.Tag, this.Value) = (Result1Tag.NeuronId, value); }
 
 		public Result1(Result1Tag tag, object value)
@@ -2413,9 +2351,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public Neuron Ok { get => this.Tag == Result2Tag.Ok ? (Neuron)this.Value! : default; set => (this.Tag, this.Value) = (Result2Tag.Ok, value); }
-
 		public GovernanceError Err { get => this.Tag == Result2Tag.Err ? (GovernanceError)this.Value! : default; set => (this.Tag, this.Value) = (Result2Tag.Err, value); }
 
 		public Result2(Result2Tag tag, object value)
@@ -2451,9 +2387,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public RewardNodeProviders Ok { get => this.Tag == Result3Tag.Ok ? (RewardNodeProviders)this.Value! : default; set => (this.Tag, this.Value) = (Result3Tag.Ok, value); }
-
 		public GovernanceError Err { get => this.Tag == Result3Tag.Err ? (GovernanceError)this.Value! : default; set => (this.Tag, this.Value) = (Result3Tag.Err, value); }
 
 		public Result3(Result3Tag tag, object value)
@@ -2489,9 +2423,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public NeuronInfo Ok { get => this.Tag == Result4Tag.Ok ? (NeuronInfo)this.Value! : default; set => (this.Tag, this.Value) = (Result4Tag.Ok, value); }
-
 		public GovernanceError Err { get => this.Tag == Result4Tag.Err ? (GovernanceError)this.Value! : default; set => (this.Tag, this.Value) = (Result4Tag.Err, value); }
 
 		public Result4(Result4Tag tag, object value)
@@ -2527,9 +2459,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public NodeProvider Ok { get => this.Tag == Result5Tag.Ok ? (NodeProvider)this.Value! : default; set => (this.Tag, this.Value) = (Result5Tag.Ok, value); }
-
 		public GovernanceError Err { get => this.Tag == Result5Tag.Err ? (GovernanceError)this.Value! : default; set => (this.Tag, this.Value) = (Result5Tag.Err, value); }
 
 		public Result5(Result5Tag tag, object value)
@@ -2601,9 +2531,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public RewardToNeuron RewardToNeuron { get => this.Tag == RewardModeTag.RewardToNeuron ? (RewardToNeuron)this.Value! : default; set => (this.Tag, this.Value) = (RewardModeTag.RewardToNeuron, value); }
-
 		public RewardToAccount RewardToAccount { get => this.Tag == RewardModeTag.RewardToAccount ? (RewardToAccount)this.Value! : default; set => (this.Tag, this.Value) = (RewardModeTag.RewardToAccount, value); }
 
 		public RewardMode(RewardModeTag tag, object value)
