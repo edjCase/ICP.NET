@@ -1,7 +1,11 @@
+using System;
+using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.PocketIC;
 using EdjCase.ICP.PocketIC.Models;
+using Xunit;
 
 namespace EdjCase.ICP.PocketIC.Tests
 {
@@ -9,15 +13,13 @@ namespace EdjCase.ICP.PocketIC.Tests
 	{
 		private PocketIcServer server;
 
-		[OneTimeSetUp]
-		public async Task Setup()
+		public PocketIcTests()
 		{
 			// Start the server for all tests
-			this.server = await PocketIcServer.Start();
+			this.server = PocketIcServer.Start().GetAwaiter().GetResult();
 		}
 
-		[OneTimeTearDown]
-		public async Task Teardown()
+		public async ValueTask DisposeAsync()
 		{
 			// Stop the server after all tests
 			if (this.server != null)
@@ -27,7 +29,7 @@ namespace EdjCase.ICP.PocketIC.Tests
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task CreateCanisterAsync__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -41,7 +43,7 @@ namespace EdjCase.ICP.PocketIC.Tests
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task CreateAndInstallCanisterAsync__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -57,7 +59,7 @@ namespace EdjCase.ICP.PocketIC.Tests
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task Create_And_StartCanisterAsync__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -68,12 +70,10 @@ namespace EdjCase.ICP.PocketIC.Tests
 				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
 				await pocketIc.StartCanisterAsync(new StartCanisterRequest { CanisterId = response.CanisterId });
 
-				// No exception means success
-				Assert.Pass();
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task Create_And_StopCanisterAsync__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -84,12 +84,10 @@ namespace EdjCase.ICP.PocketIC.Tests
 				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
 				await pocketIc.StopCanisterAsync(new StopCanisterRequest { CanisterId = response.CanisterId });
 
-				// No exception means success
-				Assert.Pass();
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task Create_And_InstallCodeAsync__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -108,12 +106,10 @@ namespace EdjCase.ICP.PocketIC.Tests
 					Mode = InstallCodeMode.Install
 				});
 
-				// No exception means success
-				Assert.Pass();
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task QueryCallAsync_CounterWasm__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -124,7 +120,7 @@ namespace EdjCase.ICP.PocketIC.Tests
 			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
 			{
 				Principal canisterId = await pocketIc.CreateAndInstallCanisterAsync(wasmModule, arg);
-				var result = await pocketIc.QueryCallNoRequestAsync<UnboundedUInt>(
+				var result = await pocketIc.QueryCallAsync<UnboundedUInt>(
 					Principal.Anonymous(),
 					canisterId,
 					"get"
@@ -134,7 +130,7 @@ namespace EdjCase.ICP.PocketIC.Tests
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task UpdateCallAsync_CounterWasm__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -145,17 +141,16 @@ namespace EdjCase.ICP.PocketIC.Tests
 			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
 			{
 				Principal canisterId = await pocketIc.CreateAndInstallCanisterAsync(wasmModule, arg);
-				await pocketIc.UpdateCallNoRequestOrResponseAsync(
+				await pocketIc.UpdateCallNoResponseAsync(
 					Principal.Anonymous(),
 					canisterId,
 					"inc"
 				);
 
-				Assert.Pass();
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task TickAsync__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -164,13 +159,10 @@ namespace EdjCase.ICP.PocketIC.Tests
 			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
 			{
 				await pocketIc.TickAsync();
-
-				// No exception means success
-				Assert.Pass();
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task GetTimeAsync__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -184,7 +176,7 @@ namespace EdjCase.ICP.PocketIC.Tests
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task AdvanceTimeAsync__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -198,20 +190,17 @@ namespace EdjCase.ICP.PocketIC.Tests
 
 				ICTimestamp newTime = await pocketIc.GetTimeAsync();
 
-				Assert.That(newTime.NanoSeconds, Is.EqualTo(initialTime.NanoSeconds + 60_000_000_000ul));
+				Assert.Equal(initialTime.NanoSeconds + 60_000_000_000ul, newTime.NanoSeconds);
 
 				await pocketIc.SetTimeAsync(initialTime);
 
 				ICTimestamp resetTime = await pocketIc.GetTimeAsync();
 
-				Assert.That(resetTime.NanoSeconds, Is.EqualTo(initialTime.NanoSeconds));
-
-				// No exception means success
-				Assert.Pass();
+				Assert.Equal(initialTime.NanoSeconds, resetTime.NanoSeconds);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task GetCanisterSubnetIdAsync_Basic_Valid()
 		{
 			string url = this.server.GetUrl();

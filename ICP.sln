@@ -51,9 +51,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSockets.Tests", "test\We
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BLS.Tests", "test\BLS.Tests\BLS.Tests.csproj", "{213F30BA-D147-4291-93A3-13A8A006126D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdjCase.ICP.PocketIC", "src\PocketIC\EdjCase.ICP.PocketIC.csproj", "{051EE789-4283-48DA-81EF-4B8ADFD406D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EdjCase.ICP.PocketIC", "src\PocketIC\EdjCase.ICP.PocketIC.csproj", "{051EE789-4283-48DA-81EF-4B8ADFD406D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.PocketIC", "samples\Sample.PocketIC\Sample.PocketIC.csproj", "{E674253B-7B51-40D0-9F3D-805007174D31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.PocketIC", "samples\Sample.PocketIC\Sample.PocketIC.csproj", "{E674253B-7B51-40D0-9F3D-805007174D31}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PocketIC.Tests", "test\PocketIC.Tests\PocketIC.Tests.csproj", "{02D1DDA8-7A9A-4355-BE95-DE1720D56055}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,10 @@ Global
 		{E674253B-7B51-40D0-9F3D-805007174D31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E674253B-7B51-40D0-9F3D-805007174D31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E674253B-7B51-40D0-9F3D-805007174D31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02D1DDA8-7A9A-4355-BE95-DE1720D56055}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02D1DDA8-7A9A-4355-BE95-DE1720D56055}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02D1DDA8-7A9A-4355-BE95-DE1720D56055}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02D1DDA8-7A9A-4355-BE95-DE1720D56055}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +152,7 @@ Global
 		{3015AFBC-B866-459F-B25C-4BEA00C2A91E} = {F71B8320-C279-4A79-A8D4-4039DB39D522}
 		{213F30BA-D147-4291-93A3-13A8A006126D} = {F71B8320-C279-4A79-A8D4-4039DB39D522}
 		{E674253B-7B51-40D0-9F3D-805007174D31} = {7FADA9D9-5FDA-4CFB-8A53-A578A61FBBA9}
+		{02D1DDA8-7A9A-4355-BE95-DE1720D56055} = {F71B8320-C279-4A79-A8D4-4039DB39D522}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3103E11A-E792-49EE-98C5-B2F3709DB088}

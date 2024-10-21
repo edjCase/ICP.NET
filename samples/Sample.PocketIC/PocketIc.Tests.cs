@@ -2,6 +2,7 @@ using System.Net;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.PocketIC;
 using EdjCase.ICP.PocketIC.Models;
+using Xunit;
 
 namespace Sample.PocketIC
 {
@@ -9,15 +10,13 @@ namespace Sample.PocketIC
 	{
 		private PocketIcServer server;
 
-		[OneTimeSetUp]
-		public async Task Setup()
+		public PocketIcTests()
 		{
 			// Start the server for all tests
-			this.server = await PocketIcServer.Start();
+			this.server = PocketIcServer.Start().GetAwaiter().GetResult();
 		}
 
-		[OneTimeTearDown]
-		public async Task Teardown()
+		public async ValueTask DisposeAsync()
 		{
 			// Stop the server after all tests
 			if (this.server != null)
@@ -27,7 +26,7 @@ namespace Sample.PocketIC
 			}
 		}
 
-		[Test]
+		[Fact]
 		public async Task UpdateCallAsync_CounterWasm__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
@@ -44,7 +43,7 @@ namespace Sample.PocketIC
 					canisterId,
 					"get"
 				);
-				Assert.That(value, Is.EqualTo((UnboundedUInt)0));
+				Assert.Equal((UnboundedUInt)0, value);
 
 
 				await pocketIc.UpdateCallNoResponseAsync(
@@ -58,7 +57,7 @@ namespace Sample.PocketIC
 					canisterId,
 					"get"
 				);
-				Assert.That(value, Is.EqualTo((UnboundedUInt)1));
+				Assert.Equal((UnboundedUInt)1, value);
 
 				await pocketIc.UpdateCallNoResponseAsync(
 					Principal.Anonymous(),
@@ -73,7 +72,7 @@ namespace Sample.PocketIC
 					"get"
 				);
 
-				Assert.That(value, Is.EqualTo((UnboundedUInt)10));
+				Assert.Equal((UnboundedUInt)10, value);
 			}
 		}
 	}
