@@ -21,6 +21,16 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// </summary>
 		public bool IsOpaqueReference { get; }
 
+		/// <summary>
+		/// service of the function
+		/// </summary>
+		public CandidService? Service => this.serviceInfo!.Value.Service;
+
+		/// <summary>
+		/// Method of the function
+		/// </summary>
+		public string? Method => this.serviceInfo!.Value.Method;
+
 		private readonly (CandidService Service, string Method)? serviceInfo;
 
 		/// <param name="service">The candid service definition the function lives in</param>
