@@ -6,28 +6,12 @@
 
 		<IsPackable>false</IsPackable>
 
-		<RootNamespace>EdjCase.ICP.Candid.Tests</RootNamespace>
+		<RootNamespace>EdjCase.ICP.PocketIC.Tests</RootNamespace>
 		<UseAppHost>true</UseAppHost>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Generators\Files\AnonymousTuples.did" />
-	  <None Remove="Generators\Files\Dex.did" />
-	  <None Remove="Generators\Files\DuplicatePropertyNames.did" />
-	  <None Remove="Generators\Files\Governance.did" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="Generators\Files\DuplicatePropertyNames.did" />
-	  <EmbeddedResource Include="Generators\Files\AnonymousTuples.did" />
-	  <EmbeddedResource Include="Generators\Files\Dex.did" />
-	  <EmbeddedResource Include="Generators\Files\Governance.did" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-		<PackageReference Include="Moq" Version="4.20.72" />
-		<PackageReference Include="Snapshooter.Xunit" Version="0.14.1" />
 		<PackageReference Include="xunit" Version="2.9.2" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -44,13 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Candid\EdjCase.ICP.Candid.csproj" />
-		<ProjectReference Include="..\..\src\Agent\EdjCase.ICP.Agent.csproj" />
-		<ProjectReference Include="..\..\src\ClientGenerator\EdjCase.ICP.ClientGenerator.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Generators\__snapshots__\" />
+		<ProjectReference Include="..\..\src\Agent\EdjCase.ICP.PocketIC.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using EdjCase.ICP.Candid;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.PocketIC.Client;
@@ -21,7 +22,7 @@ namespace EdjCase.ICP.PocketIC
 			this.candidConverter = candidConverter ?? CandidConverter.Default;
 		}
 
-		public async Task<Principal> SetupCanisterAsync(
+		public async Task<Principal> CreateAndInstallCanisterAsync(
 			byte[] wasmModule,
 			CandidArg arg, // TODO can we take in a generic arg type? but issue is there can be multiple args
 			CreateCanisterRequest? request = null
@@ -80,30 +81,7 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
-
-		public async Task<TResponse> QueryCallAsync<TRequest, TResponse>(
-			Principal sender,
-			Principal canisterId,
-			string method,
-			TRequest request,
-			EffectivePrincipal? effectivePrincipal = null
-		)
-			where TRequest : notnull
-		{
-			CandidTypedValue requestValue = this.candidConverter.FromTypedObject(request);
-			CandidArg arg = CandidArg.FromCandid(requestValue);
-			CandidArg responseArg = await this.QueryCallRawAsync(
-				sender,
-				canisterId,
-				method,
-				arg,
-				effectivePrincipal
-			);
-			return responseArg.ToObjects<TResponse>(this.candidConverter);
-		}
-
-
-		public async Task<TResponse> QueryCallNoRequestAsync<TResponse>(
+		public async Task<TResponse> QueryCallAsync<TResponse>(
 			Principal sender,
 			Principal canisterId,
 			string method,
@@ -121,7 +99,80 @@ namespace EdjCase.ICP.PocketIC
 			return responseArg.ToObjects<TResponse>(this.candidConverter);
 		}
 
+		public async Task<TResponse> QueryCallAsync<T1, TResponse>(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			T1 p1,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+			where T1 : notnull
+		{
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1)
+			);
+			CandidArg responseArg = await this.QueryCallRawAsync(
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+			return responseArg.ToObjects<TResponse>(this.candidConverter);
+		}
 
+		public async Task<TResponse> QueryCallAsync<T1, T2, TResponse>(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			T1 p1,
+			T2 p2,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+			where T1 : notnull
+			where T2 : notnull
+		{
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1),
+				this.candidConverter.FromTypedObject(p2)
+			);
+			CandidArg responseArg = await this.QueryCallRawAsync(
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+			return responseArg.ToObjects<TResponse>(this.candidConverter);
+		}
+
+		public async Task<TResponse> QueryCallAsync<T1, T2, T3, TResponse>(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			T1 p1,
+			T2 p2,
+			T3 p3,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+		{
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1),
+				this.candidConverter.FromTypedObject(p2),
+				this.candidConverter.FromTypedObject(p3)
+			);
+			CandidArg responseArg = await this.QueryCallRawAsync(
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+			return responseArg.ToObjects<TResponse>(this.candidConverter);
+		}
 
 		public async Task<CandidArg> QueryCallRawAsync(
 			Principal sender,
@@ -140,28 +191,7 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
-		public async Task<TResponse> UpdateCallAsync<TRequest, TResponse>(
-			Principal sender,
-			Principal canisterId,
-			string method,
-			TRequest request,
-			EffectivePrincipal? effectivePrincipal = null
-		)
-			where TRequest : notnull
-		{
-			CandidTypedValue requestValue = this.candidConverter.FromTypedObject(request);
-			CandidArg arg = CandidArg.FromCandid(requestValue);
-			CandidArg responseArg = await this.UpdateCallRawAsync(
-				sender,
-				canisterId,
-				method,
-				arg,
-				effectivePrincipal
-			);
-			return responseArg.ToObjects<TResponse>(this.candidConverter);
-		}
-
-		public async Task<TResponse> UpdateCallNoRequestAsync<TResponse>(
+		public async Task<TResponse> UpdateCallAsync<TResponse>(
 			Principal sender,
 			Principal canisterId,
 			string method,
@@ -179,17 +209,89 @@ namespace EdjCase.ICP.PocketIC
 			return responseArg.ToObjects<TResponse>(this.candidConverter);
 		}
 
-		public async Task UpdateCallNoResponseAsync<TRequest>(
+		public async Task<TResponse> UpdateCallAsync<T1, TResponse>(
 			Principal sender,
 			Principal canisterId,
 			string method,
-			TRequest request,
+			T1 p1,
 			EffectivePrincipal? effectivePrincipal = null
 		)
-			where TRequest : notnull
+			where T1 : notnull
 		{
-			CandidTypedValue requestValue = this.candidConverter.FromTypedObject(request);
-			CandidArg arg = CandidArg.FromCandid(requestValue);
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1)
+			);
+			CandidArg responseArg = await this.UpdateCallRawAsync(
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+			return responseArg.ToObjects<TResponse>(this.candidConverter);
+		}
+
+		public async Task<TResponse> UpdateCallAsync<T1, T2, TResponse>(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			T1 p1,
+			T2 p2,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+			where T1 : notnull
+			where T2 : notnull
+		{
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1),
+				this.candidConverter.FromTypedObject(p2)
+			);
+			CandidArg responseArg = await this.UpdateCallRawAsync(
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+			return responseArg.ToObjects<TResponse>(this.candidConverter);
+		}
+
+		public async Task<TResponse> UpdateCallAsync<T1, T2, T3, TResponse>(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			T1 p1,
+			T2 p2,
+			T3 p3,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+		{
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1),
+				this.candidConverter.FromTypedObject(p2),
+				this.candidConverter.FromTypedObject(p3)
+			);
+			CandidArg responseArg = await this.UpdateCallRawAsync(
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+			return responseArg.ToObjects<TResponse>(this.candidConverter);
+		}
+
+		public async Task UpdateCallNoResponseAsync(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+		{
+			CandidArg arg = CandidArg.FromCandid();
 			await this.UpdateCallRawAsync(
 				sender,
 				canisterId,
@@ -199,14 +301,69 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
-		public async Task UpdateCallNoRequestOrResponseAsync(
+		public async Task UpdateCallNoResponseAsync<T1>(
 			Principal sender,
 			Principal canisterId,
 			string method,
+			T1 p1,
 			EffectivePrincipal? effectivePrincipal = null
 		)
+			where T1 : notnull
 		{
-			CandidArg arg = CandidArg.FromCandid();
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1)
+			);
+			await this.UpdateCallRawAsync(
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+		}
+
+		public async Task UpdateCallNoResponseAsync<T1, T2>(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			T1 p1,
+			T2 p2,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+			where T1 : notnull
+			where T2 : notnull
+		{
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1),
+				this.candidConverter.FromTypedObject(p2)
+			);
+			await this.UpdateCallRawAsync(
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+		}
+
+		public async Task UpdateCallNoResponseAsync<T1, T2, T3>(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			T1 p1,
+			T2 p2,
+			T3 p3,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+		{
+			CandidArg arg = CandidArg.FromCandid(
+				this.candidConverter.FromTypedObject(p1),
+				this.candidConverter.FromTypedObject(p2),
+				this.candidConverter.FromTypedObject(p3)
+			);
 			await this.UpdateCallRawAsync(
 				sender,
 				canisterId,
@@ -265,12 +422,12 @@ namespace EdjCase.ICP.PocketIC
 			await this.SetTimeAsync(newTime);
 		}
 
-		public Task<byte[]> GetPublicKeyAsync(Principal subnetId)
+		public Task<Principal> GetPublicKeyAsync(Principal subnetId)
 		{
 			return this.client.GetPublicKeyAsync(subnetId);
 		}
 
-		public Task<Principal?> GetCanisterSubnetIdAsync(Principal canisterId)
+		public Task<Principal> GetCanisterSubnetIdAsync(Principal canisterId)
 		{
 			return this.client.GetCanisterSubnetIdAsync(canisterId);
 		}

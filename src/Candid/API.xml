@@ -2691,6 +2691,11 @@
             otherwise false
             </summary>
         </member>
+        <member name="P:EdjCase.ICP.Candid.Models.Values.CandidFunc.ServiceInfo">
+            <summary>
+            Specifies the service and method of the func if is not an opaque reference, otherwise will be null
+            </summary>
+        </member>
         <member name="M:EdjCase.ICP.Candid.Models.Values.CandidFunc.#ctor(EdjCase.ICP.Candid.Models.Values.CandidService,System.String)">
             <param name="service">The candid service definition the function lives in</param>
             <param name="name">The name of the function</param>

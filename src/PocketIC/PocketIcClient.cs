@@ -31,14 +31,15 @@ namespace EdjCase.ICP.PocketIC.Client
 			await this.PostAsync("/update/tick", null);
 		}
 
-		public async Task<byte[]> GetPublicKeyAsync(Principal subnetId)
+		public async Task<Principal> GetPublicKeyAsync(Principal subnetId)
 		{
 			var request = new JsonObject
 			{
 				["subnet_id"] = Convert.ToBase64String(subnetId.Raw)
 			};
 			JsonNode? response = await this.PostAsync("/read/pub_key", request);
-			return response!["public_key"].Deserialize<byte[]>()!;
+			byte[] publicKey = response!["public_key"].Deserialize<byte[]>()!;
+			return Principal.FromBytes(publicKey);
 		}
 
 		public Dictionary<string, SubnetTopology> GetTopology()
@@ -148,14 +149,15 @@ namespace EdjCase.ICP.PocketIC.Client
 			}
 			return CandidArg.FromBytes(candidBytes);
 		}
-		public async Task<Principal?> GetCanisterSubnetIdAsync(Principal canisterId)
+		public async Task<Principal> GetCanisterSubnetIdAsync(Principal canisterId)
 		{
 			var request = new JsonObject
 			{
 				["canister_id"] = Convert.ToBase64String(canisterId.Raw)
 			};
 			JsonNode? response = await this.PostAsync("/read/get_subnet", request);
-			return response!["subnet_id"].Deserialize<Principal>();
+			byte[] subnetId = response!["subnet_id"].Deserialize<byte[]>()!;
+			return Principal.FromBytes(subnetId);
 		}
 
 		public async Task<ulong> GetCyclesBalanceAsync(Principal canisterId)

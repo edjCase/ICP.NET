@@ -11,9 +11,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup Dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 8.0.x
 
       - name: Pack Candid
         run: dotnet pack src/Candid/EdjCase.ICP.Candid.csproj --configuration Release /p:Version=${{ github.event.release.tag_name }} --output . --include-symbols --include-source
@@ -32,6 +32,12 @@ jobs:
 
       - name: Push Agent
         run: dotnet nuget push EdjCase.ICP.Agent.${{ github.event.release.tag_name }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+      - name: Pack Agent
+        run: dotnet pack src/PocketIC/EdjCase.ICP.PocketIC.csproj --configuration Release /p:Version=${{ github.event.release.tag_name }} --output . --include-symbols --include-source
+
+      - name: Push PocketIC
+        run: dotnet nuget push EdjCase.ICP.PocketIC.${{ github.event.release.tag_name }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
       - name: Pack WebSockets
         run: dotnet pack src/WebSockets/EdjCase.ICP.WebSockets.csproj --configuration Release /p:Version=${{ github.event.release.tag_name }} --output . --include-symbols --include-source

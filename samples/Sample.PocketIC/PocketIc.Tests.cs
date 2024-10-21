@@ -12,12 +12,14 @@ namespace Sample.PocketIC
 		[OneTimeSetUp]
 		public async Task Setup()
 		{
+			// Start the server for all tests
 			this.server = await PocketIcServer.Start();
 		}
 
 		[OneTimeTearDown]
 		public async Task Teardown()
 		{
+			// Stop the server after all tests
 			if (this.server != null)
 			{
 				await this.server.Stop();
@@ -26,163 +28,52 @@ namespace Sample.PocketIC
 		}
 
 		[Test]
-		public async Task CreateCanisterAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
-
-				Assert.NotNull(response);
-				Assert.NotNull(response.CanisterId);
-			}
-		}
-
-		[Test]
-		public async Task SetupCanisterAsync__Basic__Valid()
+		public async Task UpdateCallAsync_CounterWasm__Basic__Valid()
 		{
 			string url = this.server.GetUrl();
 			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
 			CandidArg arg = CandidArg.FromCandid();
 
+			// Create new pocketic instance for test, then dispose it
 			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
 			{
-				Principal canisterId = await pocketIc.SetupCanisterAsync(wasmModule, arg);
+				Principal canisterId = await pocketIc.CreateAndInstallCanisterAsync(wasmModule, arg);
 
-				Assert.NotNull(canisterId);
-			}
-		}
-
-		[Test]
-		public async Task StartCanisterAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
-				await pocketIc.StartCanisterAsync(new StartCanisterRequest { CanisterId = response.CanisterId });
-
-				// No exception means success
-				Assert.Pass();
-			}
-		}
-
-		[Test]
-		public async Task StopCanisterAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
-				await pocketIc.StopCanisterAsync(new StopCanisterRequest { CanisterId = response.CanisterId });
-
-				// No exception means success
-				Assert.Pass();
-			}
-		}
-
-		[Test]
-		public async Task InstallCodeAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
-			CandidArg arg = CandidArg.FromCandid();
-
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
-				await pocketIc.InstallCodeAsync(new InstallCodeRequest
-				{
-					CanisterId = response.CanisterId,
-					WasmModule = wasmModule,
-					Arg = arg.Encode(),
-					Mode = InstallCodeMode.Install
-				});
-
-				// No exception means success
-				Assert.Pass();
-			}
-		}
-
-		[Test]
-		public async Task QueryCallAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
-			CandidArg arg = CandidArg.FromCandid();
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				Principal canisterId = await pocketIc.SetupCanisterAsync(wasmModule, arg);
-				var result = await pocketIc.QueryCallNoRequestAsync<UnboundedUInt>(
+				UnboundedUInt value = await pocketIc.QueryCallAsync<UnboundedUInt>(
 					Principal.Anonymous(),
 					canisterId,
 					"get"
 				);
+				Assert.That(value, Is.EqualTo((UnboundedUInt)0));
 
-				Assert.NotNull(result);
-			}
-		}
 
-		[Test]
-		public async Task UpdateCallAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
-			CandidArg arg = CandidArg.FromCandid();
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				Principal canisterId = await pocketIc.SetupCanisterAsync(wasmModule, arg);
-				await pocketIc.UpdateCallNoRequestOrResponseAsync(
+				await pocketIc.UpdateCallNoResponseAsync(
 					Principal.Anonymous(),
 					canisterId,
 					"inc"
 				);
 
-				Assert.Pass();
-			}
-		}
+				value = await pocketIc.QueryCallAsync<UnboundedUInt>(
+					Principal.Anonymous(),
+					canisterId,
+					"get"
+				);
+				Assert.That(value, Is.EqualTo((UnboundedUInt)1));
 
-		[Test]
-		public async Task TickAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				await pocketIc.TickAsync();
+				await pocketIc.UpdateCallNoResponseAsync(
+					Principal.Anonymous(),
+					canisterId,
+					"set",
+					(UnboundedUInt)10
+				);
 
-				// No exception means success
-				Assert.Pass();
-			}
-		}
+				value = await pocketIc.QueryCallAsync<UnboundedUInt>(
+					Principal.Anonymous(),
+					canisterId,
+					"get"
+				);
 
-		[Test]
-		public async Task GetTimeAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				var time = await pocketIc.GetTimeAsync();
-
-				Assert.NotNull(time);
-			}
-		}
-
-		[Test]
-		public async Task AdvanceTimeAsync__Basic__Valid()
-		{
-			string url = this.server.GetUrl();
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
-			{
-				ICTimestamp initialTime = await pocketIc.GetTimeAsync();
-
-				await pocketIc.AdvanceTimeAsync(TimeSpan.FromMinutes(1));
-
-				ICTimestamp newTime = await pocketIc.GetTimeAsync();
-
-				Assert.That(newTime.NanoSeconds, Is.EqualTo(initialTime.NanoSeconds + 60_000_000_000ul));
-
-				// No exception means success
-				Assert.Pass();
+				Assert.That(value, Is.EqualTo((UnboundedUInt)10));
 			}
 		}
 	}
