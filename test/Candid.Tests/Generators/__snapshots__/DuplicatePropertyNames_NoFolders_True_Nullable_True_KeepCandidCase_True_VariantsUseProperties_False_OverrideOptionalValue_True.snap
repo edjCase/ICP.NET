@@ -10,9 +10,7 @@ namespace Test
 	public class DuplicatePropertyNamesApiClient
 	{
 		public IAgent Agent { get; }
-
 		public Principal CanisterId { get; }
-
 		public CandidConverter? Converter { get; }
 
 		public DuplicatePropertyNamesApiClient(IAgent agent, Principal canisterId, CandidConverter? converter = default)
@@ -39,7 +37,6 @@ namespace Test
 	public class Result
 	{
 		public ulong a { get; set; }
-
 		public ulong _a { get; set; }
 
 		public Result(ulong a, ulong _a)
