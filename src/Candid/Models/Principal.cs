@@ -105,7 +105,7 @@ namespace EdjCase.ICP.Candid.Models
 		///
 		/// The method expects a sub-account byte array of exactly 32 bytes in length. If the provided array does not meet this
 		/// requirement, an <see cref="ArgumentException"/> is thrown.
-		/// 
+		///
 		/// The account identifier format follows the specification:
 		/// account_identifier(principal, subaccount_identifier) = CRC32(h) || h
 		/// where h = sha224("\x0Aaccount-id" || principal || subaccount_identifier).
@@ -119,7 +119,7 @@ namespace EdjCase.ICP.Candid.Models
 			if (subAccount == null)
 			{
 				// Empty byte array of 32 bytes for no subaccount
-				subAccount = new byte[32]; 
+				subAccount = new byte[32];
 			}
 			// Ensure the subAccount is of expected length (32 bytes)
 			if (subAccount.Length != 32)
@@ -147,9 +147,9 @@ namespace EdjCase.ICP.Candid.Models
 		}
 
 		/// <summary>
-		/// Helper method to create the principal for the Internet Computer management cansiter "aaaaa-aa"
+		/// Helper method to create the principal for the Internet Computer management canister "aaaaa-aa"
 		/// </summary>
-		/// <returns>Principal for the management cansiter</returns>
+		/// <returns>Principal for the management canister</returns>
 		public static Principal ManagementCanisterId()
 		{
 			return new Principal(PrincipalType.Opaque, new byte[0]);

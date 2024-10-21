@@ -113,7 +113,7 @@
         </member>
         <member name="T:EdjCase.ICP.Agent.Agents.IAgent">
             <summary>
-            An agent is used to communicate with the Internet Computer with certain protocols that 
+            An agent is used to communicate with the Internet Computer with certain protocols that
             are specific to an `IAgent` implementation
             </summary>
         </member>
@@ -130,7 +130,7 @@
             <param name="canisterId">Canister to read state for</param>
             <param name="paths">The state paths to get information for. Other state data will be pruned if not specified</param>
             <param name="cancellationToken">Optional. Token to cancel request</param>
-            <returns>A response that contains the certificate of the current cansiter state</returns>
+            <returns>A response that contains the certificate of the current canister state</returns>
         </member>
         <member name="M:EdjCase.ICP.Agent.Agents.IAgent.GetRequestStatusAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,System.Nullable{System.Threading.CancellationToken})">
             <summary>
@@ -143,12 +143,12 @@
         </member>
         <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
-            Sends a call request to a specified canister method and gets back an id of the 
+            Sends a call request to a specified canister method and gets back an id of the
             request that is being processed. This call does NOT wait for the request to be complete.
             Either check the status with `GetRequestStatusAsync` or use the `CallAndWaitAsync` method
             </summary>
             <param name="canisterId">Canister to read state for</param>
-            <param name="method">The name of the method to call on the cansiter</param>
+            <param name="method">The name of the method to call on the canister</param>
             <param name="arg">The candid arg to send with the request</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
             <param name="cancellationToken">Optional. Token to cancel request</param>
@@ -166,7 +166,7 @@
             Sends a query request to a specified canister method
             </summary>
             <param name="canisterId">Canister to read state for</param>
-            <param name="method">The name of the method to call on the cansiter</param>
+            <param name="method">The name of the method to call on the canister</param>
             <param name="arg">The candid arg to send with the request</param>
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>The response data of the query call</returns>
@@ -191,7 +191,7 @@
             </summary>
             <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister to read state for</param>
-            <param name="method">The name of the method to call on the cansiter</param>
+            <param name="method">The name of the method to call on the canister</param>
             <param name="arg">The candid arg to send with the request</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
             <param name="cancellationToken">Optional. Token to cancel request</param>
@@ -1004,7 +1004,7 @@
         </member>
         <member name="F:EdjCase.ICP.Agent.Responses.QueryResponseType.Rejected">
             <summary>
-            When the cansiter request has errors to query request
+            When the canister request has errors to query request
             </summary>
         </member>
         <member name="T:EdjCase.ICP.Agent.Responses.QueryRejectInfo">

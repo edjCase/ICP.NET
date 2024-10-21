@@ -20,59 +20,70 @@ namespace EdjCase.ICP.ClientGenerator
 		/// The name of the client class and file to use
 		/// </summary>
 		public string Name { get; }
+
 		/// <summary>
 		/// If true, will treat `FilePathOrCanisterId` as a canister id and get the definition from the canister. Otherwise will treat it as a file path and get the definition from the file
 		/// </summary>
-		public bool GetDefinitionFromCansiter { get; }
+		public bool GetDefinitionFromCanister { get; }
+
 		/// <summary>
-		/// The file path to a local *.did file to get definition from or the canister id, depending on `GetDefinitionFromCansiter` value
+		/// The file path to a local *.did file to get definition from or the canister id, depending on `GetDefinitionFromCanister` value
 		/// </summary>
 		public string FilePathOrCanisterId { get; }
+
 		/// <summary>
 		/// If true, removes all files in the output directory before regeneration, otherwise does nothing. Defaults to true
 		/// </summary>
 		public bool PurgeOutputDirectory { get; }
+
 		/// <summary>
 		/// The base namespace to use in the generated files
 		/// </summary>
 		public string Namespace { get; }
+
 		/// <summary>
 		/// If true, there will be no folders, all files will be in the same directory
 		/// </summary>
 		public string OutputDirectory { get; }
+
 		/// <summary>
 		/// If true, there will be no folders, all files will be in the same directory
 		/// </summary>
 		public bool NoFolders { get; }
+
 		/// <summary>
 		/// If true, the nullable C# feature will be used
 		/// </summary>
 		public bool FeatureNullable { get; }
+
 		/// <summary>
 		/// If true, variant classes will be generated with properties instead of methods
 		/// </summary>
 		public bool VariantsUseProperties { get; }
+
 		/// <summary>
 		/// If true, the names of properties and methods will keep the raw candid name.
 		/// Otherwise they will be converted to something prettier
 		/// </summary>
 		public bool KeepCandidCase { get; }
+
 		/// <summary>
 		/// If true, OptionalValue will be used for opt values
 		/// Otherwise will use just the nullable class values or nullable struct
 		/// Defaults to true
 		/// </summary>
 		public bool OverrideOptionalValue { get; }
+
 		/// <summary>
 		/// Optional. The url of the boundry node for the internet computer. Defaults to ic0.app
 		/// </summary>
 		public Uri? BoundryNodeUrl { get; }
+
 		/// <summary>
 		/// Optional. Specifies options for each candid type in the definition.
 		/// Only supports named types, no anonymous types
 		/// </summary>
 		public Dictionary<string, NamedTypeOptions> Types { get; }
-
 
 
 		/// <param name="name">The name of the client class and file to use</param>
@@ -108,10 +119,11 @@ namespace EdjCase.ICP.ClientGenerator
 			{
 				throw new ArgumentNullException(nameof(name));
 			}
+
 			// Trim whitespace and replace spaces with underscores
 			this.Name = StringUtil.ToPascalCase(name.Trim().Replace(' ', '_'));
 			this.Namespace = @namespace ?? throw new ArgumentNullException(nameof(@namespace));
-			this.GetDefinitionFromCansiter = getDefinitionFromCanister;
+			this.GetDefinitionFromCanister = getDefinitionFromCanister;
 			this.FilePathOrCanisterId = filePathOrCandidId;
 			this.OutputDirectory = outputDirectory;
 			this.PurgeOutputDirectory = purgeOutputDirectory;
@@ -135,6 +147,7 @@ namespace EdjCase.ICP.ClientGenerator
 		/// Optional. The C# type name to use instead of the default
 		/// </summary>
 		public string? NameOverride { get; }
+
 		/// <summary>
 		/// Optional. The field or option type information
 		/// </summary>
@@ -161,10 +174,12 @@ namespace EdjCase.ICP.ClientGenerator
 		/// Optional. The type options for each of the records fields or variant options
 		/// </summary>
 		public Dictionary<string, NamedTypeOptions> Fields { get; }
+
 		/// <summary>
 		/// Optional. The type options for the sub type of a vec or opt
 		/// </summary>
 		public TypeOptions? InnerType { get; }
+
 		/// <summary>
 		/// Optional. How the type should be represented in C#
 		/// </summary>

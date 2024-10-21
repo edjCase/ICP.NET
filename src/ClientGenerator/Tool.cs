@@ -89,10 +89,10 @@ file-path = ""../MyService.did""
 
 # Will make generated files in a flat structure with no folders, for this client
 #no-folders = true
-				
+
 # Can specify multiple clients by creating another [[clients]]
 #[[clients]]
-#name = ""MyClient2"" 
+#name = ""MyClient2""
 #type = ""file""
 #file-path = ""../MyService2.did""
 				";
@@ -117,7 +117,7 @@ file-path = ""../MyService.did""
 				foreach (ClientGenerationOptions clientOptions in clientOptionList)
 				{
 					ClientSyntax source;
-					if (clientOptions.GetDefinitionFromCansiter)
+					if (clientOptions.GetDefinitionFromCanister)
 					{
 						string canisterIdString = clientOptions.FilePathOrCanisterId;
 						Principal canisterId = Principal.FromText(canisterIdString);

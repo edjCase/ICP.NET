@@ -1660,7 +1660,7 @@
             
              The method expects a sub-account byte array of exactly 32 bytes in length. If the provided array does not meet this
              requirement, an <see cref="T:System.ArgumentException"/> is thrown.
-             
+            
              The account identifier format follows the specification:
              account_identifier(principal, subaccount_identifier) = CRC32(h) || h
              where h = sha224("\x0Aaccount-id" || principal || subaccount_identifier).
@@ -1671,9 +1671,9 @@
         </member>
         <member name="M:EdjCase.ICP.Candid.Models.Principal.ManagementCanisterId">
             <summary>
-            Helper method to create the principal for the Internet Computer management cansiter "aaaaa-aa"
+            Helper method to create the principal for the Internet Computer management canister "aaaaa-aa"
             </summary>
-            <returns>Principal for the management cansiter</returns>
+            <returns>Principal for the management canister</returns>
         </member>
         <member name="M:EdjCase.ICP.Candid.Models.Principal.FromBytes(System.Byte[])">
             <summary>
