@@ -20,7 +20,7 @@ Collection of Internet Computer Protocol (ICP) libraries for .NET/Blazor/Unity
 - Start coding 💻
 
 # 📡 Generating a client for a canister
-You can specify all the models and api calls yourself, but this is a tool to automatically generate a client and models based on the cansiter or .did file
+You can specify all the models and api calls yourself, but this is a tool to automatically generate a client and models based on the canister or .did file
 - Prerequisite: Have .Net 6 installed (https://dotnet.microsoft.com/en-us/download/dotnet)
 - Navigate to directory of .Net project
   ```
