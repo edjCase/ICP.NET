@@ -4,45 +4,6 @@
         <name>EdjCase.ICP.Agent</name>
     </assembly>
     <members>
-        <member name="T:EdjCase.ICP.Agent.Agents.HttpAgent">
-            <summary>
-            An `IAgent` implementation using HTTP to make requests to the IC
-            </summary>
-        </member>
-        <member name="P:EdjCase.ICP.Agent.Agents.HttpAgent.Identity">
-            <summary>
-            The identity that will be used on each request unless overriden
-            This identity can be anonymous
-            </summary>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.#ctor(EdjCase.ICP.Agent.Agents.Http.IHttpClient,EdjCase.ICP.Agent.Identities.IIdentity,EdjCase.ICP.BLS.IBlsCryptography)">
-            <param name="identity">Optional. Identity to use for each request. If unspecified, will use anonymous identity</param>
-            <param name="bls">Optional. Bls crypto implementation to validate signatures. If unspecified, will use default implementation</param>
-            <param name="httpClient">Optional. Sets the http client to use, otherwise will use the default http client</param>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.#ctor(EdjCase.ICP.Agent.Identities.IIdentity,System.Uri,EdjCase.ICP.BLS.IBlsCryptography)">
-            <param name="identity">Optional. Identity to use for each request. If unspecified, will use anonymous identity</param>
-            <param name="bls">Optional. Bls crypto implementation to validate signatures. If unspecified, will use default implementation</param>
-            <param name="httpBoundryNodeUrl">Url to the boundry node to connect to. Defaults to `https://ic0.app/`</param>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.QueryAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.ReadStateAsync(EdjCase.ICP.Candid.Models.Principal,System.Collections.Generic.List{EdjCase.ICP.Candid.Models.StatePath},System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetRequestStatusAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetRootKeyAsync(System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetReplicaStatusAsync(System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
         <member name="T:EdjCase.ICP.Agent.Agents.Http.DefaultHttpClient">
             <summary>
             The default http client to use with the built in `HttpClient`
@@ -110,6 +71,45 @@
             Throws an exception if the status code is not 200-299, otherwise does nothing
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:EdjCase.ICP.Agent.Agents.HttpAgent">
+            <summary>
+            An `IAgent` implementation using HTTP to make requests to the IC
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.Agent.Agents.HttpAgent.Identity">
+            <summary>
+            The identity that will be used on each request unless overriden
+            This identity can be anonymous
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.#ctor(EdjCase.ICP.Agent.Agents.Http.IHttpClient,EdjCase.ICP.Agent.Identities.IIdentity,EdjCase.ICP.BLS.IBlsCryptography)">
+            <param name="identity">Optional. Identity to use for each request. If unspecified, will use anonymous identity</param>
+            <param name="bls">Optional. Bls crypto implementation to validate signatures. If unspecified, will use default implementation</param>
+            <param name="httpClient">Optional. Sets the http client to use, otherwise will use the default http client</param>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.#ctor(EdjCase.ICP.Agent.Identities.IIdentity,System.Uri,EdjCase.ICP.BLS.IBlsCryptography)">
+            <param name="identity">Optional. Identity to use for each request. If unspecified, will use anonymous identity</param>
+            <param name="bls">Optional. Bls crypto implementation to validate signatures. If unspecified, will use default implementation</param>
+            <param name="httpBoundryNodeUrl">Url to the boundry node to connect to. Defaults to `https://ic0.app/`</param>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.QueryAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.ReadStateAsync(EdjCase.ICP.Candid.Models.Principal,System.Collections.Generic.List{EdjCase.ICP.Candid.Models.StatePath},System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetRequestStatusAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetRootKeyAsync(System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetReplicaStatusAsync(System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
         </member>
         <member name="T:EdjCase.ICP.Agent.Agents.IAgent">
             <summary>

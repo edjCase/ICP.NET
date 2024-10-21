@@ -9,32 +9,43 @@ using Xunit;
 
 namespace EdjCase.ICP.PocketIC.Tests
 {
-	public class PocketIcTests
-	{
-		private PocketIcServer server;
 
-		public PocketIcTests()
+	public class PocketIcServerFixture : IDisposable
+	{
+		public PocketIcServer Server { get; private set; }
+
+		public PocketIcServerFixture()
 		{
 			// Start the server for all tests
-			this.server = PocketIcServer.Start().GetAwaiter().GetResult();
+			this.Server = PocketIcServer.Start().GetAwaiter().GetResult();
 		}
 
-		public async ValueTask DisposeAsync()
+		public void Dispose()
 		{
 			// Stop the server after all tests
-			if (this.server != null)
+			if (this.Server != null)
 			{
-				await this.server.Stop();
-				this.server.Dispose();
+				this.Server.Stop().GetAwaiter().GetResult();
+				this.Server.Dispose();
 			}
+		}
+	}
+
+	public class PocketIcTests : IClassFixture<PocketIcServerFixture>
+	{
+		private readonly PocketIcServerFixture fixture;
+		private string url => this.fixture.Server.GetUrl();
+
+		public PocketIcTests(PocketIcServerFixture fixture)
+		{
+			this.fixture = fixture;
 		}
 
 		[Fact]
 		public async Task CreateCanisterAsync__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
 
@@ -46,12 +57,11 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task CreateAndInstallCanisterAsync__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
 			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
 			CandidArg arg = CandidArg.FromCandid();
 
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				Principal canisterId = await pocketIc.CreateAndInstallCanisterAsync(wasmModule, arg);
 
@@ -62,10 +72,8 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task Create_And_StartCanisterAsync__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
-
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
 				await pocketIc.StartCanisterAsync(new StartCanisterRequest { CanisterId = response.CanisterId });
@@ -76,10 +84,8 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task Create_And_StopCanisterAsync__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
-
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
 				await pocketIc.StopCanisterAsync(new StopCanisterRequest { CanisterId = response.CanisterId });
@@ -90,12 +96,11 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task Create_And_InstallCodeAsync__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
 			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
 			CandidArg arg = CandidArg.FromCandid();
 
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
 				await pocketIc.InstallCodeAsync(new InstallCodeRequest
@@ -112,12 +117,11 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task QueryCallAsync_CounterWasm__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
 			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
 			CandidArg arg = CandidArg.FromCandid();
 
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				Principal canisterId = await pocketIc.CreateAndInstallCanisterAsync(wasmModule, arg);
 				var result = await pocketIc.QueryCallAsync<UnboundedUInt>(
@@ -133,12 +137,11 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task UpdateCallAsync_CounterWasm__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
 			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
 			CandidArg arg = CandidArg.FromCandid();
 
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				Principal canisterId = await pocketIc.CreateAndInstallCanisterAsync(wasmModule, arg);
 				await pocketIc.UpdateCallNoResponseAsync(
@@ -153,10 +156,9 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task TickAsync__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
 
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				await pocketIc.TickAsync();
 			}
@@ -165,10 +167,9 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task GetTimeAsync__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
 
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				var time = await pocketIc.GetTimeAsync();
 
@@ -179,10 +180,8 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task AdvanceTimeAsync__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
-
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				ICTimestamp initialTime = await pocketIc.GetTimeAsync();
 
@@ -203,9 +202,8 @@ namespace EdjCase.ICP.PocketIC.Tests
 		[Fact]
 		public async Task GetCanisterSubnetIdAsync_Basic_Valid()
 		{
-			string url = this.server.GetUrl();
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
 				Principal subnetId = await pocketIc.GetCanisterSubnetIdAsync(response.CanisterId);

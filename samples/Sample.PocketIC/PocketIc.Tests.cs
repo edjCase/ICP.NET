@@ -6,35 +6,45 @@ using Xunit;
 
 namespace Sample.PocketIC
 {
-	public class PocketIcTests
+	public class PocketIcServerFixture : IDisposable
 	{
-		private PocketIcServer server;
+		public PocketIcServer Server { get; private set; }
 
-		public PocketIcTests()
+		public PocketIcServerFixture()
 		{
 			// Start the server for all tests
-			this.server = PocketIcServer.Start().GetAwaiter().GetResult();
+			this.Server = PocketIcServer.Start().GetAwaiter().GetResult();
 		}
 
-		public async ValueTask DisposeAsync()
+		public void Dispose()
 		{
 			// Stop the server after all tests
-			if (this.server != null)
+			if (this.Server != null)
 			{
-				await this.server.Stop();
-				this.server.Dispose();
+				this.Server.Stop().GetAwaiter().GetResult();
+				this.Server.Dispose();
 			}
+		}
+	}
+
+	public class PocketIcTests : IClassFixture<PocketIcServerFixture>
+	{
+		private readonly PocketIcServerFixture fixture;
+		private string url => this.fixture.Server.GetUrl();
+
+		public PocketIcTests(PocketIcServerFixture fixture)
+		{
+			this.fixture = fixture;
 		}
 
 		[Fact]
 		public async Task UpdateCallAsync_CounterWasm__Basic__Valid()
 		{
-			string url = this.server.GetUrl();
 			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/counter.wasm");
 			CandidArg arg = CandidArg.FromCandid();
 
 			// Create new pocketic instance for test, then dispose it
-			await using (PocketIc pocketIc = await PocketIc.CreateAsync(url))
+			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				Principal canisterId = await pocketIc.CreateAndInstallCanisterAsync(wasmModule, arg);
 

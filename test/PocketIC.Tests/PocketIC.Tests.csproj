@@ -27,6 +27,14 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing.XUnit" Version="1.1.2" />
 	</ItemGroup>
 
+	
+	<ItemGroup>
+		<Content Include="CanisterWasmModules/*.wasm">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\PocketIC\EdjCase.ICP.PocketIC.csproj" />
 	</ItemGroup>
