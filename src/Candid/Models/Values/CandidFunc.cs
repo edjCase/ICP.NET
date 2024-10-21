@@ -2,8 +2,6 @@ using EdjCase.ICP.Candid.Models.Types;
 using EdjCase.ICP.Candid.Utilities;
 using System;
 using System.Buffers;
-using System.Linq;
-using System.Text;
 
 namespace EdjCase.ICP.Candid.Models.Values
 {
@@ -21,43 +19,36 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// </summary>
 		public bool IsOpaqueReference { get; }
 
-		/// <summary>
-		/// service of the function
-		/// </summary>
-		public CandidService? Service => this.serviceInfo!.Value.Service;
 
-		/// <summary>
-		/// Method of the function
-		/// </summary>
-		public string? Method => this.serviceInfo!.Value.Method;
-
-		private readonly (CandidService Service, string Method)? serviceInfo;
+		public (CandidService Service, string Method)? ServiceInfo { get; }
 
 		/// <param name="service">The candid service definition the function lives in</param>
 		/// <param name="name">The name of the function</param>
 		public CandidFunc(CandidService service, string name)
 		{
 			this.IsOpaqueReference = false;
-			this.serviceInfo = (service, name);
+			this.ServiceInfo = (service, name);
 		}
 
 
 		private CandidFunc()
 		{
 			this.IsOpaqueReference = true;
-			this.serviceInfo = null;
+			this.ServiceInfo = null;
 		}
 
 		/// <inheritdoc />
-		internal override void EncodeValue(CandidType type, Func<CandidId, CandidCompoundType> getReferencedType, IBufferWriter<byte> destination)
+		internal override void EncodeValue(CandidType type, Func<CandidId, CandidCompoundType> getReferencedType,
+			IBufferWriter<byte> destination)
 		{
 			if (this.IsOpaqueReference)
 			{
 				destination.WriteOne<byte>(0);
 				return;
 			}
+
 			CandidFuncType t = DereferenceType<CandidFuncType>(type, getReferencedType);
-			(CandidService service, string method) = this.serviceInfo!.Value;
+			(CandidService service, string method) = this.ServiceInfo!.Value;
 			destination.WriteOne<byte>(1); // Encode bit to indicate it is not opaque
 			service.EncodeValue(t, getReferencedType, destination); // Encode value
 			destination.WriteUtf8LebAndValue(method); // Encode method name
@@ -66,7 +57,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <inheritdoc />
 		public override int GetHashCode()
 		{
-			return HashCode.Combine(this.IsOpaqueReference, this.serviceInfo);
+			return HashCode.Combine(this.IsOpaqueReference, this.ServiceInfo);
 		}
 
 		/// <inheritdoc />
@@ -78,13 +69,16 @@ namespace EdjCase.ICP.Candid.Models.Values
 				{
 					return false;
 				}
+
 				if (this.IsOpaqueReference)
 				{
 					// TODO can we tell if they are equal?
 					return false;
 				}
-				return this.serviceInfo == f.serviceInfo;
+
+				return this.ServiceInfo == f.ServiceInfo;
 			}
+
 			return false;
 		}
 
@@ -95,7 +89,8 @@ namespace EdjCase.ICP.Candid.Models.Values
 			{
 				return "(Opaque Reference)";
 			}
-			(CandidService service, string method) = this.serviceInfo!.Value;
+
+			(CandidService service, string method) = this.ServiceInfo!.Value;
 			return $"(Method: {method}, Service: {service})";
 		}
 
@@ -109,5 +104,4 @@ namespace EdjCase.ICP.Candid.Models.Values
 			return new CandidFunc();
 		}
 	}
-
 }
