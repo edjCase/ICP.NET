@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace EdjCase.ICP.Agent.Agents
 {
 	/// <summary>
-	/// An agent is used to communicate with the Internet Computer with certain protocols that 
+	/// An agent is used to communicate with the Internet Computer with certain protocols that
 	/// are specific to an `IAgent` implementation
 	/// </summary>
 	public interface IAgent
@@ -24,7 +24,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="canisterId">Canister to read state for</param>
 		/// <param name="paths">The state paths to get information for. Other state data will be pruned if not specified</param>
 		/// <param name="cancellationToken">Optional. Token to cancel request</param>
-		/// <returns>A response that contains the certificate of the current cansiter state</returns>
+		/// <returns>A response that contains the certificate of the current canister state</returns>
 		Task<ReadStateResponse> ReadStateAsync(Principal canisterId, List<StatePath> paths, CancellationToken? cancellationToken = null);
 
 		/// <summary>
@@ -37,12 +37,12 @@ namespace EdjCase.ICP.Agent.Agents
 		Task<RequestStatus?> GetRequestStatusAsync(Principal canisterId, RequestId id, CancellationToken? cancellationToken = null);
 
 		/// <summary>
-		/// Sends a call request to a specified canister method and gets back an id of the 
+		/// Sends a call request to a specified canister method and gets back an id of the
 		/// request that is being processed. This call does NOT wait for the request to be complete.
 		/// Either check the status with `GetRequestStatusAsync` or use the `CallAndWaitAsync` method
 		/// </summary>
 		/// <param name="canisterId">Canister to read state for</param>
-		/// <param name="method">The name of the method to call on the cansiter</param>
+		/// <param name="method">The name of the method to call on the canister</param>
 		/// <param name="arg">The candid arg to send with the request</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
 		/// <param name="cancellationToken">Optional. Token to cancel request</param>
@@ -60,7 +60,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// Sends a query request to a specified canister method
 		/// </summary>
 		/// <param name="canisterId">Canister to read state for</param>
-		/// <param name="method">The name of the method to call on the cansiter</param>
+		/// <param name="method">The name of the method to call on the canister</param>
 		/// <param name="arg">The candid arg to send with the request</param>
 		/// <param name="cancellationToken">Optional. Token to cancel request</param>
 		/// <returns>The response data of the query call</returns>
@@ -86,7 +86,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// </summary>
 		/// <param name="agent">The agent to use for the call</param>
 		/// <param name="canisterId">Canister to read state for</param>
-		/// <param name="method">The name of the method to call on the cansiter</param>
+		/// <param name="method">The name of the method to call on the canister</param>
 		/// <param name="arg">The candid arg to send with the request</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
 		/// <param name="cancellationToken">Optional. Token to cancel request</param>

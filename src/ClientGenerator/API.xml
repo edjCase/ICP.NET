@@ -42,14 +42,14 @@
             The name of the client class and file to use
             </summary>
         </member>
-        <member name="P:EdjCase.ICP.ClientGenerator.ClientGenerationOptions.GetDefinitionFromCansiter">
+        <member name="P:EdjCase.ICP.ClientGenerator.ClientGenerationOptions.GetDefinitionFromCanister">
             <summary>
             If true, will treat `FilePathOrCanisterId` as a canister id and get the definition from the canister. Otherwise will treat it as a file path and get the definition from the file
             </summary>
         </member>
         <member name="P:EdjCase.ICP.ClientGenerator.ClientGenerationOptions.FilePathOrCanisterId">
             <summary>
-            The file path to a local *.did file to get definition from or the canister id, depending on `GetDefinitionFromCansiter` value
+            The file path to a local *.did file to get definition from or the canister id, depending on `GetDefinitionFromCanister` value
             </summary>
         </member>
         <member name="P:EdjCase.ICP.ClientGenerator.ClientGenerationOptions.PurgeOutputDirectory">
