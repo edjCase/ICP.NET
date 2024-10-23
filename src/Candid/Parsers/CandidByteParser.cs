@@ -582,11 +582,14 @@ namespace EdjCase.ICP.Candid.Parsers
 					// Opaque reference
 					throw new NotImplementedException();
 				}
-				else
-				{
-					List<byte> bytes = this.ReadVectorInner(() => this.ReadByte());
-					return Principal.FromBytes(bytes.ToArray());
-				}
+
+				return this.ReadTransparentPrincipal();
+			}
+
+			private Principal ReadTransparentPrincipal()
+			{
+				List<byte> bytes = this.ReadVectorInner(this.ReadByte);
+				return Principal.FromBytes(bytes.ToArray());
 			}
 
 			public sbyte ReadInt8()
@@ -647,7 +650,7 @@ namespace EdjCase.ICP.Candid.Parsers
 				}
 				else
 				{
-					Principal? principalId = this.ReadPrincipal();
+					Principal principalId = this.ReadTransparentPrincipal();
 					return new CandidService(principalId);
 				}
 			}

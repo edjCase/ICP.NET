@@ -58,11 +58,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 				destination.WriteOne<byte>(0);
 				return;
 			}
-			int size = this.principalId!.Raw.Length + 1;
-			Span<byte> bytes = destination.GetSpan(size);
-			bytes[0] = 1; // Set first byte to 1
-			this.principalId.Raw.CopyTo(bytes[1..]); // Set other bytes to raw id
-			destination.Advance(size);
+			CandidValue.Principal(this.principalId!).EncodeValue(CandidType.Principal(), getReferencedType, destination);
 		}
 
 		/// <inheritdoc />
