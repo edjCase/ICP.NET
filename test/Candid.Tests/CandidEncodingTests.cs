@@ -440,7 +440,7 @@ namespace EdjCase.ICP.Candid.Tests
 			var type1 = new CandidServiceType(new Dictionary<CandidId, CandidFuncType>{
 				{
 					CandidId.Create("method1"),
-					new CandidFuncType([FuncMode.Query], new List<CandidType>(), new List<CandidType>())
+					new CandidFuncType(new List<FuncMode>{FuncMode.Query}, new List<CandidType>(), new List<CandidType>())
 				},
 			});
 			var expectedArg = CandidArg.FromCandid(new List<CandidTypedValue>
