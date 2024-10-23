@@ -452,9 +452,11 @@ namespace EdjCase.ICP.Candid.Tests
 			byte[] actualBytes = ByteUtil.FromHexString(hex);
 			CandidArg actualArg = CandidArg.FromBytes(actualBytes);
 
-			string a = ByteUtil.ToHexString(expectedArg.Encode());
-
 			Assert.Equal(expectedArg, actualArg);
+
+			string actualHex = ByteUtil.ToHexString(expectedArg.Encode());
+
+			Assert.Equal(hex, actualHex);
 		}
 
 
