@@ -71,7 +71,7 @@ candid-client-generator gen ./
   - `file` - Will create a client based on a service definition file (`*.did`)
     - `file-path` - (Text) REQUIRED. The file path to the `*.did` file to generate from
   - `canister` - Creates a client based on a canister id
-    - `cansiter-id` - (Text) REQUIRED. The principal id of the canister to generate a client for
+    - `canister-id` - (Text) REQUIRED. The principal id of the canister to generate a client for
 - `output-directory` - (Text) OPTIONAL. Directory to put all generated client files. Overrides the top level `output-directory`. NOTE: this does not create a sub-folder based on the client name like the top level `output-directory` does
 - `no-folders` - (Bool) OPTIONAL. If true, no sub-folders will be generated for the client. All generated files will be in a flat structure. Defaults to false. Overrides the top level `no-folders`
 - `feature-nullable` - (Bool) Optional. Sets whether to use the C# nullable feature when generating the client (like `object?`). Defaults to true. Overrides the top level `feature-nullable`

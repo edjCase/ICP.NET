@@ -13,9 +13,7 @@ namespace Test
 	public class DexApiClient
 	{
 		public IAgent Agent { get; }
-
 		public Principal CanisterId { get; }
-
 		public CandidConverter Converter { get; }
 
 		public DexApiClient(IAgent agent, Principal canisterId, CandidConverter converter = default)
@@ -143,9 +141,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public WithdrawErr Err { get => this.Tag == WithdrawReceiptTag.Err ? (WithdrawErr)this.Value! : default; set => (this.Tag, this.Value) = (WithdrawReceiptTag.Err, value); }
-
 		public UnboundedUInt Ok { get => this.Tag == WithdrawReceiptTag.Ok ? (UnboundedUInt)this.Value! : default; set => (this.Tag, this.Value) = (WithdrawReceiptTag.Ok, value); }
 
 		public WithdrawReceipt(WithdrawReceiptTag tag, object value)
@@ -193,9 +189,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public OrderPlacementErr Err { get => this.Tag == OrderPlacementReceiptTag.Err ? (OrderPlacementErr)this.Value! : default; set => (this.Tag, this.Value) = (OrderPlacementReceiptTag.Err, value); }
-
 		public OptionalValue<Order> Ok { get => this.Tag == OrderPlacementReceiptTag.Ok ? (OptionalValue<Order>)this.Value! : default; set => (this.Tag, this.Value) = (OrderPlacementReceiptTag.Ok, value); }
 
 		public OrderPlacementReceipt(OrderPlacementReceiptTag tag, object value)
@@ -288,9 +282,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public DepositErr Err { get => this.Tag == DepositReceiptTag.Err ? (DepositErr)this.Value! : default; set => (this.Tag, this.Value) = (DepositReceiptTag.Err, value); }
-
 		public UnboundedUInt Ok { get => this.Tag == DepositReceiptTag.Ok ? (UnboundedUInt)this.Value! : default; set => (this.Tag, this.Value) = (DepositReceiptTag.Ok, value); }
 
 		public DepositReceipt(DepositReceiptTag tag, object value)
@@ -338,9 +330,7 @@ namespace Test
 
 		[VariantValueProperty]
 		public object Value { get; set; }
-
 		public CancelOrderErr Err { get => this.Tag == CancelOrderReceiptTag.Err ? (CancelOrderErr)this.Value! : default; set => (this.Tag, this.Value) = (CancelOrderReceiptTag.Err, value); }
-
 		public OrderId Ok { get => this.Tag == CancelOrderReceiptTag.Ok ? (OrderId)this.Value! : default; set => (this.Tag, this.Value) = (CancelOrderReceiptTag.Ok, value); }
 
 		public CancelOrderReceipt(CancelOrderReceiptTag tag, object value)

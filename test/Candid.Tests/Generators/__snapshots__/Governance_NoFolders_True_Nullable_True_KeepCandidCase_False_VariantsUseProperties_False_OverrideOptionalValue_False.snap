@@ -11,9 +11,7 @@ namespace Test
 	public class GovernanceApiClient
 	{
 		public IAgent Agent { get; }
-
 		public Principal CanisterId { get; }
-
 		public CandidConverter? Converter { get; }
 
 		public GovernanceApiClient(IAgent agent, Principal canisterId, CandidConverter? converter = default)

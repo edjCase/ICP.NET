@@ -197,7 +197,7 @@ namespace EdjCase.ICP.Agent.Responses
 		/// </summary>
 		Replied,
 		/// <summary>
-		/// When the cansiter request has errors to query request
+		/// When the canister request has errors to query request
 		/// </summary>
 		Rejected
 	}
