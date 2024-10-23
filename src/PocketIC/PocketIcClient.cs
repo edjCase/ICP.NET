@@ -4,6 +4,7 @@ using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.Candid;
 using System.Text.Json.Nodes;
 using System.Security.Cryptography;
+using System.Runtime.CompilerServices;
 
 namespace EdjCase.ICP.PocketIC.Client
 {
@@ -12,58 +13,113 @@ namespace EdjCase.ICP.PocketIC.Client
 		private readonly HttpClient httpClient;
 		private readonly string baseUrl;
 		private readonly int instanceId;
-		private readonly Dictionary<string, SubnetTopology> topology;
+		private Dictionary<string, SubnetTopology>? topologyCache;
 
 		private PocketIcClient(
 			HttpClient httpClient,
 			string url,
 			int instanceId,
-			Dictionary<string, SubnetTopology> topology)
+			Dictionary<string, SubnetTopology>? topology = null
+		)
 		{
 			this.httpClient = httpClient;
 			this.baseUrl = url;
 			this.instanceId = instanceId;
-			this.topology = topology;
+			this.topologyCache = topology;
 		}
 
-		public async Task TickAsync()
+		public int GetInstanceId() => this.instanceId;
+
+		public Dictionary<string, SubnetTopology>? GetCachedTopology() => this.topologyCache;
+
+		public async Task<JsonNode?> GetStatusAsync()
 		{
-			await this.PostAsync("/update/tick", null);
+			return await this.GetAsync("/status");
 		}
 
-		public async Task<Principal> GetPublicKeyAsync(Principal subnetId)
+		public async Task<byte[]> UploadBlobAsync(byte[] blob)
+		{
+			var content = new ByteArrayContent(blob);
+			HttpResponseMessage response = await this.httpClient.PostAsync($"{this.baseUrl}/blobstore", content);
+			response.EnsureSuccessStatusCode();
+			var stream = await response.Content.ReadAsStreamAsync();
+			JsonNode? json = await JsonNode.ParseAsync(stream)!;
+			return json!["blob"].Deserialize<byte[]>()!;
+		}
+
+		public async Task<byte[]> DownloadBlobAsync(byte[] blobId)
+		{
+			HttpResponseMessage response = await this.httpClient.GetAsync($"{this.baseUrl}/blobstore/{Convert.ToBase64String(blobId)}");
+			response.EnsureSuccessStatusCode();
+			return await response.Content.ReadAsByteArrayAsync();
+		}
+
+		public async Task<JsonNode?> VerifySignatureAsync(
+			byte[] message,
+			Principal publicKey,
+			Principal rootPublicKey,
+			byte[] signature
+		)
 		{
 			var request = new JsonObject
 			{
-				["subnet_id"] = Convert.ToBase64String(subnetId.Raw)
+				["msg"] = JsonValue.Create(message),
+				["pubkey"] = JsonValue.Create(publicKey.Raw),
+				["root_pubkey"] = JsonValue.Create(rootPublicKey.Raw),
+				["sig"] = JsonValue.Create(signature),
 			};
-			JsonNode? response = await this.PostAsync("/read/pub_key", request);
-			byte[] publicKey = response!["public_key"].Deserialize<byte[]>()!;
-			return Principal.FromBytes(publicKey);
+			return await this.PostAsync("/verify_signature", request);
 		}
 
-		public Dictionary<string, SubnetTopology> GetTopology()
+		public async Task<JsonNode?> ReadGraphAsync(string stateLabel, string opId)
 		{
-			return this.topology;
+			return await this.GetAsync($"/read_graph/{stateLabel}/{opId}");
 		}
 
-		public async Task<ICTimestamp> GetTimeAsync()
+		public async Task<List<string>> GetInstanceIdsAsync()
 		{
-			JsonNode? response = await this.GetAsync("/read/get_time");
-			return ICTimestamp.FromNanoSeconds(response!["nanos_since_epoch"].Deserialize<ulong>()!);
+			JsonNode? response = await this.GetAsync("/instances");
+			return response!.AsArray().Select(i => i!.Deserialize<string>()!).ToList();
 		}
 
-		public async Task SetTimeAsync(ICTimestamp timestamp)
+		public async Task<(int Id, Dictionary<string, SubnetTopology> Topology)> CreateInstanceAsync(
+			List<SubnetConfig>? applicationSubnets = null,
+			SubnetConfig? bitcoinSubnet = null,
+			SubnetConfig? fiduciarySubnet = null,
+			SubnetConfig? iiSubnet = null,
+			SubnetConfig? nnsSubnet = null,
+			SubnetConfig? snsSubnet = null,
+			List<SubnetConfig>? systemSubnets = null,
+			List<SubnetConfig>? verifiedApplicationSubnets = null,
+			bool nonmainnetFeatures = false
+		)
 		{
-			if (!timestamp.NanoSeconds.TryToUInt64(out ulong nanosSinceEpoch))
+			return await PocketIcClient.CreateInstanceAsync(
+				this.httpClient,
+				this.baseUrl,
+				applicationSubnets,
+				bitcoinSubnet,
+				fiduciarySubnet,
+				iiSubnet,
+				nnsSubnet,
+				snsSubnet,
+				systemSubnets,
+				verifiedApplicationSubnets,
+				nonmainnetFeatures
+			);
+		}
+
+		public async Task DeleteInstanceAsync(int id)
+		{
+			try
 			{
-				throw new ArgumentException("Nanoseconds is too large to convert to ulong");
+				HttpResponseMessage message = await this.httpClient.DeleteAsync($"{this.baseUrl}/instances/{id}");
+				message.EnsureSuccessStatusCode();
 			}
-			var request = new JsonObject
+			catch (Exception e)
 			{
-				["nanos_since_epoch"] = nanosSinceEpoch
-			};
-			await this.PostAsync("/update/set_time", request);
+				throw new Exception("Failed to delete PocketIC instance", e);
+			}
 		}
 
 		public async Task<CandidArg> QueryCallAsync(
@@ -82,6 +138,81 @@ namespace EdjCase.ICP.PocketIC.Client
 				effectivePrincipal
 			);
 		}
+
+		public async Task<Dictionary<string, SubnetTopology>> GetTopologyAsync()
+		{
+			JsonNode? node = await this.GetAsync("read/topology");
+			this.topologyCache = node!
+				.AsObject()
+				?.Deserialize<Dictionary<string, JsonNode>>()
+				?.ToDictionary(kv => kv.Key, kv => MapSubnetTopology(kv.Key, kv.Value))
+				?? [];
+			return this.topologyCache;
+		}
+
+		public async Task<ICTimestamp> GetTimeAsync()
+		{
+			JsonNode? response = await this.GetAsync("/read/get_time");
+			return ICTimestamp.FromNanoSeconds(response!["nanos_since_epoch"].Deserialize<ulong>()!);
+		}
+
+		public async Task<JsonNode?> GetCanisterHttpAsync()
+		{
+			JsonNode? response = await this.GetAsync("/read/get_canister_http");
+			return response;
+		}
+
+		public async Task<ulong> GetCyclesBalanceAsync(Principal canisterId)
+		{
+			var request = new JsonObject
+			{
+				["canister_id"] = Convert.ToBase64String(canisterId.Raw)
+			};
+			JsonNode? response = await this.PostAsync("/read/get_cycles", request);
+			return response!["cycles"].Deserialize<ulong>()!;
+		}
+
+		public async Task<byte[]> GetStableMemoryAsync(Principal canisterId)
+		{
+			var request = new JsonObject
+			{
+				["canister_id"] = Convert.ToBase64String(canisterId.Raw)
+			};
+			JsonNode? response = await this.PostAsync("/read/get_stable_memory", request);
+			return response!["blob_id"].Deserialize<byte[]>()!;
+		}
+
+		// ===========================================
+
+		public async Task TickAsync()
+		{
+			await this.PostAsync("/update/tick", null);
+		}
+
+		public async Task<Principal> GetPublicKeyAsync(Principal subnetId)
+		{
+			var request = new JsonObject
+			{
+				["subnet_id"] = Convert.ToBase64String(subnetId.Raw)
+			};
+			JsonNode? response = await this.PostAsync("/read/pub_key", request);
+			byte[] publicKey = response!["public_key"].Deserialize<byte[]>()!;
+			return Principal.FromBytes(publicKey);
+		}
+
+		public async Task SetTimeAsync(ICTimestamp timestamp)
+		{
+			if (!timestamp.NanoSeconds.TryToUInt64(out ulong nanosSinceEpoch))
+			{
+				throw new ArgumentException("Nanoseconds is too large to convert to ulong");
+			}
+			var request = new JsonObject
+			{
+				["nanos_since_epoch"] = nanosSinceEpoch
+			};
+			await this.PostAsync("/update/set_time", request);
+		}
+
 
 		public async Task<CandidArg> UpdateCallAsync(
 			Principal sender,
@@ -160,16 +291,6 @@ namespace EdjCase.ICP.PocketIC.Client
 			return Principal.FromBytes(subnetId);
 		}
 
-		public async Task<ulong> GetCyclesBalanceAsync(Principal canisterId)
-		{
-			var request = new JsonObject
-			{
-				["canister_id"] = Convert.ToBase64String(canisterId.Raw)
-			};
-			JsonNode? response = await this.PostAsync("/read/get_cycles", request);
-			return response!["cycles"].Deserialize<ulong>()!;
-		}
-
 		public async Task<ulong> AddCyclesAsync(Principal canisterId, ulong amount)
 		{
 			var request = new JsonObject
@@ -190,26 +311,6 @@ namespace EdjCase.ICP.PocketIC.Client
 				["blob_id"] = JsonValue.Create(blobId)
 			};
 			await this.PostAsync("/update/set_stable_memory", request);
-		}
-
-		public async Task<byte[]> GetStableMemoryAsync(Principal canisterId)
-		{
-			var request = new JsonObject
-			{
-				["canister_id"] = Convert.ToBase64String(canisterId.Raw)
-			};
-			JsonNode? response = await this.PostAsync("/read/get_stable_memory", request);
-			return response!["blob_id"].Deserialize<byte[]>()!;
-		}
-
-		private async Task<byte[]> UploadBlobAsync(byte[] blob)
-		{
-			var content = new ByteArrayContent(blob);
-			HttpResponseMessage response = await this.httpClient.PostAsync($"{this.baseUrl}/blobstore", content);
-			response.EnsureSuccessStatusCode();
-			var stream = await response.Content.ReadAsStreamAsync();
-			JsonNode? json = await JsonNode.ParseAsync(stream)!;
-			return json!["blob"].Deserialize<byte[]>()!;
 		}
 
 		private async Task<JsonNode?> GetAsync(string endpoint)
@@ -238,15 +339,7 @@ namespace EdjCase.ICP.PocketIC.Client
 
 		public async ValueTask DisposeAsync()
 		{
-			try
-			{
-				HttpResponseMessage message = await this.httpClient.DeleteAsync($"{this.baseUrl}/instances/{this.instanceId}");
-				message.EnsureSuccessStatusCode();
-			}
-			catch (Exception e)
-			{
-				throw new Exception("Failed to delete PocketIC instance", e);
-			}
+			await this.DeleteInstanceAsync(this.instanceId);
 		}
 
 
@@ -260,10 +353,50 @@ namespace EdjCase.ICP.PocketIC.Client
 			SubnetConfig? snsSubnet = null,
 			List<SubnetConfig>? systemSubnets = null,
 			List<SubnetConfig>? verifiedApplicationSubnets = null,
+			bool nonmainnetFeatures = false,
+			HttpClient? httpClient = null
+		)
+		{
+			httpClient ??= new HttpClient();
+
+			(int instanceId, Dictionary<string, SubnetTopology> topology) = await PocketIcClient.CreateInstanceAsync(
+				httpClient,
+				url,
+				applicationSubnets,
+				bitcoinSubnet,
+				fiduciarySubnet,
+				iiSubnet,
+				nnsSubnet,
+				snsSubnet,
+				systemSubnets,
+				verifiedApplicationSubnets,
+				nonmainnetFeatures
+			);
+
+			return new PocketIcClient(
+				httpClient,
+				url,
+				instanceId,
+				topology
+			);
+		}
+
+		public static async Task<(int Id, Dictionary<string, SubnetTopology> Topology)> CreateInstanceAsync(
+			HttpClient httpClient,
+			string url,
+			List<SubnetConfig>? applicationSubnets = null,
+			SubnetConfig? bitcoinSubnet = null,
+			SubnetConfig? fiduciarySubnet = null,
+			SubnetConfig? iiSubnet = null,
+			SubnetConfig? nnsSubnet = null,
+			SubnetConfig? snsSubnet = null,
+			List<SubnetConfig>? systemSubnets = null,
+			List<SubnetConfig>? verifiedApplicationSubnets = null,
 			bool nonmainnetFeatures = false
 		)
 		{
 
+			// Default to a single application subnet
 			applicationSubnets ??= new List<SubnetConfig>
 			{
 				new SubnetConfig
@@ -333,7 +466,6 @@ namespace EdjCase.ICP.PocketIC.Client
 				["nonmainnet_features"] = nonmainnetFeatures
 			};
 
-			var httpClient = new HttpClient();
 			JsonNode? response = await PostAsync(httpClient, $"{url}/instances", request);
 			if (response == null)
 			{
@@ -353,68 +485,61 @@ namespace EdjCase.ICP.PocketIC.Client
 
 			int instanceId = created["instance_id"]!.Deserialize<int>()!;
 
-			SubnetTopology MapSubnetTopology(string subnetId, JsonNode value)
-			{
-				string? subnetTypeString = value["subnet_kind"]?.Deserialize<string>();
-				if (subnetTypeString == null || !Enum.TryParse<SubnetType>(subnetTypeString, out var subnetType))
-				{
-					throw new Exception($"Invalid subnet type: {subnetTypeString}");
-				}
-
-				byte[] subnetSeed = value["subnet_seed"]
-					?.AsArray()
-					.Select(b => b.Deserialize<byte>())
-					.ToArray()
-					?? throw new Exception("Subnet seed is missing or invalid");
-
-				List<byte[]> nodeIds = value["node_ids"]
-					?.AsArray()
-					.Select(id =>
-					{
-						byte[]? nodeId = id!["node_id"]?.Deserialize<byte[]>() ?? throw new Exception("Node ID is missing or invalid");
-						return nodeId;
-					})
-					.ToList()
-					?? [];
-
-				Principal MapCanisterRangeValue(JsonNode? value)
-				{
-					byte[] canisterIdBytes = value?["canister_id"]?.Deserialize<byte[]>() ?? throw new Exception("Canister range value is missing or invalid");
-					return Principal.FromBytes(canisterIdBytes);
-				}
-
-				List<CanisterRange> canisterRanges = value["canister_ranges"]
-					?.AsArray()
-					.Select(r => new CanisterRange
-					{
-						Start = MapCanisterRangeValue(r?["start"]),
-						End = MapCanisterRangeValue(r?["end"])
-					})
-					.ToList()
-					?? [];
-
-				return new SubnetTopology
-				{
-					Id = Principal.FromText(subnetId),
-					Type = subnetType,
-					SubnetSeed = subnetSeed,
-					NodeIds = nodeIds,
-					CanisterRanges = canisterRanges
-				};
-			}
 			Dictionary<string, SubnetTopology> topology = created["topology"]
 				?.Deserialize<Dictionary<string, JsonNode>>()
 				?.ToDictionary(kv => kv.Key, kv => MapSubnetTopology(kv.Key, kv.Value))
 				?? [];
+			return (instanceId, topology);
+		}
 
+		private static SubnetTopology MapSubnetTopology(string subnetId, JsonNode value)
+		{
+			string? subnetTypeString = value["subnet_kind"]?.Deserialize<string>();
+			if (subnetTypeString == null || !Enum.TryParse<SubnetType>(subnetTypeString, out var subnetType))
+			{
+				throw new Exception($"Invalid subnet type: {subnetTypeString}");
+			}
 
+			byte[] subnetSeed = value["subnet_seed"]
+				?.AsArray()
+				.Select(b => b.Deserialize<byte>())
+				.ToArray()
+				?? throw new Exception("Subnet seed is missing or invalid");
 
-			return new PocketIcClient(
-				httpClient,
-				url,
-				instanceId,
-				topology
-			);
+			List<byte[]> nodeIds = value["node_ids"]
+				?.AsArray()
+				.Select(id =>
+				{
+					byte[]? nodeId = id!["node_id"]?.Deserialize<byte[]>() ?? throw new Exception("Node ID is missing or invalid");
+					return nodeId;
+				})
+				.ToList()
+				?? [];
+
+			Principal MapCanisterRangeValue(JsonNode? value)
+			{
+				byte[] canisterIdBytes = value?["canister_id"]?.Deserialize<byte[]>() ?? throw new Exception("Canister range value is missing or invalid");
+				return Principal.FromBytes(canisterIdBytes);
+			}
+
+			List<CanisterRange> canisterRanges = value["canister_ranges"]
+				?.AsArray()
+				.Select(r => new CanisterRange
+				{
+					Start = MapCanisterRangeValue(r?["start"]),
+					End = MapCanisterRangeValue(r?["end"])
+				})
+				.ToList()
+				?? [];
+
+			return new SubnetTopology
+			{
+				Id = Principal.FromText(subnetId),
+				Type = subnetType,
+				SubnetSeed = subnetSeed,
+				NodeIds = nodeIds,
+				CanisterRanges = canisterRanges
+			};
 		}
 	}
 
