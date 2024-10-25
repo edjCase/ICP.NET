@@ -69,7 +69,7 @@ namespace EdjCase.ICP.Candid.Models.Types
 
 			LEB128.EncodeSigned(fieldsOrOptions.Count, destination); // Encode field/option count
 
-			foreach(var f in fieldsOrOptions.OrderBy(f => f.Key))
+			foreach (var f in fieldsOrOptions.OrderBy(f => f.Key))
 			{
 				LEB128.EncodeUnsigned(f.Key.Id, destination); // Encode key
 				f.Value.Encode(compoundTypeTable, destination); // Encode value
@@ -88,13 +88,14 @@ namespace EdjCase.ICP.Candid.Models.Types
 			bool exactType = this.GetType() == obj?.GetType();
 			if (exactType && obj is CandidRecordOrVariantType def)
 			{
-				if (fieldsOrOptions.Count != fieldsOrOptions.Count)
+				Dictionary<CandidTag, CandidType> otherFieldsOrOptions = def.GetFieldsOrOptions();
+				if (fieldsOrOptions.Count != otherFieldsOrOptions.Count)
 				{
 					return false;
 				}
 				foreach ((CandidTag fLabel, CandidType fDef) in fieldsOrOptions)
 				{
-					if (!fieldsOrOptions.TryGetValue(fLabel, out CandidType? otherFDef))
+					if (!otherFieldsOrOptions.TryGetValue(fLabel, out CandidType? otherFDef))
 					{
 						return false;
 					}

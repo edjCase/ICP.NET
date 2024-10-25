@@ -133,7 +133,7 @@ namespace EdjCase.ICP.Candid.Models
 				.Concat(subAccount).ToArray();
 
 			// Compute the SHA224 hash
-			SHA224 sha224 = new ();
+			SHA224 sha224 = new();
 			byte[] hash = sha224.GenerateDigest(data);
 
 			// Compute the CRC32 checksum
@@ -248,7 +248,7 @@ namespace EdjCase.ICP.Candid.Models
 		/// <inheritdoc />
 		public bool Equals(Principal? other)
 		{
-			if (other == null)
+			if (other is null)
 			{
 				return false;
 			}

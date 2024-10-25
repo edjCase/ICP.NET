@@ -1,4 +1,6 @@
 using EdjCase.ICP.Candid.Models;
+using EdjCase.ICP.Candid.Models.Types;
+using EdjCase.ICP.Candid.Parsers;
 using System;
 
 namespace EdjCase.ICP.Candid.Mapping
@@ -115,6 +117,25 @@ namespace EdjCase.ICP.Candid.Mapping
 		public VariantOptionAttribute(string tag) : this(CandidTag.FromName(tag))
 		{
 
+		}
+	}
+
+	/// <summary>
+	/// An attribute to specify the candid type definition for a value
+	/// This is REQUIRED for any raw candid values
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]
+	public class CandidTypeDefAttribute : Attribute
+	{
+		/// <summary>
+		/// The candid type definition for the value
+		/// </summary>
+		public CandidType Type { get; }
+
+		/// <param name="typeDef">The candid type definition in string format https://github.com/dfinity/candid/blob/master/spec/Candid.md#core-grammar</param>
+		public CandidTypeDefAttribute(string typeDef)
+		{
+			this.Type = CandidTextParser.Parse(typeDef);
 		}
 	}
 }

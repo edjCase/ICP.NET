@@ -10,7 +10,6 @@ Collection of Internet Computer Protocol (ICP) libraries for .NET/Blazor/Unity
 
 ## See each individual project README for more in depth guides
 
-
 # 🎮 Unity Integration
 
 - Download latest `agent.unitypackage` from: https://github.com/edjCase/ICP.NET/releases
@@ -20,7 +19,9 @@ Collection of Internet Computer Protocol (ICP) libraries for .NET/Blazor/Unity
 - Start coding 💻
 
 # 📡 Generating a client for a canister
+
 You can specify all the models and api calls yourself, but this is a tool to automatically generate a client and models based on the canister or .did file
+
 - Prerequisite: Have .Net 6 installed (https://dotnet.microsoft.com/en-us/download/dotnet)
 - Navigate to directory of .Net project
   ```
@@ -87,9 +88,13 @@ You can specify all the models and api calls yourself, but this is a tool to aut
 - SHIP IT! 🚀
 
 # Breaking change migrations
+
 ## 3.x.x => 4.x.x
+
 The big change here was around variant classes and their attributes. Before the option types were defined by the attribute on each enum member, but in 4.x.x it changed to using method return types and having not type information in attributes. Also the VariantAttribute now gets the enum type from the Tag property vs the attribute
+
 ### Version 3
+
 ```
 [Variant(typeof(MyVariantTag))] // Required to flag as variant and define options with enum
 public class MyVariant
@@ -109,7 +114,9 @@ public enum MyVariantTag
     Option2
 }
 ```
+
 ### Version 4
+
 ```
 [Variant] // Required to flag as variant
 public class MyVariant
@@ -136,6 +143,7 @@ public enum MyVariantTag
     Option2
 }
 ```
+
 # Candid Related Links
 
 - [IC Http Interface Spec](https://smartcontracts.org/docs/current/references/ic-interface-spec)

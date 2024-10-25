@@ -546,6 +546,260 @@ namespace EdjCase.ICP.Candid.Tests
 			this.Test(raw, candid, (a, b) => a.ValueOrDefault == b.ValueOrDefault);
 		}
 
+		public class AllRawTypes
+		{
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+			[CandidTypeDef("bool")]
+			public CandidPrimitive Bool { get; set; }
+			[CandidTypeDef("nat")]
+			public CandidPrimitive Nat { get; set; }
+			[CandidTypeDef("int")]
+			public CandidPrimitive Int { get; set; }
+			[CandidTypeDef("nat8")]
+			public CandidPrimitive Nat8 { get; set; }
+			[CandidTypeDef("nat16")]
+			public CandidPrimitive Nat16 { get; set; }
+			[CandidTypeDef("nat32")]
+			public CandidPrimitive Nat32 { get; set; }
+			[CandidTypeDef("nat64")]
+			public CandidPrimitive Nat64 { get; set; }
+			[CandidTypeDef("int8")]
+			public CandidPrimitive Int8 { get; set; }
+			[CandidTypeDef("int16")]
+			public CandidPrimitive Int16 { get; set; }
+			[CandidTypeDef("int32")]
+			public CandidPrimitive Int32 { get; set; }
+			[CandidTypeDef("int64")]
+			public CandidPrimitive Int64 { get; set; }
+			[CandidTypeDef("float32")]
+			public CandidPrimitive Float32 { get; set; }
+			[CandidTypeDef("float64")]
+			public CandidPrimitive Float64 { get; set; }
+			[CandidTypeDef("text")]
+			public CandidPrimitive Text { get; set; }
+			[CandidTypeDef("null")]
+			public CandidPrimitive Null { get; set; }
+			[CandidTypeDef("reserved")]
+			public CandidPrimitive Reserved { get; set; }
+			[CandidTypeDef("empty")]
+			public CandidPrimitive Empty { get; set; }
+			[CandidTypeDef("principal")]
+			public CandidPrimitive Principal { get; set; }
+			[CandidTypeDef("service { test : () -> () }")]
+			public CandidService Service { get; set; }
+			[CandidTypeDef("() -> ()")]
+			public CandidFunc Func { get; set; }
+			[CandidTypeDef("opt text")]
+			public CandidOptional Opt { get; set; }
+			[CandidTypeDef("vec text")]
+			public CandidVector Vec { get; set; }
+			[CandidTypeDef("record { text4 : text }")]
+			public CandidRecord Rec { get; set; }
+			[CandidTypeDef("variant { text5 : text }")]
+			public CandidVariant Var { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+		}
+
+		[Fact]
+		public void AllRawTypes__Record__NoMapping()
+		{
+			var raw = new AllRawTypes
+			{
+				Bool = CandidValue.Bool(true),
+				Nat = CandidValue.Nat(1),
+				Int = CandidValue.Int(-1),
+				Nat8 = CandidValue.Nat8(2),
+				Nat16 = CandidValue.Nat16(2),
+				Nat32 = CandidValue.Nat32(2),
+				Nat64 = CandidValue.Nat64(2),
+				Int8 = CandidValue.Int8(2),
+				Int16 = CandidValue.Int16(2),
+				Int32 = CandidValue.Int32(2),
+				Int64 = CandidValue.Int64(2),
+				Float32 = CandidValue.Float32(3.14f),
+				Float64 = CandidValue.Float64(-3.14f),
+				Text = CandidValue.Text("text"),
+				Null = CandidValue.Null(),
+				Reserved = CandidValue.Reserved(),
+				Empty = CandidValue.Empty(),
+				Principal = CandidValue.Principal(Models.Principal.FromText("rrkah-fqaaa-aaaaa-aaaaq-cai")),
+				Service = new CandidService(Models.Principal.FromText("rrkah-fqaaa-aaaaa-aaaaq-cai")),
+				Func = new CandidFunc(new CandidService(Models.Principal.FromText("rrkah-fqaaa-aaaaa-aaaaq-cai")), "test"),
+				Opt = new CandidOptional(CandidValue.Text("text2")),
+				Vec = new CandidVector(new CandidValue[] { CandidValue.Text("text3") }),
+				Rec = new CandidRecord(new Dictionary<CandidTag, CandidValue>
+				{
+					["text4"] = CandidValue.Text("text4")
+				}),
+				Var = new CandidVariant("text5", CandidValue.Text("text5"))
+			};
+
+			var candidValue = new CandidRecord(new Dictionary<CandidTag, CandidValue>
+			{
+				["Bool"] = raw.Bool,
+				["Nat"] = raw.Nat,
+				["Int"] = raw.Int,
+				["Nat8"] = raw.Nat8,
+				["Nat16"] = raw.Nat16,
+				["Nat32"] = raw.Nat32,
+				["Nat64"] = raw.Nat64,
+				["Int8"] = raw.Int8,
+				["Int16"] = raw.Int16,
+				["Int32"] = raw.Int32,
+				["Int64"] = raw.Int64,
+				["Float32"] = raw.Float32,
+				["Float64"] = raw.Float64,
+				["Text"] = raw.Text,
+				["Null"] = raw.Null,
+				["Reserved"] = raw.Reserved,
+				["Empty"] = raw.Empty,
+				["Principal"] = raw.Principal,
+				["Service"] = raw.Service,
+				["Func"] = raw.Func,
+				["Opt"] = raw.Opt,
+				["Vec"] = raw.Vec,
+				["Rec"] = raw.Rec,
+				["Var"] = raw.Var
+			});
+			var funcType = new CandidFuncType(new List<FuncMode>(), new List<CandidType>(), new List<CandidType>());
+			var candidType = new CandidRecordType(new Dictionary<CandidTag, CandidType>
+			{
+				["Bool"] = CandidType.Bool(),
+				["Nat"] = CandidType.Nat(),
+				["Int"] = CandidType.Int(),
+				["Nat8"] = CandidType.Nat8(),
+				["Nat16"] = CandidType.Nat16(),
+				["Nat32"] = CandidType.Nat32(),
+				["Nat64"] = CandidType.Nat64(),
+				["Int8"] = CandidType.Int8(),
+				["Int16"] = CandidType.Int16(),
+				["Int32"] = CandidType.Int32(),
+				["Int64"] = CandidType.Int64(),
+				["Float32"] = CandidType.Float32(),
+				["Float64"] = CandidType.Float64(),
+				["Text"] = CandidType.Text(),
+				["Null"] = CandidType.Null(),
+				["Reserved"] = CandidType.Reserved(),
+				["Empty"] = CandidType.Empty(),
+				["Principal"] = CandidType.Principal(),
+				["Service"] = new CandidServiceType(new Dictionary<CandidId, CandidFuncType>
+				{
+					[CandidId.Create("test")] = funcType
+				}),
+				["Func"] = funcType,
+				["Opt"] = new CandidOptionalType(CandidType.Text()),
+				["Vec"] = new CandidVectorType(CandidType.Text()),
+				["Rec"] = new CandidRecordType(new Dictionary<CandidTag, CandidType>
+				{
+					["text4"] = CandidType.Text()
+				}),
+				["Var"] = new CandidVariantType(new Dictionary<CandidTag, CandidType>
+				{
+					["text5"] = CandidType.Text()
+				})
+			});
+			var candid = new CandidTypedValue(candidValue, candidType);
+
+			this.Test(raw, candid, (a, b) =>
+			{
+				return a.Bool == b.Bool
+					&& a.Nat == b.Nat
+					&& a.Int == b.Int
+					&& a.Nat8 == b.Nat8
+					&& a.Nat16 == b.Nat16
+					&& a.Nat32 == b.Nat32
+					&& a.Nat64 == b.Nat64
+					&& a.Int8 == b.Int8
+					&& a.Int16 == b.Int16
+					&& a.Int32 == b.Int32
+					&& a.Int64 == b.Int64
+					&& a.Float32 == b.Float32
+					&& a.Float64 == b.Float64
+					&& a.Text == b.Text
+					&& a.Null == b.Null
+					&& a.Reserved == b.Reserved
+					&& a.Empty == b.Empty
+					&& a.Principal == b.Principal
+					&& a.Service == b.Service
+					&& a.Func == b.Func
+					&& a.Opt == b.Opt
+					&& a.Vec == b.Vec
+					&& a.Rec == b.Rec
+					&& a.Var == b.Var;
+			});
+		}
+
+		[Variant]
+		public class RawVariant
+		{
+			[VariantTagProperty]
+			public RawVariantTag Tag { get; set; }
+			[VariantValueProperty]
+			public object? Value { get; set; }
+
+			[CandidTypeDef("() -> ()")]
+			public CandidFunc AsFunc()
+			{
+				return (CandidFunc)this.Value!;
+			}
+
+			[CandidTypeDef("opt text")]
+			public CandidOptional AsOptional()
+			{
+				return (CandidOptional)this.Value!;
+			}
+		}
+		public enum RawVariantTag
+		{
+			Func,
+			Optional
+		}
+
+		[Fact]
+		public void RawVariant__NoMapping()
+		{
+			var value1 = new CandidFunc(new CandidService(Models.Principal.FromText("rrkah-fqaaa-aaaaa-aaaaq-cai")), "test");
+			var raw = new RawVariant
+			{
+				Tag = RawVariantTag.Func,
+				Value = value1
+			};
+			var candidValue = new CandidVariant("Func", value1);
+			var candidType = new CandidVariantType(new Dictionary<CandidTag, CandidType>
+			{
+				["Func"] = new CandidFuncType(new List<FuncMode>(), new List<CandidType>(), new List<CandidType>()),
+				["Optional"] = new CandidOptionalType(CandidType.Text())
+			});
+			var candidTypedValue = new CandidTypedValue(candidValue, candidType);
+
+			var value2 = new CandidOptional(CandidValue.Text("text"));
+			var raw2 = new RawVariant
+			{
+				Tag = RawVariantTag.Optional,
+				Value = value2
+			};
+
+			var candidValue2 = new CandidVariant("Optional", value2);
+			var candidTypedValue2 = new CandidTypedValue(candidValue2, candidType);
+
+
+			CandidTypedValue actualTypedCandid = CandidConverter.Default.FromTypedObject(raw);
+			Assert.Equal(candidTypedValue, actualTypedCandid);
+
+			RawVariant actual = CandidConverter.Default.ToObject<RawVariant>(candidValue);
+			Assert.NotNull(actual);
+			Assert.Equal(raw.Tag, actual.Tag);
+			Assert.Equal(raw.Value, actual.Value);
+
+			CandidTypedValue actualTypedCandid2 = CandidConverter.Default.FromTypedObject(raw2);
+			Assert.Equal(candidTypedValue2, actualTypedCandid2);
+
+			RawVariant actual2 = CandidConverter.Default.ToObject<RawVariant>(candidValue2);
+			Assert.NotNull(actual2);
+			Assert.Equal(raw2.Tag, actual2.Tag);
+			Assert.Equal(raw2.Value, actual2.Value);
+		}
+
 
 		private void Test<T>(T raw, CandidTypedValue candid, Func<T, T, bool> areEqual)
 			where T : notnull

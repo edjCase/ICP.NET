@@ -500,6 +500,20 @@
         <member name="M:EdjCase.ICP.Candid.Mapping.VariantOptionAttribute.#ctor(System.String)">
             <param name="tag">The tag of the variant option</param>
         </member>
+        <member name="T:EdjCase.ICP.Candid.Mapping.RawCandidTypeAttribute">
+            <summary>
+            An attribute to put on a raw candid value to specify its type.
+            This is REQUIRED for any raw candid values
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.Candid.Mapping.RawCandidTypeAttribute.Type">
+            <summary>
+            The candid type definition for the raw value
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Mapping.RawCandidTypeAttribute.#ctor(System.String)">
+            <param name="typeDef">The candid type definition in string format https://github.com/dfinity/candid/blob/master/spec/Candid.md#core-grammar</param>
+        </member>
         <member name="T:EdjCase.ICP.Candid.Models.CandidArg">
             <summary>
             A model representing a candid arg. Used as the list of arguments for a function
