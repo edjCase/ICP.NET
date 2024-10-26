@@ -333,7 +333,7 @@ namespace EdjCase.ICP.Candid.Mapping
 			VariantAttribute? variantAttribute = objType.GetCustomAttribute<VariantAttribute>();
 			if (variantAttribute != null)
 			{
-				return BuildVariant(objType, variantAttribute);
+				return BuildVariant(objType);
 			}
 
 			if (typeof(CandidValue).IsAssignableFrom(objType))
@@ -487,7 +487,7 @@ namespace EdjCase.ICP.Candid.Mapping
 			return new ResolvedTypeInfo(enumType, candidType, mapper);
 		}
 
-		private static IResolvableTypeInfo BuildVariant(Type objType, VariantAttribute attribute)
+		private static IResolvableTypeInfo BuildVariant(Type objType)
 		{
 			List<PropertyInfo> properties = objType
 				.GetProperties(BindingFlags.Instance | BindingFlags.Public)
@@ -628,7 +628,13 @@ namespace EdjCase.ICP.Candid.Mapping
 							{
 								return new CandidPrimitiveType(PrimitiveType.Null);
 							}
-							return o.Value.CandidType ?? resolvedDependencies[o.Value.Type];
+							CandidType type = o.Value.CandidType ?? resolvedDependencies[o.Value.Type];
+							if (o.Value.UseOptionalOverride)
+							{
+								// Property is really optional type
+								type = new CandidOptionalType(type);
+							}
+							return type;
 						}
 					);
 				var type = new CandidVariantType(optionCandidTypes);

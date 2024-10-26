@@ -372,10 +372,9 @@ namespace EdjCase.ICP.Candid.Tests
 				return (string)this.Value!;
 			}
 
-			[CandidOptional]
 			public int? AsInt()
 			{
-				return (int)this.Value!;
+				return (int?)this.Value!;
 			}
 		}
 
