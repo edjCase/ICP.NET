@@ -549,53 +549,53 @@ namespace EdjCase.ICP.Candid.Tests
 		public class AllRawTypes
 		{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-			[CandidTypeDef("bool")]
+			[CandidTypeDefinition("bool")]
 			public CandidPrimitive Bool { get; set; }
-			[CandidTypeDef("nat")]
+			[CandidTypeDefinition("nat")]
 			public CandidPrimitive Nat { get; set; }
-			[CandidTypeDef("int")]
+			[CandidTypeDefinition("int")]
 			public CandidPrimitive Int { get; set; }
-			[CandidTypeDef("nat8")]
+			[CandidTypeDefinition("nat8")]
 			public CandidPrimitive Nat8 { get; set; }
-			[CandidTypeDef("nat16")]
+			[CandidTypeDefinition("nat16")]
 			public CandidPrimitive Nat16 { get; set; }
-			[CandidTypeDef("nat32")]
+			[CandidTypeDefinition("nat32")]
 			public CandidPrimitive Nat32 { get; set; }
-			[CandidTypeDef("nat64")]
+			[CandidTypeDefinition("nat64")]
 			public CandidPrimitive Nat64 { get; set; }
-			[CandidTypeDef("int8")]
+			[CandidTypeDefinition("int8")]
 			public CandidPrimitive Int8 { get; set; }
-			[CandidTypeDef("int16")]
+			[CandidTypeDefinition("int16")]
 			public CandidPrimitive Int16 { get; set; }
-			[CandidTypeDef("int32")]
+			[CandidTypeDefinition("int32")]
 			public CandidPrimitive Int32 { get; set; }
-			[CandidTypeDef("int64")]
+			[CandidTypeDefinition("int64")]
 			public CandidPrimitive Int64 { get; set; }
-			[CandidTypeDef("float32")]
+			[CandidTypeDefinition("float32")]
 			public CandidPrimitive Float32 { get; set; }
-			[CandidTypeDef("float64")]
+			[CandidTypeDefinition("float64")]
 			public CandidPrimitive Float64 { get; set; }
-			[CandidTypeDef("text")]
+			[CandidTypeDefinition("text")]
 			public CandidPrimitive Text { get; set; }
-			[CandidTypeDef("null")]
+			[CandidTypeDefinition("null")]
 			public CandidPrimitive Null { get; set; }
-			[CandidTypeDef("reserved")]
+			[CandidTypeDefinition("reserved")]
 			public CandidPrimitive Reserved { get; set; }
-			[CandidTypeDef("empty")]
+			[CandidTypeDefinition("empty")]
 			public CandidPrimitive Empty { get; set; }
-			[CandidTypeDef("principal")]
+			[CandidTypeDefinition("principal")]
 			public CandidPrimitive Principal { get; set; }
-			[CandidTypeDef("service { test : () -> () }")]
+			[CandidTypeDefinition("service { test : () -> () }")]
 			public CandidService Service { get; set; }
-			[CandidTypeDef("() -> ()")]
+			[CandidTypeDefinition("() -> ()")]
 			public CandidFunc Func { get; set; }
-			[CandidTypeDef("opt text")]
+			[CandidTypeDefinition("opt text")]
 			public CandidOptional Opt { get; set; }
-			[CandidTypeDef("vec text")]
+			[CandidTypeDefinition("vec text")]
 			public CandidVector Vec { get; set; }
-			[CandidTypeDef("record { text4 : text }")]
+			[CandidTypeDefinition("record { text4 : text }")]
 			public CandidRecord Rec { get; set; }
-			[CandidTypeDef("variant { text5 : text }")]
+			[CandidTypeDefinition("variant { text5 : text }")]
 			public CandidVariant Var { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 		}
@@ -737,13 +737,13 @@ namespace EdjCase.ICP.Candid.Tests
 			[VariantValueProperty]
 			public object? Value { get; set; }
 
-			[CandidTypeDef("() -> ()")]
+			[CandidTypeDefinition("() -> ()")]
 			public CandidFunc AsFunc()
 			{
 				return (CandidFunc)this.Value!;
 			}
 
-			[CandidTypeDef("opt text")]
+			[CandidTypeDefinition("opt text")]
 			public CandidOptional AsOptional()
 			{
 				return (CandidOptional)this.Value!;

@@ -23,6 +23,7 @@ namespace EdjCase.ICP.Candid.Tests.Generators
 		[InlineData("Dex")]
 		[InlineData("AnonymousTuples")]
 		[InlineData("DuplicatePropertyNames")]
+		[InlineData("FuncType")]
 		public void GenerateClients(string serviceName)
 		{
 			string fileText = GetFileText(serviceName + ".did");
@@ -81,7 +82,7 @@ namespace EdjCase.ICP.Candid.Tests.Generators
 				outputDirectory: "./",
 				purgeOutputDirectory: true,
 				noFolders: noFolders,
-				featureNullable: featureNullable, 
+				featureNullable: featureNullable,
 				variantsUseProperties: variantsUseProperties,
 				keepCandidCase: keepCandidCase,
 				overrideOptionalValue: overrideOptionalValue,

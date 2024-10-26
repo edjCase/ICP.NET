@@ -125,17 +125,17 @@ namespace EdjCase.ICP.Candid.Mapping
 	/// This is REQUIRED for any raw candid values
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]
-	public class CandidTypeDefAttribute : Attribute
+	public class CandidTypeDefinitionAttribute : Attribute
 	{
 		/// <summary>
 		/// The candid type definition for the value
 		/// </summary>
 		public CandidType Type { get; }
 
-		/// <param name="typeDef">The candid type definition in string format https://github.com/dfinity/candid/blob/master/spec/Candid.md#core-grammar</param>
-		public CandidTypeDefAttribute(string typeDef)
+		/// <param name="definition">The candid type definition in string format https://github.com/dfinity/candid/blob/master/spec/Candid.md#core-grammar</param>
+		public CandidTypeDefinitionAttribute(string definition)
 		{
-			this.Type = CandidTextParser.Parse(typeDef);
+			this.Type = CandidTextParser.Parse(definition);
 		}
 	}
 }

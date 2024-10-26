@@ -199,16 +199,16 @@ public class MyRecord
 
 ## Raw Candid Types
 
-If you want to use the raw candid forms for the value, then the candid type definition must be specified with the CandidTypeDefAttribute
+If you want to use the raw candid forms for the value, then the candid type definition must be specified with the CandidTypeDefinitionAttribute
 The definition is in text form of candid (like in a \*.did file) as seen here https://github.com/dfinity/candid/blob/master/spec/Candid.md#core-grammar
 The text form is used because attributes cannot have an object type, so cannot accept the CandidType class
 
-NOTE: func and service do not have a compatible type that is not the raw candid form, so they must have the CandidTypeDefAttribute
+NOTE: func and service do not have a compatible type that is not the raw candid form, so they must have the CandidTypeDefinitionAttribute
 
 ```
 public class MyRecord
 {
-    [CandidTypeDef("() -> ()")]
+    [CandidTypeDefinition("() -> ()")]
     public CandidFunc Callback { get; set; }
 }
 ```
@@ -242,5 +242,5 @@ NullValue -> Null
 * CandidFunc -> Func
 * CandidService -> Service
 
-* Raw types require the [CandidTypeDef("...")] attribute
+* Raw types require the [CandidTypeDefinition("...")] attribute
 ```

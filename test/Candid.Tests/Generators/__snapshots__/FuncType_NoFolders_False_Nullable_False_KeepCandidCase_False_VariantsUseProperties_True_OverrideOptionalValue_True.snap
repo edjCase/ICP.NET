@@ -1,0 +1,55 @@
+﻿using EdjCase.ICP.Agent.Agents;
+using EdjCase.ICP.Candid.Models;
+using EdjCase.ICP.Candid;
+using System.Threading.Tasks;
+using Test;
+using EdjCase.ICP.Agent.Responses;
+
+namespace Test
+{
+	public class FuncTypeApiClient
+	{
+		public IAgent Agent { get; }
+		public Principal CanisterId { get; }
+		public CandidConverter Converter { get; }
+
+		public FuncTypeApiClient(IAgent agent, Principal canisterId, CandidConverter converter = default)
+		{
+			this.Agent = agent;
+			this.CanisterId = canisterId;
+			this.Converter = converter;
+		}
+
+		public async Task<Models.Result> A()
+		{
+			CandidArg arg = CandidArg.FromCandid();
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "a", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Models.Result>(this.Converter);
+		}
+	}
+}
+
+Type File: 'Result'
+
+using EdjCase.ICP.Candid.Mapping;
+using EdjCase.ICP.Candid.Models.Values;
+
+namespace Test.Models
+{
+	public class Result
+	{
+		[CandidName("callback")]
+		[CandidTypeDefinition("( ) -> ( )")]
+		public CandidFunc Callback { get; set; }
+
+		public Result(CandidFunc callback)
+		{
+			this.Callback = callback;
+		}
+
+		public Result()
+		{
+		}
+	}
+}

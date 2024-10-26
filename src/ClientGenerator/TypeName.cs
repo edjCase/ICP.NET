@@ -1,4 +1,6 @@
 using EdjCase.ICP.Candid.Models;
+using EdjCase.ICP.Candid.Models.Types;
+using EdjCase.ICP.Candid.Models.Values;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -63,6 +65,44 @@ namespace EdjCase.ICP.ClientGenerator
 			string typeName = this.BuildName(featureNullable, includeNamespace: true, resolveAliases: resolveAliases);
 			return SyntaxFactory.IdentifierName(typeName);
 		}
+	}
+
+	internal class CandidTypeTypeName : TypeName
+	{
+		public override bool IsDefaultNullable => false;
+		public CandidType CandidType { get; }
+
+		public CandidTypeTypeName(CandidType candidType)
+		{
+			this.CandidType = candidType;
+		}
+
+		public override string BuildName(bool featureNullable, bool includeNamespace, bool resolveAliases)
+		{
+			Type candidValueType;
+			switch (this.CandidType)
+			{
+				case CandidFuncType f:
+					candidValueType = typeof(CandidFunc);
+					break;
+				default:
+					throw new NotImplementedException("RawCandidType type not implemented: " + this.CandidType);
+			}
+			if (!includeNamespace || candidValueType.Namespace == null)
+			{
+				return candidValueType.Name;
+			}
+			return candidValueType.Namespace + "." + candidValueType.Name;
+		}
+
+		public override TypeSyntax ToTypeSyntax(bool featureNullable, bool resolveAliases)
+		{
+			string typeName = this.BuildName(featureNullable, includeNamespace: true, resolveAliases: resolveAliases);
+			return SyntaxFactory.IdentifierName(typeName);
+		}
+
+		public override CandidType? GetCandidType() => this.CandidType;
+
 	}
 
 	internal class SimpleTypeName : TypeName
@@ -244,7 +284,7 @@ namespace EdjCase.ICP.ClientGenerator
 		public override string BuildName(bool featureNullable, bool includeNamespace, bool resolveAliases)
 		{
 			string innerName = this.InnerType.BuildName(featureNullable, includeNamespace, resolveAliases);
-			return featureNullable  ? innerName + "?" : innerName;
+			return featureNullable ? innerName + "?" : innerName;
 		}
 	}
 
@@ -319,6 +359,7 @@ namespace EdjCase.ICP.ClientGenerator
 
 	internal abstract class TypeName
 	{
+		public virtual CandidType? GetCandidType() => null;
 		public abstract string BuildName(bool featureNullable, bool includeNamespace, bool resolveAliases = false);
 		public abstract TypeSyntax ToTypeSyntax(bool featureNullable, bool resolveAliases = false);
 		public abstract bool IsDefaultNullable { get; }

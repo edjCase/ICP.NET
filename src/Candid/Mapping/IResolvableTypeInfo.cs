@@ -339,7 +339,7 @@ namespace EdjCase.ICP.Candid.Mapping
 			if (typeof(CandidValue).IsAssignableFrom(objType))
 			{
 				// If RawCandidValueAttribute is on the property, then it will never reach here
-				throw new InvalidOperationException("Raw candid values must have the `CandidTypeDefAttribute` on the property");
+				throw new InvalidOperationException("Raw candid values must have the `CandidTypeDefinitionAttribute` on the property");
 			}
 
 			// Assume anything else is a record
@@ -545,7 +545,7 @@ namespace EdjCase.ICP.Candid.Mapping
 				CandidOptionalAttribute? optionalAttribute = classMethod.GetCustomAttribute<CandidOptionalAttribute>();
 				bool useOptionalOverride = optionalAttribute != null;
 
-				CandidTypeDefAttribute? rawCandidTypeAttribute = classMethod.GetCustomAttribute<CandidTypeDefAttribute>();
+				CandidTypeDefinitionAttribute? rawCandidTypeAttribute = classMethod.GetCustomAttribute<CandidTypeDefinitionAttribute>();
 
 				optionTypes.Add(tag, (classMethod.ReturnType, useOptionalOverride, rawCandidTypeAttribute?.Type));
 			}
@@ -574,7 +574,7 @@ namespace EdjCase.ICP.Candid.Mapping
 				}
 				CandidOptionalAttribute? optionalAttribute = property.GetCustomAttribute<CandidOptionalAttribute>();
 				bool useOptionalOverride = optionalAttribute != null;
-				CandidTypeDefAttribute? rawCandidTypeAttribute = property.GetCustomAttribute<CandidTypeDefAttribute>();
+				CandidTypeDefinitionAttribute? rawCandidTypeAttribute = property.GetCustomAttribute<CandidTypeDefinitionAttribute>();
 				if (!optionTypes.TryGetValue(tag, out (Type, bool, CandidType?) optionType))
 				{
 					// Add if not already added by a method
@@ -685,7 +685,7 @@ namespace EdjCase.ICP.Candid.Mapping
 				CandidOptionalAttribute? optionalAttribute = property.GetCustomAttribute<CandidOptionalAttribute>();
 				bool useOptionalOverride = optionalAttribute != null;
 
-				CandidTypeDefAttribute? rawCandidValueAttribute = property.GetCustomAttribute<CandidTypeDefAttribute>();
+				CandidTypeDefinitionAttribute? rawCandidValueAttribute = property.GetCustomAttribute<CandidTypeDefinitionAttribute>();
 
 
 				PropertyMetaData propertyMetaData = new(property, useOptionalOverride, rawCandidValueAttribute?.Type);
