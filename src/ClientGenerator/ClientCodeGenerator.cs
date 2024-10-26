@@ -73,7 +73,7 @@ namespace EdjCase.ICP.ClientGenerator
 		)
 		{
 			var nameHelper = new NameHelper(options.KeepCandidCase);
-			HashSet<string> aliasedTypeIds = new ();
+			HashSet<string> aliasedTypeIds = new();
 			// Mapping of A => Type
 			// where candid is: type A = Type;
 			Dictionary<string, (string Name, SourceCodeType Type)> declaredTypes = service.DeclaredTypes
@@ -168,7 +168,7 @@ namespace EdjCase.ICP.ClientGenerator
 				case CandidFuncType f:
 					{
 						hasAliasReference = false;
-						return new NonGenericSourceCodeType(typeof(CandidFunc));
+						return new RawCandidType(f);
 					}
 				case CandidPrimitiveType p:
 					{

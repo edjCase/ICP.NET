@@ -2,6 +2,7 @@ using EdjCase.ICP.Candid.Mapping.Mappers;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.Candid.Models.Types;
 using EdjCase.ICP.Candid.Models.Values;
+using EdjCase.ICP.Candid.Parsers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -332,9 +333,14 @@ namespace EdjCase.ICP.Candid.Mapping
 			VariantAttribute? variantAttribute = objType.GetCustomAttribute<VariantAttribute>();
 			if (variantAttribute != null)
 			{
-				return BuildVariant(objType, variantAttribute);
+				return BuildVariant(objType);
 			}
 
+			if (typeof(CandidValue).IsAssignableFrom(objType))
+			{
+				// If RawCandidValueAttribute is on the property, then it will never reach here
+				throw new InvalidOperationException("Raw candid values must have the `CandidTypeDefinitionAttribute` on the property");
+			}
 
 			// Assume anything else is a record
 			return BuildRecord(objType);
@@ -481,7 +487,7 @@ namespace EdjCase.ICP.Candid.Mapping
 			return new ResolvedTypeInfo(enumType, candidType, mapper);
 		}
 
-		private static IResolvableTypeInfo BuildVariant(Type objType, VariantAttribute attribute)
+		private static IResolvableTypeInfo BuildVariant(Type objType)
 		{
 			List<PropertyInfo> properties = objType
 				.GetProperties(BindingFlags.Instance | BindingFlags.Public)
@@ -519,7 +525,7 @@ namespace EdjCase.ICP.Candid.Mapping
 					t => t
 				);
 
-			var optionTypes = new Dictionary<CandidTag, (Type Type, bool UseOptionalOverride)>();
+			var optionTypes = new Dictionary<CandidTag, (Type Type, bool UseOptionalOverride, CandidType? CandidType)>();
 			foreach (MethodInfo classMethod in objType.GetMethods(BindingFlags.Instance | BindingFlags.Public))
 			{
 				CandidTag tag;
@@ -539,7 +545,9 @@ namespace EdjCase.ICP.Candid.Mapping
 				CandidOptionalAttribute? optionalAttribute = classMethod.GetCustomAttribute<CandidOptionalAttribute>();
 				bool useOptionalOverride = optionalAttribute != null;
 
-				optionTypes.Add(tag, (classMethod.ReturnType, useOptionalOverride));
+				CandidTypeDefinitionAttribute? rawCandidTypeAttribute = classMethod.GetCustomAttribute<CandidTypeDefinitionAttribute>();
+
+				optionTypes.Add(tag, (classMethod.ReturnType, useOptionalOverride, rawCandidTypeAttribute?.Type));
 			}
 			foreach (PropertyInfo property in properties)
 			{
@@ -566,14 +574,15 @@ namespace EdjCase.ICP.Candid.Mapping
 				}
 				CandidOptionalAttribute? optionalAttribute = property.GetCustomAttribute<CandidOptionalAttribute>();
 				bool useOptionalOverride = optionalAttribute != null;
-				if (!optionTypes.TryGetValue(tag, out (Type, bool) optionType))
+				CandidTypeDefinitionAttribute? rawCandidTypeAttribute = property.GetCustomAttribute<CandidTypeDefinitionAttribute>();
+				if (!optionTypes.TryGetValue(tag, out (Type, bool, CandidType?) optionType))
 				{
 					// Add if not already added by a method
-					optionTypes.Add(tag, (property.PropertyType, useOptionalOverride));
+					optionTypes.Add(tag, (property.PropertyType, useOptionalOverride, rawCandidTypeAttribute?.Type));
 				}
 				else
 				{
-					if (optionType != (property.PropertyType, useOptionalOverride))
+					if (optionType != (property.PropertyType, useOptionalOverride, rawCandidTypeAttribute?.Type))
 					{
 						throw new Exception($"Conflict: Variant '{objType.FullName}' defines a property '{property.Name}' and a method with different types for an option");
 					}
@@ -589,19 +598,21 @@ namespace EdjCase.ICP.Candid.Mapping
 					MemberInfo enumOption = variantTagProperty.PropertyType.GetMember(tagName.Name).First();
 					Type? optionType = null;
 					bool useOptionalOverride = false;
-					if (optionTypes.TryGetValue(tagName, out (Type Type, bool UseOptionalOverride) o))
+					CandidType? candidType = null;
+					if (optionTypes.TryGetValue(tagName, out (Type Type, bool UseOptionalOverride, CandidType? CandidType) o))
 					{
 						optionType = o.Type;
 						useOptionalOverride = o.UseOptionalOverride;
+						candidType = o.CandidType;
 					}
 					var tagAttribute = enumOption.GetCustomAttribute<CandidTagAttribute>();
 					CandidTag tag = tagAttribute?.Tag ?? tagName;
-					return (tag, new VariantMapper.Option(tagEnum, optionType, useOptionalOverride));
+					return (tag, new VariantMapper.Option(tagEnum, optionType, useOptionalOverride, candidType));
 				})
 				.ToDictionary(k => k.Item1, k => k.Item2);
 
 			List<Type> dependencies = options.Values
-				.Where(v => v.Type != null)
+				.Where(v => v.Type != null && v.CandidType == null)
 				.Select(v => v.Type!)
 				.Distinct()
 				.ToList();
@@ -617,7 +628,13 @@ namespace EdjCase.ICP.Candid.Mapping
 							{
 								return new CandidPrimitiveType(PrimitiveType.Null);
 							}
-							return resolvedDependencies[o.Value.Type];
+							CandidType type = o.Value.CandidType ?? resolvedDependencies[o.Value.Type];
+							if (o.Value.UseOptionalOverride)
+							{
+								// Property is really optional type
+								type = new CandidOptionalType(type);
+							}
+							return type;
 						}
 					);
 				var type = new CandidVariantType(optionCandidTypes);
@@ -673,10 +690,15 @@ namespace EdjCase.ICP.Candid.Mapping
 				}
 				CandidOptionalAttribute? optionalAttribute = property.GetCustomAttribute<CandidOptionalAttribute>();
 				bool useOptionalOverride = optionalAttribute != null;
-				PropertyMetaData propertyMetaData = new(property, useOptionalOverride);
+
+				CandidTypeDefinitionAttribute? rawCandidValueAttribute = property.GetCustomAttribute<CandidTypeDefinitionAttribute>();
+
+
+				PropertyMetaData propertyMetaData = new(property, useOptionalOverride, rawCandidValueAttribute?.Type);
 				propertyMetaDataMap.Add(tag, propertyMetaData);
 			}
 			List<Type> dependencies = propertyMetaDataMap
+				.Where(p => p.Value.CandidType is null)
 				.Select(p => p.Value.PropertyInfo.PropertyType)
 				.ToList();
 			return new ComplexTypeInfo(objType, dependencies, (resolvedMappings) =>
@@ -686,7 +708,7 @@ namespace EdjCase.ICP.Candid.Mapping
 						p => p.Key,
 						p =>
 						{
-							CandidType type = resolvedMappings[p.Value.PropertyInfo.PropertyType];
+							CandidType type = p.Value.CandidType ?? resolvedMappings[p.Value.PropertyInfo.PropertyType];
 							if (p.Value.UseOptionalOverride)
 							{
 								// Property is really optional type
@@ -702,10 +724,28 @@ namespace EdjCase.ICP.Candid.Mapping
 		}
 
 	}
+
 	internal record PropertyMetaData(
 		PropertyInfo PropertyInfo,
-		bool UseOptionalOverride
-	);
+		bool UseOptionalOverride,
+		CandidType? CandidType
+	)
+	{
+		private bool? isGenericNullableCache;
 
-
+		public bool IsGenericNullable
+		{
+			get
+			{
+				{
+					if (!this.isGenericNullableCache.HasValue)
+					{
+						this.isGenericNullableCache = this.PropertyInfo.PropertyType.IsGenericType
+						&& this.PropertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
+					}
+					return this.isGenericNullableCache.Value;
+				}
+			}
+		}
+	};
 }

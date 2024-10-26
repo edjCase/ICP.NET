@@ -11,6 +11,17 @@ namespace EdjCase.ICP.ClientGenerator
 
 	}
 
+	internal class RawCandidType : SourceCodeType
+	{
+		public Candid.Models.Types.CandidType CandidType { get; }
+		public override bool IsPredefinedType { get; } = true;
+
+		public RawCandidType(Candid.Models.Types.CandidType candidType)
+		{
+			this.CandidType = candidType ?? throw new ArgumentNullException(nameof(candidType));
+		}
+	}
+
 	internal class NonGenericSourceCodeType : SourceCodeType
 	{
 		public Type Type { get; }
@@ -71,7 +82,7 @@ namespace EdjCase.ICP.ClientGenerator
 		{
 			this.KeyType = keyType;
 			this.ValueType = valueType;
-			this.IsPredefinedType= usePredefined;
+			this.IsPredefinedType = usePredefined;
 		}
 	}
 
