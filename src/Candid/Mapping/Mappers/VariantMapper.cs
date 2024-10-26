@@ -123,7 +123,7 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 				{
 					// Convert
 					innerValue = converter.FromObject(innerObj);
-					if (optionInfo.UseOptionalOverride)
+					if (optionInfo.UseOptionalOverride || optionInfo.IsGenericNullable)
 					{
 						// Wrap in candid optional
 						innerValue = new CandidOptional(innerValue);
@@ -151,6 +151,24 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 				this.Type = type;
 				this.UseOptionalOverride = useOptionalOverride;
 				this.CandidType = candidType;
+			}
+
+
+			private bool? isGenericNullableCache;
+
+			public bool IsGenericNullable
+			{
+				get
+				{
+					{
+						if (!this.isGenericNullableCache.HasValue)
+						{
+							this.isGenericNullableCache = this.Type != null && this.Type.IsGenericType
+							&& this.Type.GetGenericTypeDefinition() == typeof(Nullable<>);
+						}
+						return this.isGenericNullableCache.Value;
+					}
+				}
 			}
 		}
 	}

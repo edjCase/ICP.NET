@@ -169,6 +169,10 @@ namespace EdjCase.ICP.Candid.Tests
 			public object? Value { get; set; }
 
 
+			public string AsV2()
+			{
+				return (string)this.Value!;
+			}
 			public int AsV3()
 			{
 				return (int)this.Value!;
@@ -313,7 +317,6 @@ namespace EdjCase.ICP.Candid.Tests
 
 			[CandidOptional]
 			public string? OptValue { get; set; }
-			[CandidOptional]
 			public int? OptIntValue { get; set; }
 			public OptionalValue<string> OptValue2 { get; set; } = OptionalValue<string>.NoValue();
 		}

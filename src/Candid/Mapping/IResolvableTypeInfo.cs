@@ -724,11 +724,28 @@ namespace EdjCase.ICP.Candid.Mapping
 		}
 
 	}
+
 	internal record PropertyMetaData(
 		PropertyInfo PropertyInfo,
 		bool UseOptionalOverride,
 		CandidType? CandidType
-	);
+	)
+	{
+		private bool? isGenericNullableCache;
 
-
+		public bool IsGenericNullable
+		{
+			get
+			{
+				{
+					if (!this.isGenericNullableCache.HasValue)
+					{
+						this.isGenericNullableCache = this.PropertyInfo.PropertyType.IsGenericType
+						&& this.PropertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
+					}
+					return this.isGenericNullableCache.Value;
+				}
+			}
+		}
+	};
 }

@@ -37,12 +37,6 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 					}
 					else
 					{
-						if (t.IsGenericType
-							&& t.GetGenericTypeDefinition() == typeof(Nullable<>))
-						{
-							// Get T of Nullable<T>
-							t = t.GetGenericArguments()[0];
-						}
 						if (property.UseOptionalOverride
 							&& fieldCandidValue is CandidOptional o
 							&& o.Value.IsNull())
@@ -101,9 +95,10 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 					else
 					{
 						v = converter.FromObject(propValue);
-						if (property.UseOptionalOverride)
+						if (property.UseOptionalOverride || property.IsGenericNullable)
 						{
 							// Wrap in candid optional if has override [CandidOptional]
+							// or is Nullable<> (Nullable<T> gives just T if setting the value)
 							v = new CandidOptional(v);
 						}
 					}
