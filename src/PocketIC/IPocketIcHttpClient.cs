@@ -1,27 +1,26 @@
 
-using System.Text.Json.Nodes;
 using EdjCase.ICP.Candid.Models;
 
 namespace EdjCase.ICP.PocketIC.Client;
 
 public interface IPocketIcHttpClient
 {
-	Task<JsonNode?> GetStatusAsync();
+	// Task<JsonNode?> GetStatusAsync();
 
-	Task<byte[]> UploadBlobAsync(byte[] blob);
+	Task<string> UploadBlobAsync(byte[] blob);
 
-	Task<byte[]> DownloadBlobAsync(byte[] blobId);
+	Task<byte[]> DownloadBlobAsync(string blobId);
 
-	Task<JsonNode?> VerifySignatureAsync(
-		byte[] message,
-		Principal publicKey,
-		Principal rootPublicKey,
-		byte[] signature
-	);
+	// Task<JsonNode?> VerifySignatureAsync(
+	// 	byte[] message,
+	// 	Principal publicKey,
+	// 	Principal rootPublicKey,
+	// 	byte[] signature
+	// );
 
-	Task<JsonNode?> ReadGraphAsync(string stateLabel, string opId);
+	// Task<JsonNode?> ReadGraphAsync(string stateLabel, string opId);
 
-	Task<List<string>> GetInstanceIdsAsync();
+	Task<List<Instance>> GetInstancesAsync();
 
 	Task<(int Id, List<SubnetTopology> Topology)> CreateInstanceAsync(
 		List<SubnetConfig>? applicationSubnets = null,
@@ -49,7 +48,8 @@ public interface IPocketIcHttpClient
 
 	Task<ICTimestamp> GetTimeAsync(int instanceId);
 
-	Task<JsonNode?> GetCanisterHttpAsync(int instanceId);
+	// TODO?
+	// Task<JsonNode?> GetCanisterHttpAsync(int instanceId);
 
 	Task<ulong> GetCyclesBalanceAsync(int instanceId, Principal canisterId);
 
@@ -87,29 +87,41 @@ public interface IPocketIcHttpClient
 }
 
 
-public class HttpGatewayConfig
+public class Instance
 {
-	public required JsonObject ForwardTo { get; set; }
-	public List<string>? Domains { get; set; }
-	public ushort? Port { get; set; }
-	public string? IpAddr { get; set; }
-	public HttpsConfig? HttpsConfig { get; set; }
+	public required int Id { get; set; }
+	public required InstanceStatus Status { get; set; }
 }
 
-public class HttpsConfig
+public enum InstanceStatus
 {
-	public required string CertPath { get; set; }
-	public required string KeyPath { get; set; }
+	Available,
+	Deleted
 }
 
-public class HttpGatewayDetails
-{
-	public required uint InstanceId { get; set; }
-	public required ushort Port { get; set; }
-	public required JsonObject ForwardTo { get; set; }
-	public List<string>? Domains { get; set; }
-	public HttpsConfig? HttpsConfig { get; set; }
-}
+// public class HttpGatewayConfig
+// {
+// 	public required JsonObject ForwardTo { get; set; }
+// 	public List<string>? Domains { get; set; }
+// 	public ushort? Port { get; set; }
+// 	public string? IpAddr { get; set; }
+// 	public HttpsConfig? HttpsConfig { get; set; }
+// }
+
+// public class HttpsConfig
+// {
+// 	public required string CertPath { get; set; }
+// 	public required string KeyPath { get; set; }
+// }
+
+// public class HttpGatewayDetails
+// {
+// 	public required uint InstanceId { get; set; }
+// 	public required ushort Port { get; set; }
+// 	public required JsonObject ForwardTo { get; set; }
+// 	public List<string>? Domains { get; set; }
+// 	public HttpsConfig? HttpsConfig { get; set; }
+// }
 
 public class SubnetTopology
 {
@@ -187,23 +199,23 @@ public enum SubnetStateType
 	FromPath
 }
 
-public class CanisterHttpResponse { }
+// public class CanisterHttpResponse { }
 
-public class CanisterHttpReply : CanisterHttpResponse
-{
-	public required ushort Status { get; set; }
-	public required List<CanisterHttpHeader> Headers { get; set; }
-	public required byte[] Body { get; set; }
-}
+// public class CanisterHttpReply : CanisterHttpResponse
+// {
+// 	public required ushort Status { get; set; }
+// 	public required List<CanisterHttpHeader> Headers { get; set; }
+// 	public required byte[] Body { get; set; }
+// }
 
-public class CanisterHttpReject : CanisterHttpResponse
-{
-	public required ulong RejectCode { get; set; }
-	public required string Message { get; set; }
-}
+// public class CanisterHttpReject : CanisterHttpResponse
+// {
+// 	public required ulong RejectCode { get; set; }
+// 	public required string Message { get; set; }
+// }
 
-public class CanisterHttpHeader
-{
-	public required string Name { get; set; }
-	public required string Value { get; set; }
-}
+// public class CanisterHttpHeader
+// {
+// 	public required string Name { get; set; }
+// 	public required string Value { get; set; }
+// }

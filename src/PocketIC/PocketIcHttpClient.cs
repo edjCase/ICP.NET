@@ -19,54 +19,56 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		this.baseUrl = url;
 	}
 
-	public async Task<JsonNode?> GetStatusAsync()
-	{
-		return await this.GetAsync("/status");
-	}
+	// TODO what are these?
+	// public async Task<JsonNode?> GetStatusAsync()
+	// {
+	// 	return await this.GetAsync("/status");
+	// }
 
-	public async Task<byte[]> UploadBlobAsync(byte[] blob)
+	public async Task<string> UploadBlobAsync(byte[] blob)
 	{
 		var content = new ByteArrayContent(blob);
 		HttpResponseMessage response = await this.httpClient.PostAsync($"{this.baseUrl}/blobstore", content);
 		response.EnsureSuccessStatusCode();
-		var stream = await response.Content.ReadAsStreamAsync();
-		JsonNode? json = await JsonNode.ParseAsync(stream)!;
-		return json!["blob"].Deserialize<byte[]>()!;
+		return await response.Content.ReadAsStringAsync();
 	}
 
-	public async Task<byte[]> DownloadBlobAsync(byte[] blobId)
+	public async Task<byte[]> DownloadBlobAsync(string blobId)
 	{
-		HttpResponseMessage response = await this.httpClient.GetAsync($"{this.baseUrl}/blobstore/{Convert.ToBase64String(blobId)}");
+		HttpResponseMessage response = await this.httpClient.GetAsync($"{this.baseUrl}/blobstore/{blobId}");
 		response.EnsureSuccessStatusCode();
 		return await response.Content.ReadAsByteArrayAsync();
 	}
 
-	public async Task<JsonNode?> VerifySignatureAsync(
-		byte[] message,
-		Principal publicKey,
-		Principal rootPublicKey,
-		byte[] signature
-	)
-	{
-		var request = new JsonObject
-		{
-			["msg"] = JsonValue.Create(message),
-			["pubkey"] = JsonValue.Create(publicKey.Raw),
-			["root_pubkey"] = JsonValue.Create(rootPublicKey.Raw),
-			["sig"] = JsonValue.Create(signature),
-		};
-		return await this.PostAsync("/verify_signature", request);
-	}
+	// TODO?
+	// public async Task<JsonNode?> VerifySignatureAsync(
+	// 	byte[] message,
+	// 	Principal publicKey,
+	// 	Principal rootPublicKey,
+	// 	byte[] signature
+	// )
+	// {
+	// 	var request = new JsonObject
+	// 	{
+	// 		["msg"] = JsonValue.Create(message),
+	// 		["pubkey"] = JsonValue.Create(publicKey.Raw),
+	// 		["root_pubkey"] = JsonValue.Create(rootPublicKey.Raw),
+	// 		["sig"] = JsonValue.Create(signature),
+	// 	};
+	// 	return await this.PostAsync("/verify_signature", request);
+	// }
 
-	public async Task<JsonNode?> ReadGraphAsync(string stateLabel, string opId)
-	{
-		return await this.GetAsync($"/read_graph/{stateLabel}/{opId}");
-	}
+	// public async Task<JsonNode?> ReadGraphAsync(string stateLabel, string opId)
+	// {
+	// 	return await this.GetAsync($"/read_graph/{stateLabel}/{opId}");
+	// }
 
-	public async Task<List<string>> GetInstanceIdsAsync()
+	public async Task<List<Instance>> GetInstancesAsync()
 	{
-		JsonNode? response = await this.GetAsync("/instances");
-		return response!.AsArray().Select(i => i!.Deserialize<string>()!).ToList();
+		JsonNode? response = await this.GetJsonAsync("/instances");
+		return response
+		!.AsArray()
+		.Select((s, i) => new Instance { Id = i, Status = Enum.Parse<InstanceStatus>(s!.Deserialize<string>()!) }).ToList();
 	}
 
 	public async Task<(int Id, List<SubnetTopology> Topology)> CreateInstanceAsync(
@@ -151,7 +153,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["nonmainnet_features"] = nonmainnetFeatures
 		};
 
-		JsonNode? response = await this.PostAsync("/instances", request);
+		JsonNode? response = await this.PostJsonAsync("/instances", request);
 		if (response == null)
 		{
 			throw new Exception("Failed to create PocketIC instance, no response from server");
@@ -211,7 +213,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 
 	public async Task<List<SubnetTopology>> GetTopologyAsync(int instanceId)
 	{
-		JsonNode? node = await this.GetAsync($"/instances/{instanceId}/read/topology");
+		JsonNode? node = await this.GetJsonAsync($"/instances/{instanceId}/read/topology");
 		return node!
 			.AsObject()
 			?.Deserialize<Dictionary<string, JsonNode>>()
@@ -222,15 +224,16 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 
 	public async Task<ICTimestamp> GetTimeAsync(int instanceId)
 	{
-		JsonNode? response = await this.GetAsync($"/instances/{instanceId}/read/get_time");
+		JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/get_time");
 		return ICTimestamp.FromNanoSeconds(response!["nanos_since_epoch"].Deserialize<ulong>()!);
 	}
 
-	public async Task<JsonNode?> GetCanisterHttpAsync(int instanceId)
-	{
-		JsonNode? response = await this.GetAsync($"/instances/{instanceId}/read/get_canister_http");
-		return response;
-	}
+	// TODO?
+	// public async Task<JsonNode?> GetCanisterHttpAsync(int instanceId)
+	// {
+	// 	JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/get_canister_http");
+	// 	return response;
+	// }
 
 	public async Task<ulong> GetCyclesBalanceAsync(int instanceId, Principal canisterId)
 	{
@@ -238,7 +241,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		{
 			["canister_id"] = Convert.ToBase64String(canisterId.Raw)
 		};
-		JsonNode? response = await this.PostAsync($"/instances/{instanceId}/read/get_cycles", request);
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/get_cycles", request);
 		return response!["cycles"].Deserialize<ulong>()!;
 	}
 
@@ -248,8 +251,8 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		{
 			["canister_id"] = Convert.ToBase64String(canisterId.Raw)
 		};
-		JsonNode? response = await this.PostAsync($"/instances/{instanceId}/read/get_stable_memory", request);
-		return response!["blob_id"].Deserialize<byte[]>()!;
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/get_stable_memory", request);
+		return response!["blob"].Deserialize<byte[]>()!;
 	}
 
 	public async Task<Principal> GetSubnetIdForCanisterAsync(int instanceId, Principal canisterId)
@@ -258,7 +261,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		{
 			["canister_id"] = Convert.ToBase64String(canisterId.Raw)
 		};
-		JsonNode? response = await this.PostAsync($"/instances/{instanceId}/read/get_subnet", request);
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/get_subnet", request);
 		byte[] subnetId = response!["subnet_id"].Deserialize<byte[]>()!;
 		return Principal.FromBytes(subnetId);
 	}
@@ -269,8 +272,8 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		{
 			["subnet_id"] = Convert.ToBase64String(subnetId.Raw)
 		};
-		JsonNode? response = await this.PostAsync($"/instances/{instanceId}/read/pub_key", request);
-		byte[] publicKey = response!["public_key"].Deserialize<byte[]>()!;
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/pub_key", request);
+		byte[] publicKey = response!.AsArray().Select(r => r.Deserialize<byte>()!).ToArray();
 		return Principal.FromBytes(publicKey);
 	}
 
@@ -337,7 +340,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["payload"] = Convert.ToBase64String(payload),
 			["sender"] = Convert.ToBase64String(sender.Raw)
 		};
-		JsonNode? response = await this.PostAsync(route, options);
+		JsonNode? response = await this.PostJsonAsync(route, options);
 		if (response == null)
 		{
 			throw new Exception("Failed to get response from canister");
@@ -367,7 +370,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["message_id"] = Convert.ToBase64String(messageId),
 			["effective_principal"] = effectivePrincipal == null ? null : Convert.ToBase64String(effectivePrincipal.Raw)
 		};
-		JsonNode? response = await this.PostAsync($"/instances/{instanceId}/update/await_ingress_message", request);
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/update/await_ingress_message", request);
 		// TODO
 	}
 
@@ -381,7 +384,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		{
 			["nanos_since_epoch"] = nanosSinceEpoch
 		};
-		await this.PostAsync($"/instances/{instanceId}/update/set_time", request);
+		await this.PostJsonAsync($"/instances/{instanceId}/update/set_time", request);
 	}
 
 	public async Task<ulong> AddCyclesAsync(int instanceId, Principal canisterId, ulong amount)
@@ -391,24 +394,24 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["canister_id"] = Convert.ToBase64String(canisterId.Raw),
 			["amount"] = amount
 		};
-		JsonNode? response = await this.PostAsync($"/instances/{instanceId}/update/add_cycles", request);
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/update/add_cycles", request);
 		return response!["cycles"].Deserialize<ulong>()!;
 	}
 
 	public async Task SetStableMemoryAsync(int instanceId, Principal canisterId, byte[] memory)
 	{
-		byte[] blobId = await this.UploadBlobAsync(memory);
+		string blobId = await this.UploadBlobAsync(memory);
 		var request = new JsonObject
 		{
 			["canister_id"] = Convert.ToBase64String(canisterId.Raw),
-			["blob_id"] = JsonValue.Create(blobId)
+			["blob_id"] = JsonValue.Create(Convert.FromHexString(blobId))
 		};
-		await this.PostAsync($"/instances/{instanceId}/update/set_stable_memory", request);
+		await this.PostJsonAsync($"/instances/{instanceId}/update/set_stable_memory", request);
 	}
 
 	public async Task TickAsync(int instanceId)
 	{
-		await this.PostAsync($"/instances/{instanceId}/update/tick", null);
+		await this.PostJsonAsync($"/instances/{instanceId}/update/tick", null);
 	}
 
 	// TODO new routes?
@@ -579,37 +582,37 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 
 	// =======================================
 
-	private JsonNode SerializeCanisterHttpResponse(CanisterHttpResponse response)
-	{
-		if (response is CanisterHttpReply reply)
-		{
-			return new JsonObject
-			{
-				["CanisterHttpReply"] = new JsonObject
-				{
-					["status"] = JsonValue.Create(reply.Status),
-					["headers"] = JsonValue.Create(reply.Headers.Select(h => new { name = h.Name, value = h.Value }).ToArray()),
-					["body"] = JsonValue.Create(reply.Body)
-				}
-			};
-		}
-		else if (response is CanisterHttpReject reject)
-		{
-			return new JsonObject
-			{
-				["CanisterHttpReject"] = new JsonObject
-				{
-					["reject_code"] = JsonValue.Create(reject.RejectCode),
-					["message"] = reject.Message
-				}
-			};
-		}
-		throw new ArgumentException("Unknown CanisterHttpResponse type");
-	}
+	// private JsonNode SerializeCanisterHttpResponse(CanisterHttpResponse response)
+	// {
+	// 	if (response is CanisterHttpReply reply)
+	// 	{
+	// 		return new JsonObject
+	// 		{
+	// 			["CanisterHttpReply"] = new JsonObject
+	// 			{
+	// 				["status"] = JsonValue.Create(reply.Status),
+	// 				["headers"] = JsonValue.Create(reply.Headers.Select(h => new { name = h.Name, value = h.Value }).ToArray()),
+	// 				["body"] = JsonValue.Create(reply.Body)
+	// 			}
+	// 		};
+	// 	}
+	// 	else if (response is CanisterHttpReject reject)
+	// 	{
+	// 		return new JsonObject
+	// 		{
+	// 			["CanisterHttpReject"] = new JsonObject
+	// 			{
+	// 				["reject_code"] = JsonValue.Create(reject.RejectCode),
+	// 				["message"] = reject.Message
+	// 			}
+	// 		};
+	// 	}
+	// 	throw new ArgumentException("Unknown CanisterHttpResponse type");
+	// }
 
 
 
-	private async Task<JsonNode?> GetAsync(string endpoint)
+	private async Task<JsonNode?> GetJsonAsync(string endpoint)
 	{
 		HttpResponseMessage response = await this.httpClient.GetAsync($"{this.baseUrl}{endpoint}");
 		response.EnsureSuccessStatusCode();
@@ -617,13 +620,13 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		return await JsonNode.ParseAsync(stream)!;
 	}
 
-	private async Task<JsonNode?> PostAsync(string endpoint, JsonObject? data)
+	private async Task<JsonNode?> PostJsonAsync(string endpoint, JsonObject? data)
 	{
 		string url = $"{this.baseUrl}{endpoint}";
-		return await PocketIcHttpClient.PostAsync(this.httpClient, url, data);
+		return await PocketIcHttpClient.PostJsonAsync(this.httpClient, url, data);
 	}
 
-	private static async Task<JsonNode?> PostAsync(HttpClient httpClient, string url, JsonObject? data)
+	private static async Task<JsonNode?> PostJsonAsync(HttpClient httpClient, string url, JsonObject? data)
 	{
 		var json = data?.ToJsonString() ?? "";
 		var content = new StringContent(json, Encoding.UTF8, "application/json");

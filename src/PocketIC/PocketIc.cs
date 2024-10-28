@@ -10,8 +10,8 @@ namespace EdjCase.ICP.PocketIC
 	{
 		private static readonly Principal MANAGEMENT_CANISTER_ID = Principal.FromText("aaaaa-aa");
 
-		private readonly IPocketIcHttpClient client;
-		private readonly int instanceId;
+		public IPocketIcHttpClient HttpClient { get; }
+		public int InstanceId { get; }
 		private readonly CandidConverter candidConverter;
 		private List<SubnetTopology>? topologyCache;
 
@@ -22,33 +22,47 @@ namespace EdjCase.ICP.PocketIC
 			CandidConverter? candidConverter = null
 		)
 		{
-			this.client = client;
-			this.instanceId = instanceId;
+			this.HttpClient = client;
+			this.InstanceId = instanceId;
 			this.candidConverter = candidConverter ?? CandidConverter.Default;
 			this.topologyCache = topology;
 		}
 
+
 		public async Task<Principal> CreateAndInstallCanisterAsync(
 			byte[] wasmModule,
 			CandidArg arg, // TODO can we take in a generic arg type? but issue is there can be multiple args
-			CreateCanisterRequest? request = null
+			CanisterSettings? settings = null,
+			UnboundedUInt? cyclesAmount = null,
+			Principal? specifiedId = null
 		)
 		{
-			CreateCanisterResponse createCanisterResponse = await this.CreateCanisterAsync(request);
-			byte[] argBytes = arg.Encode();
-			await this.InstallCodeAsync(new InstallCodeRequest
-			{
-				CanisterId = createCanisterResponse.CanisterId,
-				WasmModule = wasmModule,
-				Arg = argBytes,
-				Mode = InstallCodeMode.Install
-			});
+			CreateCanisterResponse createCanisterResponse = await this.CreateCanisterAsync(
+				settings: settings,
+				cyclesAmount: cyclesAmount,
+				specifiedId: specifiedId
+			);
+			await this.InstallCodeAsync(
+				canisterId: createCanisterResponse.CanisterId,
+				wasmModule: wasmModule,
+				arg: arg,
+				mode: InstallCodeMode.Install
+			);
 			return createCanisterResponse.CanisterId;
 		}
 
-		public async Task<CreateCanisterResponse> CreateCanisterAsync(CreateCanisterRequest? request = null)
+		public async Task<CreateCanisterResponse> CreateCanisterAsync(
+			CanisterSettings? settings = null,
+			UnboundedUInt? cyclesAmount = null,
+			Principal? specifiedId = null
+		)
 		{
-			request ??= new CreateCanisterRequest();
+			var request = new CreateCanisterRequest
+			{
+				Settings = settings == null ? OptionalValue<CanisterSettings>.NoValue() : OptionalValue<CanisterSettings>.WithValue(settings),
+				Amount = cyclesAmount == null ? OptionalValue<UnboundedUInt>.NoValue() : OptionalValue<UnboundedUInt>.WithValue(cyclesAmount),
+				SpecifiedId = specifiedId == null ? OptionalValue<Principal>.NoValue() : OptionalValue<Principal>.WithValue(specifiedId)
+			};
 			return await this.UpdateCallAsync<CreateCanisterRequest, CreateCanisterResponse>(
 				Principal.Anonymous(),
 				MANAGEMENT_CANISTER_ID,
@@ -57,8 +71,9 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
-		public async Task StartCanisterAsync(StartCanisterRequest request)
+		public async Task StartCanisterAsync(Principal canisterId)
 		{
+			StartCanisterRequest request = new() { CanisterId = canisterId };
 			await this.UpdateCallNoResponseAsync(
 				Principal.Anonymous(),
 				MANAGEMENT_CANISTER_ID,
@@ -67,8 +82,10 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
-		public async Task StopCanisterAsync(StopCanisterRequest request)
+		public async Task StopCanisterAsync(Principal canisterId)
 		{
+			StopCanisterRequest request = new() { CanisterId = canisterId };
+
 			await this.UpdateCallNoResponseAsync(
 				Principal.Anonymous(),
 				MANAGEMENT_CANISTER_ID,
@@ -77,8 +94,20 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
-		public async Task InstallCodeAsync(InstallCodeRequest request)
+		public async Task InstallCodeAsync(
+			Principal canisterId,
+			byte[] wasmModule,
+			CandidArg arg,
+			InstallCodeMode mode
+		)
 		{
+			InstallCodeRequest request = new()
+			{
+				CanisterId = canisterId,
+				Arg = arg.Encode(),
+				WasmModule = wasmModule,
+				Mode = mode
+			};
 			await this.UpdateCallNoResponseAsync(
 				Principal.Anonymous(),
 				MANAGEMENT_CANISTER_ID,
@@ -188,8 +217,8 @@ namespace EdjCase.ICP.PocketIC
 			EffectivePrincipal? effectivePrincipal = null
 		)
 		{
-			return await this.client.QueryCallAsync(
-				this.instanceId,
+			return await this.HttpClient.QueryCallAsync(
+				this.InstanceId,
 				sender,
 				canisterId,
 				method,
@@ -389,8 +418,8 @@ namespace EdjCase.ICP.PocketIC
 			EffectivePrincipal? effectivePrincipal = null
 		)
 		{
-			return await this.client.ExecuteIngressMessageAsync(
-				this.instanceId,
+			return await this.HttpClient.ExecuteIngressMessageAsync(
+				this.InstanceId,
 				sender,
 				canisterId,
 				method,
@@ -404,13 +433,13 @@ namespace EdjCase.ICP.PocketIC
 		{
 			for (int i = 0; i < times; i++)
 			{
-				await this.client.TickAsync(this.instanceId);
+				await this.HttpClient.TickAsync(this.InstanceId);
 			}
 		}
 
 		public Task<ICTimestamp> GetTimeAsync()
 		{
-			return this.client.GetTimeAsync(this.instanceId);
+			return this.HttpClient.GetTimeAsync(this.InstanceId);
 		}
 
 		public async Task ResetTimeAsync()
@@ -420,7 +449,7 @@ namespace EdjCase.ICP.PocketIC
 
 		public Task SetTimeAsync(ICTimestamp time)
 		{
-			return this.client.SetTimeAsync(this.instanceId, time);
+			return this.HttpClient.SetTimeAsync(this.InstanceId, time);
 		}
 
 		public async Task AdvanceTimeAsync(TimeSpan duration)
@@ -432,15 +461,15 @@ namespace EdjCase.ICP.PocketIC
 
 		public Task<Principal> GetPublicKeyForSubnetAsync(Principal subnetId)
 		{
-			return this.client.GetPublicKeyForSubnetAsync(this.instanceId, subnetId);
+			return this.HttpClient.GetPublicKeyForSubnetAsync(this.InstanceId, subnetId);
 		}
 
 		public Task<Principal> GetSubnetIdForCanisterAsync(Principal canisterId)
 		{
-			return this.client.GetSubnetIdForCanisterAsync(this.instanceId, canisterId);
+			return this.HttpClient.GetSubnetIdForCanisterAsync(this.InstanceId, canisterId);
 		}
 
-		public async ValueTask<Topology> GetTopologyAsync(bool useCache = true)
+		public async ValueTask<List<SubnetTopology>> GetTopologyAsync(bool useCache = true)
 		{
 			List<SubnetTopology>? topologies = null;
 			if (useCache)
@@ -449,37 +478,65 @@ namespace EdjCase.ICP.PocketIC
 			}
 			if (topologies == null)
 			{
-				topologies = await this.client.GetTopologyAsync(this.instanceId);
+				topologies = await this.HttpClient.GetTopologyAsync(this.InstanceId);
 				this.topologyCache = topologies;
 			}
-			return new Topology(topologies);
+			return topologies;
 		}
 
 		public Task<ulong> GetCyclesBalanceAsync(Principal canisterId)
 		{
-			return this.client.GetCyclesBalanceAsync(this.instanceId, canisterId);
+			return this.HttpClient.GetCyclesBalanceAsync(this.InstanceId, canisterId);
 		}
 
 		public Task<ulong> AddCyclesAsync(Principal canisterId, ulong amount)
 		{
-			return this.client.AddCyclesAsync(this.instanceId, canisterId, amount);
+			return this.HttpClient.AddCyclesAsync(this.InstanceId, canisterId, amount);
 		}
 
 		public Task SetStableMemoryAsync(Principal canisterId, byte[] stableMemory)
 		{
-			return this.client.SetStableMemoryAsync(this.instanceId, canisterId, stableMemory);
+			return this.HttpClient.SetStableMemoryAsync(this.InstanceId, canisterId, stableMemory);
 		}
 
 		public Task<byte[]> GetStableMemoryAsync(Principal canisterId)
 		{
-			return this.client.GetStableMemoryAsync(this.instanceId, canisterId);
+			return this.HttpClient.GetStableMemoryAsync(this.InstanceId, canisterId);
 		}
 
 		public async ValueTask DisposeAsync()
 		{
-			await this.client.DeleteInstanceAsync(this.instanceId);
+			await this.HttpClient.DeleteInstanceAsync(this.InstanceId);
 		}
 
+		public static async Task<PocketIc> CreateAsync(
+			IPocketIcHttpClient httpClient,
+			List<SubnetConfig>? applicationSubnets = null,
+			SubnetConfig? bitcoinSubnet = null,
+			SubnetConfig? fiduciarySubnet = null,
+			SubnetConfig? iiSubnet = null,
+			SubnetConfig? nnsSubnet = null,
+			SubnetConfig? snsSubnet = null,
+			List<SubnetConfig>? systemSubnets = null,
+			List<SubnetConfig>? verifiedApplicationSubnets = null,
+			bool nonmainnetFeatures = false,
+			CandidConverter? candidConverter = null
+		)
+		{
+			(int instanceId, List<SubnetTopology> topology) = await httpClient.CreateInstanceAsync(
+				applicationSubnets,
+				bitcoinSubnet,
+				fiduciarySubnet,
+				iiSubnet,
+				nnsSubnet,
+				snsSubnet,
+				systemSubnets,
+				verifiedApplicationSubnets,
+				nonmainnetFeatures
+			);
+
+			return new PocketIc(httpClient, instanceId, topology, candidConverter);
+		}
 
 
 		public static async Task<PocketIc> CreateAsync(
@@ -493,13 +550,12 @@ namespace EdjCase.ICP.PocketIC
 			List<SubnetConfig>? systemSubnets = null,
 			List<SubnetConfig>? verifiedApplicationSubnets = null,
 			bool nonmainnetFeatures = false,
-			CandidConverter? candidConverter = null,
-			HttpClient? httpClient = null
+			CandidConverter? candidConverter = null
 		)
 		{
-			httpClient ??= new HttpClient();
-			IPocketIcHttpClient client = new PocketIcHttpClient(httpClient, url);
-			(int instanceId, List<SubnetTopology> topology) = await client.CreateInstanceAsync(
+			IPocketIcHttpClient httpClient = new PocketIcHttpClient(new HttpClient(), url);
+			return await PocketIc.CreateAsync(
+				httpClient,
 				applicationSubnets,
 				bitcoinSubnet,
 				fiduciarySubnet,
@@ -508,59 +564,11 @@ namespace EdjCase.ICP.PocketIC
 				snsSubnet,
 				systemSubnets,
 				verifiedApplicationSubnets,
-				nonmainnetFeatures
+				nonmainnetFeatures,
+				candidConverter
 			);
-
-			return new PocketIc(client, instanceId, topology, candidConverter);
 		}
 
-	}
-
-
-	public class Topology
-	{
-		public Topology(List<SubnetTopology> subnets)
-		{
-			this.All = subnets;
-		}
-
-		public List<SubnetTopology> All { get; }
-
-
-		public SubnetTopology? GetBitcoinSubnet()
-		{
-			return this.All.FirstOrDefault(s => s.Type == SubnetType.Bitcoin);
-		}
-
-		public SubnetTopology? GetFiduciarySubnet()
-		{
-			return this.All.FirstOrDefault(s => s.Type == SubnetType.Fiduciary);
-		}
-
-		public SubnetTopology? GetInternetIdentitySubnet()
-		{
-			return this.All.FirstOrDefault(s => s.Type == SubnetType.InternetIdentity);
-		}
-
-		public SubnetTopology? GetNnsSubnet()
-		{
-			return this.All.FirstOrDefault(s => s.Type == SubnetType.NNS);
-		}
-
-		public SubnetTopology? GetSnsSubnet()
-		{
-			return this.All.FirstOrDefault(s => s.Type == SubnetType.SNS);
-		}
-
-		public List<SubnetTopology> GetApplicationSubnets()
-		{
-			return this.All.Where(s => s.Type == SubnetType.Application).ToList();
-		}
-
-		public List<SubnetTopology> GetSystemSubnets()
-		{
-			return this.All.Where(s => s.Type == SubnetType.System).ToList();
-		}
 	}
 
 }
