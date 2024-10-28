@@ -48,6 +48,7 @@ namespace EdjCase.ICP.Candid.Parsers
 				case CandidTextTokenType.OpenParenthesis:
 					return GetFunc(helper, null);
 				case CandidTextTokenType.OpenCurlyBrace:
+					// TODO service type
 					return GetRecord(helper, null);
 				case CandidTextTokenType.OpenBracket:
 					return GetVec(helper, null);
@@ -99,6 +100,7 @@ namespace EdjCase.ICP.Candid.Parsers
 				if (helper.CurrentToken.Type == CandidTextTokenType.SemiColon
 					|| helper.CurrentToken.Type == CandidTextTokenType.CloseCurlyBrace)
 				{
+					helper.MoveNext();
 					break;
 				}
 				string rawMode = helper.CurrentToken.GetTextValueOrThrow();

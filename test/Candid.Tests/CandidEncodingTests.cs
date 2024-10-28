@@ -432,6 +432,33 @@ namespace EdjCase.ICP.Candid.Tests
 			Assert.Equal(expectedArg, actualArg);
 		}
 
+		[Fact]
+		public void Encode_Service_Example1()
+		{
+			const string hex = "4449444C026A000001016901076D6574686F6431000101010A0000000001E0102A0101";
+			var value1 = new CandidService(Principal.FromText("bpo6s-4qaaa-aaaap-acava-cai"));
+			var type1 = new CandidServiceType(new Dictionary<CandidId, CandidFuncType>{
+				{
+					CandidId.Create("method1"),
+					new CandidFuncType(new List<FuncMode>{FuncMode.Query}, new List<CandidType>(), new List<CandidType>())
+				},
+			});
+			var expectedArg = CandidArg.FromCandid(new List<CandidTypedValue>
+			{
+				CandidTypedValue.FromValueAndType(value1, type1)
+			});
+
+
+			byte[] actualBytes = ByteUtil.FromHexString(hex);
+			CandidArg actualArg = CandidArg.FromBytes(actualBytes);
+
+			Assert.Equal(expectedArg, actualArg);
+
+			string actualHex = ByteUtil.ToHexString(expectedArg.Encode());
+
+			Assert.Equal(hex, actualHex);
+		}
+
 
 		[Fact]
 		public void EncodeDecode_1()

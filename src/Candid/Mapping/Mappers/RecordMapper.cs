@@ -30,23 +30,25 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 				if (record.Fields.TryGetValue(tag, out CandidValue fieldCandidValue))
 				{
 					Type t = property.PropertyInfo.PropertyType;
-					if (t.IsGenericType
-						&& t.GetGenericTypeDefinition() == typeof(Nullable<>))
+					if (typeof(CandidValue).IsAssignableFrom(t))
 					{
-						// Get T of Nullable<T>
-						t = t.GetGenericArguments()[0];
-					}
-					if (property.UseOptionalOverride
-						&& fieldCandidValue is CandidOptional o
-						&& o.Value.IsNull())
-					{
-						// If not using OptionalValue and the value is opt null,
-						// that is the same as setting to null, so just skip
-						fieldValue = null;
+						// If the property is a candid value, just set it
+						fieldValue = fieldCandidValue;
 					}
 					else
 					{
-						fieldValue = converter.ToObject(t, fieldCandidValue);
+						if (property.UseOptionalOverride
+							&& fieldCandidValue is CandidOptional o
+							&& o.Value.IsNull())
+						{
+							// If not using OptionalValue and the value is opt null,
+							// that is the same as setting to null, so just skip
+							fieldValue = null;
+						}
+						else
+						{
+							fieldValue = converter.ToObject(t, fieldCandidValue);
+						}
 					}
 
 					if (fieldValue != null)
@@ -79,18 +81,26 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 			foreach ((CandidTag tag, PropertyMetaData property) in this.Properties)
 			{
 				object? propValue = property.PropertyInfo.GetValue(value);
-				CandidValue v;
-				if (propValue == null)
+				CandidValue v; if (propValue is CandidValue cv)
 				{
-					v = new CandidOptional(null);
+					// If the property is a candid value, just set it
+					v = cv;
 				}
 				else
 				{
-					v = converter.FromObject(propValue);
-					if (property.UseOptionalOverride)
+					if (propValue == null)
 					{
-						// Wrap in candid optional if has override [CandidOptional]
-						v = new CandidOptional(v);
+						v = new CandidOptional(null);
+					}
+					else
+					{
+						v = converter.FromObject(propValue);
+						if (property.UseOptionalOverride || property.IsGenericNullable)
+						{
+							// Wrap in candid optional if has override [CandidOptional]
+							// or is Nullable<> (Nullable<T> gives just T if setting the value)
+							v = new CandidOptional(v);
+						}
 					}
 				}
 				fields.Add(tag, v);

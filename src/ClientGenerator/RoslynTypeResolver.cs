@@ -13,6 +13,7 @@ using EdjCase.ICP.Agent.Responses;
 using System.Threading.Tasks;
 using EdjCase.ICP.Candid;
 using Org.BouncyCastle.Asn1.Cms;
+using EdjCase.ICP.Candid.Models.Types;
 
 namespace EdjCase.ICP.ClientGenerator
 {
@@ -77,6 +78,11 @@ namespace EdjCase.ICP.ClientGenerator
 		{
 			switch (type)
 			{
+				case RawCandidType t:
+					{
+						CandidTypeTypeName typeName = new(t.CandidType);
+						return new ResolvedType(typeName);
+					}
 				case NonGenericSourceCodeType c:
 					{
 						var cType = new SimpleTypeName(
@@ -503,6 +509,14 @@ namespace EdjCase.ICP.ClientGenerator
 					{
 						attributeSyntaxList.Add(this.GenerateAttribute(AttributeInfo.FromType<CandidOptionalAttribute>()));
 					}
+					CandidType? candidType = o.Type!.Name.GetCandidType();
+					if (candidType != null)
+					{
+						// [CandidTypeDefinition("{typeDefinition}")]
+						string candidTypeDefinition = CandidTextGenerator.Generate(candidType, indentType: CandidTextGenerator.IndentType.None);
+						attributeSyntaxList.Add(this.GenerateAttribute(AttributeInfo.FromType<CandidTypeDefinitionAttribute>(candidTypeDefinition)));
+					}
+
 					List<AccessorDeclarationSyntax> accessors = new()
 					{
 						// Add getter
@@ -849,6 +863,14 @@ namespace EdjCase.ICP.ClientGenerator
 				// Add '?' if applicible
 				returnTypeName = new NullableTypeName(returnTypeName);
 			}
+			CandidType? candidType = returnTypeName.GetCandidType();
+			if (candidType != null)
+			{
+				// [CandidTypeDefinition("{typeDefinition}")]
+				attributes ??= new List<AttributeInfo>();
+				string candidTypeDefinition = CandidTextGenerator.Generate(candidType, indentType: CandidTextGenerator.IndentType.None);
+				attributes.Add(AttributeInfo.FromType<CandidTypeDefinitionAttribute>(candidTypeDefinition));
+			}
 
 			return this.GenerateMethod(
 				body: body,
@@ -981,6 +1003,14 @@ namespace EdjCase.ICP.ClientGenerator
 						// Add '?' if applicible
 						typeName = new NullableTypeName(typeName);
 					}
+					CandidType? candidType = typeName.GetCandidType();
+					if (candidType != null)
+					{
+						// [CandidTypeDefinition("{typeDefinition}")]
+						string candidTypeDefinition = CandidTextGenerator.Generate(candidType, indentType: CandidTextGenerator.IndentType.None);
+						attributes.Add(AttributeInfo.FromType<CandidTypeDefinitionAttribute>(candidTypeDefinition));
+					}
+
 
 
 					// public {fieldType} {fieldName} {{ get; set; }}

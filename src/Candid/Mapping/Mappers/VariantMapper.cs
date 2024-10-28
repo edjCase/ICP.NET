@@ -35,47 +35,55 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 		public object Map(CandidValue value, CandidConverter converter)
 		{
 			CandidVariant variant = value.AsVariant();
-			object obj = Activator.CreateInstance(this.Type, nonPublic: true);
 
 			if (!this.Options.TryGetValue(variant.Tag, out Option optionInfo))
 			{
 				throw new Exception($"Could not map candid variant to type '{this.Type}'. Type is missing option '{variant.Tag}'");
 			}
-
 			object? variantValue;
-			if (optionInfo.Type != null)
+			if (typeof(CandidValue).IsAssignableFrom(optionInfo.Type))
 			{
-				if (optionInfo.UseOptionalOverride && variant.Value is CandidOptional o)
+				// If the type is a candid value, just set it
+				variantValue = variant.Value;
+			}
+			else
+			{
+				if (optionInfo.Type != null)
 				{
-					// If UseOptionalOverride, then unwrap the inner value
-					if (o.Value.IsNull())
+					if (optionInfo.UseOptionalOverride && variant.Value is CandidOptional o)
 					{
-						// If null, no need to convert
-						variantValue = null;
+						// If UseOptionalOverride, then unwrap the inner value
+						if (o.Value.IsNull())
+						{
+							// If null, no need to convert
+							variantValue = null;
+						}
+						else
+						{
+							Type t = optionInfo.Type;
+							if (t.IsGenericType
+								&& t.GetGenericTypeDefinition() == typeof(Nullable<>))
+							{
+								// Get T of Nullable<T>
+								t = t.GetGenericArguments()[0];
+							}
+							// Use inner value
+							variantValue = converter.ToObject(t, o.Value);
+						}
 					}
 					else
 					{
-						Type t = optionInfo.Type;
-						if (t.IsGenericType
-							&& t.GetGenericTypeDefinition() == typeof(Nullable<>))
-						{
-							// Get T of Nullable<T>
-							t = t.GetGenericArguments()[0];
-						}
-						// Use inner value
-						variantValue = converter.ToObject(t, o.Value);
+						// Treat like normal
+						variantValue = converter.ToObject(optionInfo.Type, variant.Value);
 					}
 				}
 				else
 				{
-					// Treat like normal
-					variantValue = converter.ToObject(optionInfo.Type, variant.Value);
+					variantValue = null;
 				}
 			}
-			else
-			{
-				variantValue = null;
-			}
+
+			object obj = Activator.CreateInstance(this.Type, nonPublic: true);
 			this.TypeProperty.SetValue(obj, optionInfo.EnumValue);
 			this.ValueProperty.SetValue(obj, variantValue);
 			return obj;
@@ -94,24 +102,32 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 
 
 			CandidValue innerValue;
-			if(optionInfo.Type == null)
+			if (innerObj is CandidValue value)
 			{
-				// If typeless, always set to null
-				innerValue = CandidValue.Null();
-			}
-			else if (innerObj == null)
-			{
-				// If null and has a type, should always be a null opt 
-				innerValue = new CandidOptional(null);
+				// If the object is a candid value, just use it
+				innerValue = value;
 			}
 			else
 			{
-				// Convert
-				innerValue = converter.FromObject(innerObj);
-				if (optionInfo.UseOptionalOverride)
+				if (optionInfo.Type == null)
 				{
-					// Wrap in candid optional
-					innerValue = new CandidOptional(innerValue);
+					// If typeless, always set to null
+					innerValue = CandidValue.Null();
+				}
+				else if (innerObj == null)
+				{
+					// If null and has a type, should always be a null opt 
+					innerValue = new CandidOptional(null);
+				}
+				else
+				{
+					// Convert
+					innerValue = converter.FromObject(innerObj);
+					if (optionInfo.UseOptionalOverride || optionInfo.IsGenericNullable)
+					{
+						// Wrap in candid optional
+						innerValue = new CandidOptional(innerValue);
+					}
 				}
 			}
 			return new CandidVariant(innerTag, innerValue);
@@ -127,12 +143,32 @@ namespace EdjCase.ICP.Candid.Mapping.Mappers
 			public Enum EnumValue { get; }
 			public Type? Type { get; }
 			public bool UseOptionalOverride { get; }
+			public CandidType? CandidType { get; }
 
-			public Option(Enum enumValue, Type? type, bool useOptionalOverride)
+			public Option(Enum enumValue, Type? type, bool useOptionalOverride, CandidType? candidType)
 			{
 				this.EnumValue = enumValue ?? throw new ArgumentNullException(nameof(enumValue));
 				this.Type = type;
 				this.UseOptionalOverride = useOptionalOverride;
+				this.CandidType = candidType;
+			}
+
+
+			private bool? isGenericNullableCache;
+
+			public bool IsGenericNullable
+			{
+				get
+				{
+					{
+						if (!this.isGenericNullableCache.HasValue)
+						{
+							this.isGenericNullableCache = this.Type != null && this.Type.IsGenericType
+							&& this.Type.GetGenericTypeDefinition() == typeof(Nullable<>);
+						}
+						return this.isGenericNullableCache.Value;
+					}
+				}
 			}
 		}
 	}
