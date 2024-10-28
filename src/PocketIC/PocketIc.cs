@@ -10,16 +10,22 @@ namespace EdjCase.ICP.PocketIC
 	{
 		private static readonly Principal MANAGEMENT_CANISTER_ID = Principal.FromText("aaaaa-aa");
 
-		private readonly PocketIcClient client;
+		private readonly IPocketIcHttpClient client;
+		private readonly int instanceId;
 		private readonly CandidConverter candidConverter;
+		private List<SubnetTopology>? topologyCache;
 
 		private PocketIc(
-			PocketIcClient client,
+			IPocketIcHttpClient client,
+			int instanceId,
+			List<SubnetTopology>? topology = null,
 			CandidConverter? candidConverter = null
 		)
 		{
 			this.client = client;
+			this.instanceId = instanceId;
 			this.candidConverter = candidConverter ?? CandidConverter.Default;
+			this.topologyCache = topology;
 		}
 
 		public async Task<Principal> CreateAndInstallCanisterAsync(
@@ -183,6 +189,7 @@ namespace EdjCase.ICP.PocketIC
 		)
 		{
 			return await this.client.QueryCallAsync(
+				this.instanceId,
 				sender,
 				canisterId,
 				method,
@@ -382,7 +389,8 @@ namespace EdjCase.ICP.PocketIC
 			EffectivePrincipal? effectivePrincipal = null
 		)
 		{
-			return await this.client.UpdateCallAsync(
+			return await this.client.ExecuteIngressMessageAsync(
+				this.instanceId,
 				sender,
 				canisterId,
 				method,
@@ -396,13 +404,13 @@ namespace EdjCase.ICP.PocketIC
 		{
 			for (int i = 0; i < times; i++)
 			{
-				await this.client.TickAsync();
+				await this.client.TickAsync(this.instanceId);
 			}
 		}
 
 		public Task<ICTimestamp> GetTimeAsync()
 		{
-			return this.client.GetTimeAsync();
+			return this.client.GetTimeAsync(this.instanceId);
 		}
 
 		public async Task ResetTimeAsync()
@@ -412,7 +420,7 @@ namespace EdjCase.ICP.PocketIC
 
 		public Task SetTimeAsync(ICTimestamp time)
 		{
-			return this.client.SetTimeAsync(time);
+			return this.client.SetTimeAsync(this.instanceId, time);
 		}
 
 		public async Task AdvanceTimeAsync(TimeSpan duration)
@@ -422,79 +430,54 @@ namespace EdjCase.ICP.PocketIC
 			await this.SetTimeAsync(newTime);
 		}
 
-		public Task<Principal> GetPublicKeyAsync(Principal subnetId)
+		public Task<Principal> GetPublicKeyForSubnetAsync(Principal subnetId)
 		{
-			return this.client.GetPublicKeyAsync(subnetId);
+			return this.client.GetPublicKeyForSubnetAsync(this.instanceId, subnetId);
 		}
 
-		public Task<Principal> GetCanisterSubnetIdAsync(Principal canisterId)
+		public Task<Principal> GetSubnetIdForCanisterAsync(Principal canisterId)
 		{
-			return this.client.GetCanisterSubnetIdAsync(canisterId);
+			return this.client.GetSubnetIdForCanisterAsync(this.instanceId, canisterId);
 		}
 
-		public List<SubnetTopology> GetTopology()
+		public async ValueTask<Topology> GetTopologyAsync(bool useCache = true)
 		{
-			return this.client.GetTopology().Values.ToList();
-		}
-
-		public SubnetTopology? GetBitcoinSubnet()
-		{
-			return this.GetTopology().FirstOrDefault(s => s.Type == SubnetType.Bitcoin);
-		}
-
-		public SubnetTopology? GetFiduciarySubnet()
-		{
-			return this.GetTopology().FirstOrDefault(s => s.Type == SubnetType.Fiduciary);
-		}
-
-		public SubnetTopology? GetInternetIdentitySubnet()
-		{
-			return this.GetTopology().FirstOrDefault(s => s.Type == SubnetType.InternetIdentity);
-		}
-
-		public SubnetTopology? GetNnsSubnet()
-		{
-			return this.GetTopology().FirstOrDefault(s => s.Type == SubnetType.NNS);
-		}
-
-		public SubnetTopology? GetSnsSubnet()
-		{
-			return this.GetTopology().FirstOrDefault(s => s.Type == SubnetType.SNS);
-		}
-
-		public List<SubnetTopology> GetApplicationSubnets()
-		{
-			return this.GetTopology().Where(s => s.Type == SubnetType.Application).ToList();
-		}
-
-		public List<SubnetTopology> GetSystemSubnets()
-		{
-			return this.GetTopology().Where(s => s.Type == SubnetType.System).ToList();
+			List<SubnetTopology>? topologies = null;
+			if (useCache)
+			{
+				topologies = this.topologyCache;
+			}
+			if (topologies == null)
+			{
+				topologies = await this.client.GetTopologyAsync(this.instanceId);
+				this.topologyCache = topologies;
+			}
+			return new Topology(topologies);
 		}
 
 		public Task<ulong> GetCyclesBalanceAsync(Principal canisterId)
 		{
-			return this.client.GetCyclesBalanceAsync(canisterId);
+			return this.client.GetCyclesBalanceAsync(this.instanceId, canisterId);
 		}
 
 		public Task<ulong> AddCyclesAsync(Principal canisterId, ulong amount)
 		{
-			return this.client.AddCyclesAsync(canisterId, amount);
+			return this.client.AddCyclesAsync(this.instanceId, canisterId, amount);
 		}
 
 		public Task SetStableMemoryAsync(Principal canisterId, byte[] stableMemory)
 		{
-			return this.client.SetStableMemoryAsync(canisterId, stableMemory);
+			return this.client.SetStableMemoryAsync(this.instanceId, canisterId, stableMemory);
 		}
 
 		public Task<byte[]> GetStableMemoryAsync(Principal canisterId)
 		{
-			return this.client.GetStableMemoryAsync(canisterId);
+			return this.client.GetStableMemoryAsync(this.instanceId, canisterId);
 		}
 
 		public async ValueTask DisposeAsync()
 		{
-			await this.client.DisposeAsync();
+			await this.client.DeleteInstanceAsync(this.instanceId);
 		}
 
 
@@ -510,11 +493,13 @@ namespace EdjCase.ICP.PocketIC
 			List<SubnetConfig>? systemSubnets = null,
 			List<SubnetConfig>? verifiedApplicationSubnets = null,
 			bool nonmainnetFeatures = false,
-			CandidConverter? candidConverter = null
+			CandidConverter? candidConverter = null,
+			HttpClient? httpClient = null
 		)
 		{
-			PocketIcClient client = await PocketIcClient.CreateAsync(
-				url,
+			httpClient ??= new HttpClient();
+			IPocketIcHttpClient client = new PocketIcHttpClient(httpClient, url);
+			(int instanceId, List<SubnetTopology> topology) = await client.CreateInstanceAsync(
 				applicationSubnets,
 				bitcoinSubnet,
 				fiduciarySubnet,
@@ -525,7 +510,56 @@ namespace EdjCase.ICP.PocketIC
 				verifiedApplicationSubnets,
 				nonmainnetFeatures
 			);
-			return new PocketIc(client, candidConverter);
+
+			return new PocketIc(client, instanceId, topology, candidConverter);
+		}
+
+	}
+
+
+	public class Topology
+	{
+		public Topology(List<SubnetTopology> subnets)
+		{
+			this.All = subnets;
+		}
+
+		public List<SubnetTopology> All { get; }
+
+
+		public SubnetTopology? GetBitcoinSubnet()
+		{
+			return this.All.FirstOrDefault(s => s.Type == SubnetType.Bitcoin);
+		}
+
+		public SubnetTopology? GetFiduciarySubnet()
+		{
+			return this.All.FirstOrDefault(s => s.Type == SubnetType.Fiduciary);
+		}
+
+		public SubnetTopology? GetInternetIdentitySubnet()
+		{
+			return this.All.FirstOrDefault(s => s.Type == SubnetType.InternetIdentity);
+		}
+
+		public SubnetTopology? GetNnsSubnet()
+		{
+			return this.All.FirstOrDefault(s => s.Type == SubnetType.NNS);
+		}
+
+		public SubnetTopology? GetSnsSubnet()
+		{
+			return this.All.FirstOrDefault(s => s.Type == SubnetType.SNS);
+		}
+
+		public List<SubnetTopology> GetApplicationSubnets()
+		{
+			return this.All.Where(s => s.Type == SubnetType.Application).ToList();
+		}
+
+		public List<SubnetTopology> GetSystemSubnets()
+		{
+			return this.All.Where(s => s.Type == SubnetType.System).ToList();
 		}
 	}
 

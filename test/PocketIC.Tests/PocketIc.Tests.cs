@@ -206,7 +206,7 @@ namespace EdjCase.ICP.PocketIC.Tests
 			await using (PocketIc pocketIc = await PocketIc.CreateAsync(this.url))
 			{
 				CreateCanisterResponse response = await pocketIc.CreateCanisterAsync();
-				Principal subnetId = await pocketIc.GetCanisterSubnetIdAsync(response.CanisterId);
+				Principal subnetId = await pocketIc.GetSubnetIdForCanisterAsync(response.CanisterId);
 				Assert.NotNull(subnetId);
 			}
 		}
