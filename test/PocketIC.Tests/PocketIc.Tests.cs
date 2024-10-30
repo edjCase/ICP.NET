@@ -25,7 +25,7 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 	[Fact]
 	public async Task Test()
 	{
-		IPocketIcHttpClient httpClient = new PocketIcHttpClient(new System.Net.Http.HttpClient(), this.url);
+		IPocketIcHttpClient httpClient = new PocketIcHttpClient(new System.Net.Http.HttpClient(), this.url, TimeSpan.FromSeconds(5));
 		int? instanceId = null;
 		// Create new pocketic instance for test, then dispose it
 		await using (PocketIc pocketIc = await PocketIc.CreateAsync(httpClient))

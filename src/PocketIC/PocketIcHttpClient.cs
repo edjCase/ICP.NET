@@ -2,28 +2,28 @@ using System.Text;
 using System.Text.Json;
 using EdjCase.ICP.Candid.Models;
 using System.Text.Json.Nodes;
+using System.Net;
+using System.Diagnostics;
 
 namespace EdjCase.ICP.PocketIC.Client;
 
-public class PocketIcHttpClient : IPocketIcHttpClient
+internal class PocketIcHttpClient : IPocketIcHttpClient
 {
 	private readonly HttpClient httpClient;
 	private readonly string baseUrl;
+	private const int POLLING_PERIOD_MS = 10;
+	private readonly TimeSpan requestTimeout;
 
 	public PocketIcHttpClient(
 		HttpClient httpClient,
-		string url
+		string url,
+		TimeSpan requestTimeout
 	)
 	{
 		this.httpClient = httpClient;
 		this.baseUrl = url;
+		this.requestTimeout = requestTimeout;
 	}
-
-	// TODO what are these?
-	// public async Task<JsonNode?> GetStatusAsync()
-	// {
-	// 	return await this.GetAsync("/status");
-	// }
 
 	public async Task<string> UploadBlobAsync(byte[] blob)
 	{
@@ -40,33 +40,48 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		return await response.Content.ReadAsByteArrayAsync();
 	}
 
-	// TODO?
-	// public async Task<JsonNode?> VerifySignatureAsync(
-	// 	byte[] message,
-	// 	Principal publicKey,
-	// 	Principal rootPublicKey,
-	// 	byte[] signature
-	// )
-	// {
-	// 	var request = new JsonObject
-	// 	{
-	// 		["msg"] = JsonValue.Create(message),
-	// 		["pubkey"] = JsonValue.Create(publicKey.Raw),
-	// 		["root_pubkey"] = JsonValue.Create(rootPublicKey.Raw),
-	// 		["sig"] = JsonValue.Create(signature),
-	// 	};
-	// 	return await this.PostAsync("/verify_signature", request);
-	// }
+	public async Task<bool> VerifySignatureAsync(
+		byte[] message,
+		Principal publicKey,
+		Principal rootPublicKey,
+		byte[] signature
+	)
+	{
+		// Doesn't use the ApiResponse<T> pattern
+		var request = new JsonObject
+		{
+			["msg"] = JsonValue.Create(message),
+			["pubkey"] = JsonValue.Create(publicKey.Raw),
+			["root_pubkey"] = JsonValue.Create(rootPublicKey.Raw),
+			["sig"] = JsonValue.Create(signature),
+		};
+		HttpResponseMessage response = await this.MakeHttpRequestAsync(HttpMethod.Post, "/verify_signature", request);
+		Stream stream = await response.Content.ReadAsStreamAsync();
+		JsonNode? node = await JsonNode.ParseAsync(stream);
+		if (node == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
+		if (node["Err"] != null)
+		{
+			Console.WriteLine("Signature failed to verify: " + node["Err"]!.Deserialize<string>());
+			return false;
+		}
 
-	// public async Task<JsonNode?> ReadGraphAsync(string stateLabel, string opId)
-	// {
-	// 	return await this.GetAsync($"/read_graph/{stateLabel}/{opId}");
-	// }
+		return true;
+	}
 
 	public async Task<List<Instance>> GetInstancesAsync()
 	{
-		JsonNode? response = await this.GetJsonAsync("/instances");
-		return response
+		// Doesn't use the ApiResponse<T> pattern
+		HttpResponseMessage response = await this.MakeHttpRequestAsync(HttpMethod.Get, "/instances");
+		Stream stream = await response.Content.ReadAsStreamAsync();
+		JsonNode? node = await JsonNode.ParseAsync(stream);
+		if (node == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
+		return node
 		!.AsArray()
 		.Select((s, i) => new Instance { Id = i, Status = Enum.Parse<InstanceStatus>(s!.Deserialize<string>()!) }).ToList();
 	}
@@ -152,19 +167,21 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			},
 			["nonmainnet_features"] = nonmainnetFeatures
 		};
-
-		JsonNode? response = await this.PostJsonAsync("/instances", request);
-		if (response == null)
+		// Doesn't use the ApiResponse<T> pattern
+		HttpResponseMessage response = await this.MakeHttpRequestAsync(HttpMethod.Post, "/instances", request);
+		Stream stream = await response.Content.ReadAsStreamAsync();
+		JsonNode? node = await JsonNode.ParseAsync(stream);
+		if (node == null)
 		{
-			throw new Exception("Failed to create PocketIC instance, no response from server");
+			throw new Exception("There was no json response from the server");
 		}
 
-		if (response["Error"] != null)
+		if (node["Error"] != null)
 		{
-			string message = response!["error"]!["message"]!.Deserialize<string>()!;
+			string message = node!["error"]!["message"]!.Deserialize<string>()!;
 			throw new Exception($"Failed to create PocketIC instance: {message}");
 		}
-		JsonObject? created = response["Created"]?.AsObject();
+		JsonObject? created = node["Created"]?.AsObject();
 		if (created == null)
 		{
 			throw new Exception("Failed to create PocketIC instance, invalid response from server");
@@ -182,15 +199,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 
 	public async Task DeleteInstanceAsync(int id)
 	{
-		try
-		{
-			HttpResponseMessage message = await this.httpClient.DeleteAsync($"{this.baseUrl}/instances/{id}");
-			message.EnsureSuccessStatusCode();
-		}
-		catch (Exception e)
-		{
-			throw new Exception("Failed to delete PocketIC instance", e);
-		}
+		await this.DeleteAsync($"/instances/{id}");
 	}
 
 	public async Task<CandidArg> QueryCallAsync(
@@ -213,8 +222,12 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 
 	public async Task<List<SubnetTopology>> GetTopologyAsync(int instanceId)
 	{
-		JsonNode? node = await this.GetJsonAsync($"/instances/{instanceId}/read/topology");
-		return node!
+		JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/topology");
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
+		return response
 			.AsObject()
 			?.Deserialize<Dictionary<string, JsonNode>>()
 			?.Select(kv => MapSubnetTopology(kv.Key, kv.Value))
@@ -225,15 +238,36 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 	public async Task<ICTimestamp> GetTimeAsync(int instanceId)
 	{
 		JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/get_time");
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
 		return ICTimestamp.FromNanoSeconds(response!["nanos_since_epoch"].Deserialize<ulong>()!);
 	}
 
-	// TODO?
-	// public async Task<JsonNode?> GetCanisterHttpAsync(int instanceId)
-	// {
-	// 	JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/get_canister_http");
-	// 	return response;
-	// }
+	public async Task<CanisterHttpRequest> GetCanisterHttpAsync(int instanceId)
+	{
+		JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/get_canister_http");
+
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
+		return new CanisterHttpRequest
+		{
+			Body = response!["body"].Deserialize<byte[]>()!,
+			Headers = response!["headers"]!.AsObject()!.Select(kv => new CanisterHttpHeader
+			{
+				Name = kv.Key,
+				Value = kv.Value.Deserialize<string>()!
+			}).ToList(),
+			Url = response!["url"].Deserialize<string>()!,
+			SubnetId = Principal.FromBytes(response!["subnet_id"].Deserialize<byte[]>()!),
+			HttpMethod = Enum.Parse<CanisterHttpMethod>(response!["http_method"].Deserialize<string>()!),
+			MaxResponseBytes = response!["max_response_bytes"].Deserialize<ulong?>()!,
+			RequestId = response!["request_id"].Deserialize<ulong>()!
+		};
+	}
 
 	public async Task<ulong> GetCyclesBalanceAsync(int instanceId, Principal canisterId)
 	{
@@ -242,6 +276,10 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["canister_id"] = Convert.ToBase64String(canisterId.Raw)
 		};
 		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/get_cycles", request);
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
 		return response!["cycles"].Deserialize<ulong>()!;
 	}
 
@@ -252,6 +290,10 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["canister_id"] = Convert.ToBase64String(canisterId.Raw)
 		};
 		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/get_stable_memory", request);
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
 		return response!["blob"].Deserialize<byte[]>()!;
 	}
 
@@ -262,6 +304,10 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["canister_id"] = Convert.ToBase64String(canisterId.Raw)
 		};
 		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/get_subnet", request);
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
 		byte[] subnetId = response!["subnet_id"].Deserialize<byte[]>()!;
 		return Principal.FromBytes(subnetId);
 	}
@@ -273,6 +319,10 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["subnet_id"] = Convert.ToBase64String(subnetId.Raw)
 		};
 		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/pub_key", request);
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
 		byte[] publicKey = response!.AsArray().Select(r => r.Deserialize<byte>()!).ToArray();
 		return Principal.FromBytes(publicKey);
 	}
@@ -370,7 +420,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["message_id"] = Convert.ToBase64String(messageId),
 			["effective_principal"] = effectivePrincipal == null ? null : Convert.ToBase64String(effectivePrincipal.Raw)
 		};
-		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/update/await_ingress_message", request);
+		await this.PostJsonAsync($"/instances/{instanceId}/update/await_ingress_message", request);
 		// TODO
 	}
 
@@ -395,7 +445,11 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["amount"] = amount
 		};
 		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/update/add_cycles", request);
-		return response!["cycles"].Deserialize<ulong>()!;
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
+		return response["cycles"].Deserialize<ulong>()!;
 	}
 
 	public async Task SetStableMemoryAsync(int instanceId, Principal canisterId, byte[] memory)
@@ -414,228 +468,285 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		await this.PostJsonAsync($"/instances/{instanceId}/update/tick", null);
 	}
 
-	// TODO new routes?
+	public async Task MockCanisterHttpResponseAsync(
+		int instanceId,
+		ulong requestId,
+		Principal subnetId,
+		CanisterHttpResponse response,
+		List<CanisterHttpResponse> additionalResponses
+	)
+	{
+		var request = new JsonObject
+		{
+			["request_id"] = JsonValue.Create(requestId),
+			["subnet_id"] = JsonValue.Create(subnetId.Raw),
+			["response"] = PocketIcHttpClient.SerializeCanisterHttpResponse(response),
+			["additional_responses"] = JsonValue.Create(
+				additionalResponses
+				.Select(r => PocketIcHttpClient.SerializeCanisterHttpResponse(r))
+				.ToArray()
+			)
+		};
+		await this.PostJsonAsync($"/instances/{instanceId}/update/mock_canister_http", request);
+	}
 
-	// public async Task<JsonNode?> MockCanisterHttpAsync(
-	// 	int instanceId,
-	// 	ulong requestId,
-	// 	Principal subnetId,
-	// 	CanisterHttpResponse response,
-	// 	List<CanisterHttpResponse> additionalResponses
-	// )
-	// {
-	// 	var request = new JsonObject
-	// 	{
-	// 		["request_id"] = JsonValue.Create(requestId),
-	// 		["subnet_id"] = JsonValue.Create(subnetId.Raw),
-	// 		["response"] = this.SerializeCanisterHttpResponse(response),
-	// 		["additional_responses"] = JsonValue.Create(
-	// 			additionalResponses
-	// 			.Select(r => this.SerializeCanisterHttpResponse(r))
-	// 			.ToArray()
-	// 		)
-	// 	};
-	// 	return await this.PostAsync($"/instances/{instanceId}/update/mock_canister_http", request);
-	// }
+	public async Task<Uri> AutoProgressAsync(int instanceId, ulong? artificialDelayMs = null)
+	{
+		var request = new JsonObject();
+		if (artificialDelayMs.HasValue)
+		{
+			request["artificial_delay_ms"] = JsonValue.Create(artificialDelayMs.Value);
+		}
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/auto_progress", request);
+		if (response == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
+		return new Uri(response!["url"].Deserialize<string>()!);
+	}
 
-	// public async Task<JsonNode?> GetCanisterStatusAsync(int instanceId)
-	// {
-	// 	JsonNode? response = await this.GetAsync(
-	// 		$"/instances/{instanceId}/api/v2/status"
-	// 	);
-	// 	return response;
-	// }
+	public async Task StopProgressAsync(int instanceId)
+	{
+		await this.PostJsonAsync($"/instances/{instanceId}/stop_progress", null);
+	}
 
-	// public async Task<JsonNode?> CallCanisterAsync(int instanceId, string canisterId, byte[] content)
-	// {
-	// 	JsonObject request = new()
-	// 	{
-	// 		["content"] = JsonValue.Create(content)
-	// 	};
-	// 	JsonNode? response = await this.PostAsync(
-	// 		$"/instances/{instanceId}/api/v2/canister/{canisterId}/call",
-	// 		request
-	// 	);
-	// 	return response;
-	// }
+	public async Task<Uri> StartHttpGatewayAsync(
+		int instanceId,
+		int? port = null,
+		List<string>? domains = null,
+		HttpsConfig? httpsConfig = null
+	)
+	{
+		var request = new JsonObject
+		{
+			["ip_addr"] = null,
+			["port"] = port,
+			["forward_to"] = new JsonObject
+			{
+				["PocketIcInstance"] = instanceId
+			},
+			["domains"] = domains == null ? null : new JsonArray(domains.Select(d => JsonValue.Create(d)).ToArray()),
+			["https_config"] = httpsConfig == null ? null : new JsonObject
+			{
+				["cert_path"] = httpsConfig.CertPath,
+				["key_path"] = httpsConfig.KeyPath
+			}
+		};
+		HttpResponseMessage response = await this.MakeHttpRequestAsync(HttpMethod.Post, "/http_gateway", request);
+		response.EnsureSuccessStatusCode();
+		Stream stream = await response.Content.ReadAsStreamAsync();
+		JsonNode? node = await JsonNode.ParseAsync(stream);
+		if (node == null)
+		{
+			throw new Exception("There was no json response from the server");
+		}
+		if (node["Error"] != null)
+		{
+			string message = node!["Error"]!["message"]!.Deserialize<string>()!;
+			throw new Exception($"Failed to start HTTP gateway: {message}");
+		}
 
-	// public async Task<JsonNode?> QueryCanisterAsync(int instanceId, string canisterId, byte[] content)
-	// {
-	// 	JsonObject request = new()
-	// 	{
-	// 		["content"] = JsonValue.Create(content)
-	// 	};
-	// 	JsonNode? response = await this.PostAsync(
-	// 		$"/instances/{instanceId}/api/v2/canister/{canisterId}/query",
-	// 		request
-	// 	);
-	// 	return response;
-	// }
 
-	// public async Task<JsonNode?> ReadCanisterStateAsync(int instanceId, string canisterId, byte[] content)
-	// {
-	// 	JsonObject request = new()
-	// 	{
-	// 		["content"] = JsonValue.Create(content)
-	// 	};
-	// 	JsonNode? response = await this.PostAsync(
-	// 		$"/instances/{instanceId}/api/v2/canister/{canisterId}/read_state",
-	// 		request
-	// 	);
-	// 	return response;
-	// }
+		int actualPort = node["Created"]!["port"].Deserialize<int>()!;
+		string protocol = httpsConfig != null ? "https" : "http";
+		string domain = domains?.Any() == true ? domains.First() : "localhost";
+		string url = $"{protocol}://{domain}:{actualPort}/";
+		return new Uri(url);
+	}
 
-	// public async Task<JsonNode?> ReadSubnetStateAsync(int instanceId, string subnetId, byte[] content)
-	// {
-	// 	JsonObject request = new()
-	// 	{
-	// 		["content"] = JsonValue.Create(content)
-	// 	};
-	// 	JsonNode? response = await this.PostAsync(
-	// 		$"/instances/{instanceId}/api/v2/subnet/{subnetId}/read_state",
-	// 		request
-	// 	);
-	// 	return response;
-	// }
-
-	// public async Task<JsonNode?> CallCanisterV3Async(int instanceId, string canisterId, byte[] content)
-	// {
-	// 	JsonObject request = new JsonObject
-	// 	{
-	// 		["content"] = JsonValue.Create(content)
-	// 	};
-	// 	JsonNode? response = await this.PostAsync(
-	// 		$"/instances/{instanceId}/api/v3/canister/{canisterId}/call",
-	// 		request
-	// 	);
-	// 	return response;
-	// }
-
-	// public async Task<string> GetDashboardAsync(int instanceId)
-	// {
-	// 	JsonNode? response = await this.GetAsync($"/instances/{instanceId}/_/dashboard");
-	// 	return response!.Deserialize<string>()!;
-	// }
-
-	// public async Task<JsonNode?> AutoProgressAsync(int instanceId, ulong? artificialDelayMs = null)
-	// {
-	// 	var request = new JsonObject();
-	// 	if (artificialDelayMs.HasValue)
-	// 	{
-	// 		request["artificial_delay_ms"] = JsonValue.Create(artificialDelayMs.Value);
-	// 	}
-	// 	return await this.PostAsync($"/instances/{instanceId}/auto_progress", request);
-	// }
-
-	// public async Task StopProgressAsync(int instanceId)
-	// {
-	// 	await this.PostAsync($"/instances/{instanceId}/stop_progress", null);
-	// }
-
-	// public async Task<List<HttpGatewayDetails>> GetHttpGatewayAsync()
-	// {
-	// 	JsonNode? response = await this.GetAsync("/http_gateway/");
-	// 	return response
-	// 		?.AsArray()
-	// 		.Select(node => new HttpGatewayDetails
-	// 		{
-	// 			InstanceId = node!["instance_id"]!.Deserialize<uint>()!,
-	// 			Port = node!["port"]!.Deserialize<ushort>()!,
-	// 			ForwardTo = node!["forward_to"]!.AsObject(),
-	// 			Domains = node!["domains"]?.Deserialize<List<string>>(),
-	// 			HttpsConfig = node!["https_config"] == null ? null : new HttpsConfig
-	// 			{
-	// 				CertPath = node!["https_config"]!["cert_path"]!.Deserialize<string>()!,
-	// 				KeyPath = node!["https_config"]!["key_path"]!.Deserialize<string>()!
-	// 			}
-	// 		})
-	// 		.ToList() ?? new List<HttpGatewayDetails>();
-	// }
-
-	// public async Task<JsonNode?> UpdateHttpGatewayAsync(HttpGatewayConfig config)
-	// {
-	// 	var requestBody = new JsonObject
-	// 	{
-	// 		["forward_to"] = config.ForwardTo,
-	// 		["domains"] = config.Domains == null ? null : JsonValue.Create(config.Domains),
-	// 		["port"] = config.Port == null ? null : JsonValue.Create(config.Port),
-	// 		["ip_addr"] = config.IpAddr == null ? null : JsonValue.Create(config.IpAddr),
-	// 		["https_config"] = config.HttpsConfig == null ? null : new JsonObject
-	// 		{
-	// 			["cert_path"] = config.HttpsConfig.CertPath,
-	// 			["key_path"] = config.HttpsConfig.KeyPath
-	// 		}
-	// 	};
-
-	// 	return await this.PostAsync("/http_gateway/", requestBody);
-	// }
-
-	// public async Task StopHttpGatewayAsync(uint instanceId)
-	// {
-	// 	JsonNode request = new JsonObject();
-	// 	JsonNode? response = await this.PostAsync(
-	// 		$"/http_gateway/{instanceId}/stop",
-	// 		request
-	// 	);
-	// }
+	public async Task StopHttpGatewayAsync(int instanceId)
+	{
+		HttpResponseMessage response = await this.MakeHttpRequestAsync(HttpMethod.Post,
+			$"/http_gateway/{instanceId}/stop"
+		);
+		response.EnsureSuccessStatusCode();
+	}
 
 
 	// =======================================
 
-	// private JsonNode SerializeCanisterHttpResponse(CanisterHttpResponse response)
-	// {
-	// 	if (response is CanisterHttpReply reply)
-	// 	{
-	// 		return new JsonObject
-	// 		{
-	// 			["CanisterHttpReply"] = new JsonObject
-	// 			{
-	// 				["status"] = JsonValue.Create(reply.Status),
-	// 				["headers"] = JsonValue.Create(reply.Headers.Select(h => new { name = h.Name, value = h.Value }).ToArray()),
-	// 				["body"] = JsonValue.Create(reply.Body)
-	// 			}
-	// 		};
-	// 	}
-	// 	else if (response is CanisterHttpReject reject)
-	// 	{
-	// 		return new JsonObject
-	// 		{
-	// 			["CanisterHttpReject"] = new JsonObject
-	// 			{
-	// 				["reject_code"] = JsonValue.Create(reject.RejectCode),
-	// 				["message"] = reject.Message
-	// 			}
-	// 		};
-	// 	}
-	// 	throw new ArgumentException("Unknown CanisterHttpResponse type");
-	// }
+	private static JsonObject SerializeCanisterHttpResponse(CanisterHttpResponse response)
+	{
+		if (response is CanisterHttpReply reply)
+		{
+			return new JsonObject
+			{
+				["CanisterHttpReply"] = new JsonObject
+				{
+					["status"] = JsonValue.Create(reply.Status),
+					["headers"] = JsonValue.Create(reply.Headers.Select(h => new { name = h.Name, value = h.Value }).ToArray()),
+					["body"] = JsonValue.Create(reply.Body)
+				}
+			};
+		}
+		else if (response is CanisterHttpReject reject)
+		{
+			return new JsonObject
+			{
+				["CanisterHttpReject"] = new JsonObject
+				{
+					["reject_code"] = JsonValue.Create(reject.RejectCode),
+					["message"] = reject.Message
+				}
+			};
+		}
+		throw new ArgumentException("Unknown CanisterHttpResponse type");
+	}
 
-
+	private async Task<JsonNode?> DeleteAsync(string endpoint)
+	{
+		return await this.MakeJsonRequestAsync(HttpMethod.Delete, endpoint);
+	}
 
 	private async Task<JsonNode?> GetJsonAsync(string endpoint)
 	{
-		HttpResponseMessage response = await this.httpClient.GetAsync($"{this.baseUrl}{endpoint}");
-		response.EnsureSuccessStatusCode();
-		Stream stream = await response.Content.ReadAsStreamAsync();
-		return await JsonNode.ParseAsync(stream)!;
+		return await this.MakeJsonRequestAsync(HttpMethod.Get, endpoint);
 	}
 
-	private async Task<JsonNode?> PostJsonAsync(string endpoint, JsonObject? data)
+	private async Task<JsonNode?> PostJsonAsync(string endpoint, JsonObject? data = null)
 	{
+		return await this.MakeJsonRequestAsync(HttpMethod.Post, endpoint, data);
+	}
+
+	private async Task<JsonNode?> MakeJsonRequestAsync(
+		HttpMethod method,
+		string endpoint,
+		JsonObject? data = null
+	)
+	{
+		Stopwatch stopwatch = Stopwatch.StartNew();
+		while (true)
+		{
+			ApiResponse<JsonNode?> response = await this.MakeApiRequestAsync(method, endpoint, data);
+			switch (response.Type)
+			{
+				case ApiResponseType.Error:
+					throw new Exception(response.AsError());
+				case ApiResponseType.Success:
+					return response.AsSuccess();
+				case ApiResponseType.Started:
+					{
+						(string stateLabel, string opId) = response.AsStartedOrBusy();
+						return await this.WaitForRequestAsync(stateLabel, opId, stopwatch);
+					}
+				case ApiResponseType.Busy:
+					{
+						(string stateLabel, string opId) = response.AsStartedOrBusy();
+						Console.WriteLine($"Instance is busy. state_label: {stateLabel}, op_id: {opId}");
+						break;
+					}
+				default:
+					throw new Exception("Unexpected response type: " + response.Type);
+			}
+			await Task.Delay(POLLING_PERIOD_MS);
+		}
+	}
+
+	private async Task<JsonNode?> WaitForRequestAsync(
+		string stateLabel,
+		string opId,
+		Stopwatch stopwatch
+	)
+	{
+		while (true)
+		{
+			await Task.Delay(POLLING_PERIOD_MS);
+			ApiResponse<JsonNode?> response = await this.MakeApiRequestAsync(HttpMethod.Get, $"/read_graph/{stateLabel}/{opId}");
+			switch (response.Type)
+			{
+				case ApiResponseType.Error:
+					Console.WriteLine($"Polling failure, trying again. Error: {response.AsError()}");
+					break;
+				case ApiResponseType.Success:
+					return response.AsSuccess();
+				case ApiResponseType.Started:
+					Console.WriteLine($"Unexpected 'started' response while polling, trying again. state_label: {stateLabel}, op_id: {opId}");
+					break;
+				case ApiResponseType.Busy:
+					Console.WriteLine($"Unexpected 'started' response while polling, trying again. state_label: {stateLabel}, op_id: {opId}");
+					break;
+				default:
+					throw new Exception("Unexpected response type: " + response.Type);
+			}
+			if (this.requestTimeout > TimeSpan.Zero && stopwatch.Elapsed > this.requestTimeout)
+			{
+				throw new Exception("Request timed out while waiting for completion");
+			}
+		}
+	}
+
+	private async Task<HttpResponseMessage> MakeHttpRequestAsync(HttpMethod method, string endpoint, JsonObject? data = null)
+	{
+		HttpContent? content;
+		switch (method.Method)
+		{
+			case "GET":
+			case "DELETE":
+				content = null;
+				if (data != null)
+				{
+					throw new ArgumentException("GET and DELETE requests cannot have a body");
+				}
+				break;
+			case "POST":
+				var json = data?.ToJsonString() ?? "";
+				content = new StringContent(json, Encoding.UTF8, "application/json");
+				break;
+			default:
+				throw new Exception($"Unsupported HTTP method: {method}");
+		}
 		string url = $"{this.baseUrl}{endpoint}";
-		return await PocketIcHttpClient.PostJsonAsync(this.httpClient, url, data);
+		var request = new HttpRequestMessage(method, url)
+		{
+			Content = content
+		};
+		return await this.httpClient.SendAsync(request);
 	}
 
-	private static async Task<JsonNode?> PostJsonAsync(HttpClient httpClient, string url, JsonObject? data)
+	private async Task<ApiResponse<JsonNode?>> MakeApiRequestAsync(
+		HttpMethod method,
+		string endpoint,
+		JsonObject? data = null
+	)
 	{
-		var json = data?.ToJsonString() ?? "";
-		var content = new StringContent(json, Encoding.UTF8, "application/json");
-		var response = await httpClient.PostAsync(url, content);
-		response.EnsureSuccessStatusCode();
-		var stream = await response.Content.ReadAsStreamAsync();
-		return await JsonNode.ParseAsync(stream);
+		HttpResponseMessage response = await this.MakeHttpRequestAsync(method, endpoint, data);
+		Stream stream = await response.Content.ReadAsStreamAsync();
+		JsonNode? node = null;
+		if (stream.Length > 0)
+		{
+			node = await JsonNode.ParseAsync(stream);
+		}
+		switch (response.StatusCode)
+		{
+			case HttpStatusCode.OK:
+				{
+					return new ApiResponse<JsonNode?>(ApiResponseType.Success, node);
+				}
+			case HttpStatusCode.Accepted:
+			case HttpStatusCode.Conflict:
+				{
+					if (node == null)
+					{
+						throw new Exception("There was no json response from the server");
+					}
+					string stateLabel = node["state_label"].Deserialize<string>()!;
+					string opId = node["op_id"].Deserialize<string>()!;
+					ApiResponseType type = response.StatusCode == HttpStatusCode.Accepted
+						? ApiResponseType.Started
+						: ApiResponseType.Busy;
+					return new ApiResponse<JsonNode?>(type, (stateLabel, opId));
+				}
+			default:
+				{
+					if (node == null)
+					{
+						throw new Exception("There was no json response from the server");
+					}
+					string message = node["message"].Deserialize<string>()!;
+					return new ApiResponse<JsonNode?>(ApiResponseType.Error, message);
+				}
+		}
 	}
-
 
 
 	private static SubnetTopology MapSubnetTopology(string subnetId, JsonNode value)
@@ -686,5 +797,40 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			NodeIds = nodeIds,
 			CanisterRanges = canisterRanges
 		};
+	}
+
+	internal class ApiResponse<T>
+	{
+		public ApiResponseType Type { get; }
+		public object? Data { get; }
+
+		public ApiResponse(ApiResponseType type, object? data)
+		{
+			this.Type = type;
+			this.Data = data;
+		}
+
+		public T AsSuccess()
+		{
+			return (T)this.Data!;
+		}
+
+		public string AsError()
+		{
+			return (string)this.Data!;
+		}
+
+		public (string StateLabel, string OpId) AsStartedOrBusy()
+		{
+			return ((string, string))this.Data!;
+		}
+	}
+
+	internal enum ApiResponseType
+	{
+		Error,
+		Success,
+		Started,
+		Busy
 	}
 }

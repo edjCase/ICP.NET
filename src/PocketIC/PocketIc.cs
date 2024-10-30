@@ -550,10 +550,11 @@ namespace EdjCase.ICP.PocketIC
 			List<SubnetConfig>? systemSubnets = null,
 			List<SubnetConfig>? verifiedApplicationSubnets = null,
 			bool nonmainnetFeatures = false,
-			CandidConverter? candidConverter = null
+			CandidConverter? candidConverter = null,
+			TimeSpan? requestTimeout = null
 		)
 		{
-			IPocketIcHttpClient httpClient = new PocketIcHttpClient(new HttpClient(), url);
+			IPocketIcHttpClient httpClient = new PocketIcHttpClient(new HttpClient(), url, requestTimeout ?? TimeSpan.FromSeconds(30));
 			return await PocketIc.CreateAsync(
 				httpClient,
 				applicationSubnets,
