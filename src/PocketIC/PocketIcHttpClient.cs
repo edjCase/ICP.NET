@@ -25,6 +25,11 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		this.requestTimeout = requestTimeout;
 	}
 
+	public Uri GetServerUrl()
+	{
+		return new Uri(this.baseUrl);
+	}
+
 	public async Task<string> UploadBlobAsync(byte[] blob)
 	{
 		var content = new ByteArrayContent(blob);
@@ -519,19 +524,27 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 	{
 		var request = new JsonObject
 		{
-			["ip_addr"] = null,
-			["port"] = port,
 			["forward_to"] = new JsonObject
 			{
-				["PocketIcInstance"] = instanceId
-			},
-			["domains"] = domains == null ? null : new JsonArray(domains.Select(d => JsonValue.Create(d)).ToArray()),
-			["https_config"] = httpsConfig == null ? null : new JsonObject
+				["PocketIcInstance"] = JsonValue.Create(instanceId)
+			}
+		};
+		if (port != null)
+		{
+			request["port"] = JsonValue.Create(port.Value);
+		}
+		if (domains != null)
+		{
+			request["domains"] = new JsonArray(domains.Select(d => JsonValue.Create(d)).ToArray());
+		}
+		if (httpsConfig != null)
+		{
+			request["https_config"] = new JsonObject
 			{
 				["cert_path"] = httpsConfig.CertPath,
 				["key_path"] = httpsConfig.KeyPath
-			}
-		};
+			};
+		}
 		HttpResponseMessage response = await this.MakeHttpRequestAsync(HttpMethod.Post, "/http_gateway", request);
 		response.EnsureSuccessStatusCode();
 		Stream stream = await response.Content.ReadAsStreamAsync();

@@ -53,9 +53,9 @@ namespace EdjCase.ICP.PocketIC
 			{
 				FileName = binPath,
 				Arguments = $"--pid {pid}",
-				RedirectStandardOutput = !showRuntimeLogs,
-				RedirectStandardError = !showErrorLogs,
-				UseShellExecute = false
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false,
 			};
 
 			Process? serverProcess = Process.Start(startInfo);
@@ -64,6 +64,22 @@ namespace EdjCase.ICP.PocketIC
 			{
 				throw new Exception("Failed to start PocketIC server process");
 			}
+			serverProcess.OutputDataReceived += (sender, e) =>
+			{
+				if (e.Data != null)
+				{
+					Debug.WriteLine(e.Data);
+				}
+			};
+			serverProcess.ErrorDataReceived += (sender, e) =>
+			{
+				if (e.Data != null)
+				{
+					Debug.WriteLine(e.Data);
+				}
+			};
+			serverProcess.BeginOutputReadLine();
+			serverProcess.BeginErrorReadLine();
 
 			TimeSpan interval = TimeSpan.FromMilliseconds(20);
 			TimeSpan timeout = TimeSpan.FromSeconds(30);

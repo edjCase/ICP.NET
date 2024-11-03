@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using EdjCase.ICP.Agent.Agents;
+using EdjCase.ICP.Agent.Responses;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.PocketIC;
 using EdjCase.ICP.PocketIC.Client;
@@ -25,10 +28,15 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 	[Fact]
 	public async Task Test()
 	{
+		SubnetConfig nnsSubnet = new SubnetConfig
+		{
+			State = SubnetStateConfig.New()
+		};
+
 		IPocketIcHttpClient httpClient = new PocketIcHttpClient(new System.Net.Http.HttpClient(), this.url, TimeSpan.FromSeconds(5));
 		int? instanceId = null;
 		// Create new pocketic instance for test, then dispose it
-		await using (PocketIc pocketIc = await PocketIc.CreateAsync(httpClient))
+		await using (PocketIc pocketIc = await PocketIc.CreateAsync(httpClient, nnsSubnet: nnsSubnet))
 		{
 			instanceId = pocketIc.InstanceId;
 
@@ -39,9 +47,15 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			// Check topology
 			List<SubnetTopology> subnetTopologies = await pocketIc.GetTopologyAsync(useCache: false);
 			Assert.NotNull(subnetTopologies);
-			SubnetTopology subnetTopology = Assert.Single(subnetTopologies);
-			Assert.Equal(SubnetType.Application, subnetTopology.Type);
-			Assert.Equal(13, subnetTopology.NodeIds.Count);
+
+			SubnetTopology appTopology = Assert.Single(subnetTopologies, s => s.Type == SubnetType.Application);
+			Assert.Equal(SubnetType.Application, appTopology.Type);
+			Assert.Equal(13, appTopology.NodeIds.Count);
+
+			SubnetTopology nnsTopology = Assert.Single(subnetTopologies, s => s.Type == SubnetType.NNS);
+			Assert.Equal(SubnetType.NNS, nnsTopology.Type);
+			Assert.Equal(40, nnsTopology.NodeIds.Count);
+
 
 			UnboundedUInt initialCyclesAmount = 1_000_000_000_000; // 1 trillion cycles
 
@@ -60,12 +74,13 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			);
 			Assert.NotNull(response);
 			Assert.NotNull(response.CanisterId);
+			Principal canisterId = response.CanisterId;
 
 			// Check cycles
-			ulong balance = await pocketIc.GetCyclesBalanceAsync(response.CanisterId);
+			ulong balance = await pocketIc.GetCyclesBalanceAsync(canisterId);
 			Assert.Equal(initialCyclesAmount, balance);
 
-			ulong newBalance = await pocketIc.AddCyclesAsync(response.CanisterId, 10);
+			ulong newBalance = await pocketIc.AddCyclesAsync(canisterId, 10);
 			Assert.Equal(balance + 10, newBalance);
 
 			// Install code
@@ -73,19 +88,19 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			CandidArg arg = CandidArg.FromCandid();
 
 			await pocketIc.InstallCodeAsync(
-				canisterId: response.CanisterId,
+				canisterId: canisterId,
 				wasmModule: wasmModule,
 				arg: arg,
 				mode: InstallCodeMode.Install
 			);
 
 			// Start canister
-			await pocketIc.StartCanisterAsync(response.CanisterId);
+			await pocketIc.StartCanisterAsync(canisterId);
 
 			// Test 'get' counter value
 			UnboundedUInt counterValue = await pocketIc.QueryCallAsync<UnboundedUInt>(
 				Principal.Anonymous(),
-				response.CanisterId,
+				canisterId,
 				"get"
 			);
 
@@ -94,14 +109,14 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			// Test 'inc' counter value
 			await pocketIc.UpdateCallNoResponseAsync(
 				Principal.Anonymous(),
-				response.CanisterId,
+				canisterId,
 				"inc"
 			);
 
 			// Test 'get' counter value after inc
 			counterValue = await pocketIc.QueryCallAsync<UnboundedUInt>(
 				Principal.Anonymous(),
-				response.CanisterId,
+				canisterId,
 				"get"
 			);
 			Assert.Equal((UnboundedUInt)1, counterValue);
@@ -118,14 +133,15 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 
 			Assert.Equal(initialTime.NanoSeconds + 60_000_000_000ul, newTime.NanoSeconds);
 
-			await pocketIc.SetTimeAsync(initialTime);
+			ICTimestamp newNewTime = new(newTime.NanoSeconds + (UnboundedUInt)1_000);
+			await pocketIc.SetTimeAsync(newNewTime);
 
 			ICTimestamp resetTime = await pocketIc.GetTimeAsync();
 
-			Assert.Equal(initialTime.NanoSeconds, resetTime.NanoSeconds);
+			Assert.Equal(newNewTime.NanoSeconds, resetTime.NanoSeconds);
 
 			// Test subnet id
-			Principal subnetId = await pocketIc.GetSubnetIdForCanisterAsync(response.CanisterId);
+			Principal subnetId = await pocketIc.GetSubnetIdForCanisterAsync(canisterId);
 			Assert.NotNull(subnetId);
 
 			// Test public key
@@ -134,14 +150,25 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 
 			byte[] newStableMemory = new byte[8];
 			newStableMemory[6] = 1;
-			await pocketIc.SetStableMemoryAsync(response.CanisterId, newStableMemory);
+			await pocketIc.SetStableMemoryAsync(canisterId, newStableMemory);
 
-			byte[] stableMemory = await pocketIc.GetStableMemoryAsync(response.CanisterId);
+			byte[] stableMemory = await pocketIc.GetStableMemoryAsync(canisterId);
 			Assert.Equal(newStableMemory, stableMemory[..8]);
 
 
+			// Setup http gateway and test api call to canister
+			await using (HttpGateway httpGateway = await pocketIc.RunHttpGatewayAsync())
+			{
+				HttpAgent agent = httpGateway.BuildHttpAgent();
+				QueryResponse queryResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
+				CandidArg responseArg = queryResponse.ThrowOrGetReply();
+				UnboundedUInt queryCounterValue = responseArg.ToObjects<UnboundedUInt>();
+				Assert.Equal((UnboundedUInt)1, queryCounterValue);
+			}
+
+
 			// Stop canister
-			await pocketIc.StopCanisterAsync(response.CanisterId);
+			await pocketIc.StopCanisterAsync(canisterId);
 		}
 		if (instanceId != null)
 		{

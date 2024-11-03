@@ -1,8 +1,11 @@
 using System.Runtime.CompilerServices;
+using EdjCase.ICP.Agent.Agents;
+using EdjCase.ICP.Agent.Identities;
 using EdjCase.ICP.Candid;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.PocketIC.Client;
 using EdjCase.ICP.PocketIC.Models;
+using Org.BouncyCastle.Tls.Crypto.Impl;
 
 namespace EdjCase.ICP.PocketIC
 {
@@ -428,6 +431,14 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
+		public async Task<HttpGateway> RunHttpGatewayAsync()
+		{
+			Uri instanceUri = this.HttpClient.GetServerUrl();
+			Uri uri = await this.HttpClient.StartHttpGatewayAsync(this.InstanceId, port: null, domains: null, httpsConfig: null);
+
+			return new HttpGateway(uri, async () => await this.HttpClient.StopHttpGatewayAsync(this.InstanceId));
+		}
+
 
 		public async Task TickAsync(int times = 1)
 		{
@@ -570,6 +581,31 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
+	}
+
+	public class HttpGateway : IAsyncDisposable
+	{
+		public Uri Url { get; }
+		private readonly Func<Task> disposeTask;
+
+		internal HttpGateway(Uri url, Func<Task> disposeTask)
+		{
+			this.Url = url;
+			this.disposeTask = disposeTask;
+		}
+
+		public HttpAgent BuildHttpAgent(IIdentity? identity = null)
+		{
+			return new HttpAgent(
+				identity: identity,
+				httpBoundryNodeUrl: this.Url
+			);
+		}
+
+		public async ValueTask DisposeAsync()
+		{
+			await this.disposeTask();
+		}
 	}
 
 }

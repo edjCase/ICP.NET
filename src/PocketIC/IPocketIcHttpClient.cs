@@ -5,6 +5,8 @@ namespace EdjCase.ICP.PocketIC.Client;
 
 public interface IPocketIcHttpClient
 {
+	Uri GetServerUrl();
+
 	Task<string> UploadBlobAsync(byte[] blob);
 
 	Task<byte[]> DownloadBlobAsync(string blobId);
@@ -110,12 +112,6 @@ public class HttpsConfig
 {
 	public required string CertPath { get; set; }
 	public required string KeyPath { get; set; }
-}
-
-public class HttpGatewayDetails
-{
-	public required uint InstanceId { get; set; }
-	public required ushort Port { get; set; }
 }
 
 public class SubnetTopology

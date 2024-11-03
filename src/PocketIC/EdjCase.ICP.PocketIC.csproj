@@ -18,7 +18,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Candid\EdjCase.ICP.Candid.csproj" />
+    <ProjectReference Include="..\Agent\EdjCase.ICP.Agent.csproj" />
   </ItemGroup>
 
 </Project>
