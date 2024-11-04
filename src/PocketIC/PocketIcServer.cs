@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace EdjCase.ICP.PocketIC
 {
+	/// <summary>
+	/// A class to help start the pocket-ic server process
+	/// </summary>
 	public class PocketIcServer : IDisposable
 	{
 		private readonly Process _serverProcess;
@@ -18,8 +21,14 @@ namespace EdjCase.ICP.PocketIC
 			this._port = port;
 		}
 
+		/// <summary>
+		/// Gets the URL of the server
+		/// </summary>
 		public string GetUrl() => $"http://127.0.0.1:{this._port}";
 
+		/// <summary>
+		/// Stops the server process
+		/// </summary>
 		public async Task Stop()
 		{
 			if (!this._serverProcess.HasExited)
@@ -29,17 +38,24 @@ namespace EdjCase.ICP.PocketIC
 			}
 		}
 
+		/// <summary>
+		/// Disposes of the server process
+		/// </summary>
 		public void Dispose()
 		{
 			this._serverProcess.Dispose();
 		}
 
 
-
+		/// <summary>
+		/// Starts the pocket-ic server process
+		/// </summary>
+		/// <param name="showRuntimeLogs">Outputs the runtime logs using Debug.WriteLine(...)</param>
+		/// <param name="showErrorLogs">Outputs the error logs using Debug.WriteLine(...)</param>
+		/// <returns>The instance of the PocketIcServer with the running process</returns>
 		public static async Task<PocketIcServer> Start(
 			bool showRuntimeLogs = false,
-			bool showErrorLogs = true,
-			CancellationToken? cancellationToken = null
+			bool showErrorLogs = true
 		)
 		{
 			string binPath = GetBinPath();
@@ -53,8 +69,8 @@ namespace EdjCase.ICP.PocketIC
 			{
 				FileName = binPath,
 				Arguments = $"--pid {pid}",
-				RedirectStandardOutput = true,
-				RedirectStandardError = true,
+				RedirectStandardOutput = showRuntimeLogs,
+				RedirectStandardError = showErrorLogs,
 				UseShellExecute = false,
 			};
 
@@ -64,22 +80,30 @@ namespace EdjCase.ICP.PocketIC
 			{
 				throw new Exception("Failed to start PocketIC server process");
 			}
-			serverProcess.OutputDataReceived += (sender, e) =>
+			if (showRuntimeLogs)
 			{
-				if (e.Data != null)
+				serverProcess.OutputDataReceived += (sender, e) =>
 				{
-					Debug.WriteLine(e.Data);
-				}
-			};
-			serverProcess.ErrorDataReceived += (sender, e) =>
+					if (e.Data != null)
+					{
+						Debug.WriteLine(e.Data);
+					}
+				};
+				serverProcess.BeginOutputReadLine();
+			}
+
+			if (showErrorLogs)
 			{
-				if (e.Data != null)
+
+				serverProcess.ErrorDataReceived += (sender, e) =>
 				{
-					Debug.WriteLine(e.Data);
-				}
-			};
-			serverProcess.BeginOutputReadLine();
-			serverProcess.BeginErrorReadLine();
+					if (e.Data != null)
+					{
+						Debug.WriteLine(e.Data);
+					}
+				};
+				serverProcess.BeginErrorReadLine();
+			}
 
 			TimeSpan interval = TimeSpan.FromMilliseconds(20);
 			TimeSpan timeout = TimeSpan.FromSeconds(30);
