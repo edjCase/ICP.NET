@@ -17,7 +17,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 	private const int POLLING_PERIOD_MS = 10;
 	private readonly TimeSpan requestTimeout;
 
-	private PocketIcHttpClient(
+	internal PocketIcHttpClient(
 		HttpClient httpClient,
 		string url,
 		TimeSpan requestTimeout

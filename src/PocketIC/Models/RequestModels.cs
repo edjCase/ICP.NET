@@ -6,7 +6,7 @@ namespace EdjCase.ICP.PocketIC.Models;
 /// <summary>
 /// Request model for creating a new canister with optional settings
 /// </summary>
-public class CreateCanisterRequest
+internal class CreateCanisterRequest
 {
 	/// <summary>
 	/// Optional canister settings to configure the new canister with
@@ -66,7 +66,7 @@ public class CanisterSettings
 /// <summary>
 /// Request model for starting a canister
 /// </summary>
-public class StartCanisterRequest
+internal class StartCanisterRequest
 {
 	/// <summary>
 	/// The ID of the canister to start
@@ -78,7 +78,7 @@ public class StartCanisterRequest
 /// <summary>
 /// Request model for stopping a canister
 /// </summary>
-public class StopCanisterRequest
+internal class StopCanisterRequest
 {
 	/// <summary>
 	/// The ID of the canister to stop
@@ -90,7 +90,7 @@ public class StopCanisterRequest
 /// <summary>
 /// Request model for installing code on a canister
 /// </summary>
-public class InstallCodeRequest
+internal class InstallCodeRequest
 {
 	/// <summary>
 	/// The ID of the target canister 
@@ -144,7 +144,7 @@ public enum InstallCodeMode
 /// <summary>
 /// Request model for updating canister settings
 /// </summary>
-public class UpdateCanisterSettingsRequest
+internal class UpdateCanisterSettingsRequest
 {
 	/// <summary>
 	/// The ID of the canister to update
