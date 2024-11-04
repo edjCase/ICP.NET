@@ -10,7 +10,7 @@ namespace EdjCase.ICP.PocketIC
 	/// <summary>
 	/// A class to help start the pocket-ic server process
 	/// </summary>
-	public class PocketIcServer : IDisposable
+	public class PocketIcServer : IAsyncDisposable
 	{
 		private readonly Process _serverProcess;
 		private readonly int _port;
@@ -29,7 +29,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <summary>
 		/// Stops the server process
 		/// </summary>
-		public async Task Stop()
+		public async ValueTask StopAsync()
 		{
 			if (!this._serverProcess.HasExited)
 			{
@@ -41,8 +41,9 @@ namespace EdjCase.ICP.PocketIC
 		/// <summary>
 		/// Disposes of the server process
 		/// </summary>
-		public void Dispose()
+		public async ValueTask DisposeAsync()
 		{
+			await this.StopAsync();
 			this._serverProcess.Dispose();
 		}
 

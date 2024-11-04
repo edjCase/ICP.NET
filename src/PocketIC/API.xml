@@ -1192,12 +1192,12 @@
             Gets the URL of the server
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.Stop">
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.StopAsync">
             <summary>
             Stops the server process
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.Dispose">
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.DisposeAsync">
             <summary>
             Disposes of the server process
             </summary>

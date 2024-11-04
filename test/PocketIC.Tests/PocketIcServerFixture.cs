@@ -19,8 +19,7 @@ public class PocketIcServerFixture : IDisposable
 		// Stop the server after all tests
 		if (this.Server != null)
 		{
-			this.Server.Stop().GetAwaiter().GetResult();
-			this.Server.Dispose();
+			this.Server.DisposeAsync().GetAwaiter().GetResult();
 		}
 	}
 }

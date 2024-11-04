@@ -39,9 +39,7 @@ IAgent agent = new HttpAgent();
 
 // Create Candid arg to send in request
 ulong proposalId = 1234;
-CandidArg arg = CandidArg.FromCandid(
-	CandidTypedValue.FromObject(proposalId) // Conversion can be C# or custom types
-);
+CandidArg arg = CandidArg.FromObjects(proposalId);
 
 // Make request to IC
 string method = "get_proposal_info";
@@ -107,12 +105,15 @@ TransferResult transferResult = await client.Transfer(transferArgs);
 ```
 
 # Identities
+
 Supported identity types:
+
 - Ed25519/EdDSA
 - Secp256k1/ECDSA
 - Delegated
 
 ## From PEM file
+
 ```cs
 IIdentity identity;
 using (StreamReader pemFile = File.OpenText("C:\\identity.pem"))
@@ -124,12 +125,16 @@ IAgent agent = new HttpAgent(identity);
 ```
 
 ## From private key
+
 ### Ed25519
+
 ```cs
 byte[] privateKey = ...;
 Ed25519Identity identity = IdentityUtil.FromEd25519PrivateKey(privateKey);
 ```
+
 ### Secp256k1
+
 ```cs
 byte[] privateKey = ...;
 Secp256k1Identity identity = IdentityUtil.FromSecp256k1PrivateKey(privateKey);
@@ -138,26 +143,34 @@ Secp256k1Identity identity = IdentityUtil.FromSecp256k1PrivateKey(privateKey);
 ## Generate new keys
 
 ### Ed25519
+
 ```cs
 Ed25519Identity identity = IdentityUtil.GenerateEd25519Identity();
 ```
+
 ### Secp256k1
+
 ```cs
 Secp256k1Identity identity = IdentityUtil.GenerateSecp256k1Identity();
 ```
 
 ## From public/private key pair
+
 ### Ed25519
+
 ```cs
 Ed25519Identity identity = new Ed25519Identity(publicKey, privateKey);
 ```
+
 ### Secp256k1
+
 ```cs
 Secp256k1Identity identity = new Secp256k1Identity(publicKey, privateKey);
 ```
 
 ## Delegation
-This is most commonly used with things like Internet Identity where another identity is delegated to sign 
+
+This is most commonly used with things like Internet Identity where another identity is delegated to sign
 requests by the inner identity.
 
 ```cs
@@ -169,10 +182,12 @@ var delegatedIdentity = new DelegationIdentity(innerIdentity, chain);
 ```
 
 # WebGL Builds
+
 Due to how WebGL works by converting C# to JS/WASM using IL2CPP there are a few additional steps to avoid
-incompatibilities. 
+incompatibilities.
+
 - UnityHttpClient - The .NET `HttpClient` does not work in many cases, so `UnityHttpClient` is added via Unity C# script.
-	```cs
-	var client = new UnityHttpClient();
-	var agent = new HttpAgent(client);
-	```
+  ```cs
+  var client = new UnityHttpClient();
+  var agent = new HttpAgent(client);
+  ```
