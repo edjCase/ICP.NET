@@ -442,6 +442,22 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		await this.PostJsonAsync($"/instances/{instanceId}/update/set_time", request);
 	}
 
+
+	public async Task AutoProgressTimeAsync(int instanceId, TimeSpan? artificialDelay = null)
+	{
+		var request = new JsonObject();
+		if (artificialDelay.HasValue)
+		{
+			request["artificial_delay_ms"] = JsonValue.Create(artificialDelay.Value.TotalMilliseconds);
+		}
+		await this.PostJsonAsync($"/instances/{instanceId}/auto_progress", request);
+	}
+
+	public async Task StopProgressTimeAsync(int instanceId)
+	{
+		await this.PostJsonAsync($"/instances/{instanceId}/stop_progress", null);
+	}
+
 	public async Task<ulong> AddCyclesAsync(int instanceId, Principal canisterId, ulong amount)
 	{
 		var request = new JsonObject
@@ -493,26 +509,6 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 			)
 		};
 		await this.PostJsonAsync($"/instances/{instanceId}/update/mock_canister_http", request);
-	}
-
-	public async Task<Uri> AutoProgressAsync(int instanceId, ulong? artificialDelayMs = null)
-	{
-		var request = new JsonObject();
-		if (artificialDelayMs.HasValue)
-		{
-			request["artificial_delay_ms"] = JsonValue.Create(artificialDelayMs.Value);
-		}
-		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/auto_progress", request);
-		if (response == null)
-		{
-			throw new Exception("There was no json response from the server");
-		}
-		return new Uri(response!["url"].Deserialize<string>()!);
-	}
-
-	public async Task StopProgressAsync(int instanceId)
-	{
-		await this.PostJsonAsync($"/instances/{instanceId}/stop_progress", null);
 	}
 
 	public async Task<Uri> StartHttpGatewayAsync(

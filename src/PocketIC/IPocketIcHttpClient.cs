@@ -76,6 +76,11 @@ public interface IPocketIcHttpClient
 
 	Task SetTimeAsync(int instanceId, ICTimestamp timestamp);
 
+
+	Task AutoProgressTimeAsync(int instanceId, TimeSpan? artificialDelay = null);
+
+	Task StopProgressTimeAsync(int instanceId);
+
 	Task<ulong> AddCyclesAsync(int instanceId, Principal canisterId, ulong amount);
 
 	Task SetStableMemoryAsync(int instanceId, Principal canisterId, byte[] memory);

@@ -453,21 +453,16 @@ namespace EdjCase.ICP.PocketIC
 			return this.HttpClient.GetTimeAsync(this.InstanceId);
 		}
 
-		public async Task ResetTimeAsync()
-		{
-			await this.SetTimeAsync(ICTimestamp.Now());
-		}
-
 		public Task SetTimeAsync(ICTimestamp time)
 		{
 			return this.HttpClient.SetTimeAsync(this.InstanceId, time);
 		}
 
-		public async Task AdvanceTimeAsync(TimeSpan duration)
+		public async Task<IAsyncDisposable> AutoProgressTimeAsync(TimeSpan? artificalDelay = null)
 		{
-			var currentTime = await this.GetTimeAsync();
-			var newTime = ICTimestamp.FromNanoSeconds(currentTime.NanoSeconds + ((ulong)duration.TotalMilliseconds * 1_000_000));
-			await this.SetTimeAsync(newTime);
+			await this.HttpClient.AutoProgressTimeAsync(this.InstanceId, artificalDelay);
+
+			return new AutoProgressionDisposable(() => this.HttpClient.StopProgressTimeAsync(this.InstanceId));
 		}
 
 		public Task<Principal> GetPublicKeyForSubnetAsync(Principal subnetId)
@@ -600,6 +595,21 @@ namespace EdjCase.ICP.PocketIC
 				identity: identity,
 				httpBoundryNodeUrl: this.Url
 			);
+		}
+
+		public async ValueTask DisposeAsync()
+		{
+			await this.disposeTask();
+		}
+	}
+
+	internal class AutoProgressionDisposable : IAsyncDisposable
+	{
+		private readonly Func<Task> disposeTask;
+
+		internal AutoProgressionDisposable(Func<Task> disposeTask)
+		{
+			this.disposeTask = disposeTask;
 		}
 
 		public async ValueTask DisposeAsync()

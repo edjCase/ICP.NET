@@ -127,18 +127,26 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			// Test time
 			ICTimestamp initialTime = await pocketIc.GetTimeAsync();
 
-			await pocketIc.AdvanceTimeAsync(TimeSpan.FromMinutes(1));
-
-			ICTimestamp newTime = await pocketIc.GetTimeAsync();
-
-			Assert.Equal(initialTime.NanoSeconds + 60_000_000_000ul, newTime.NanoSeconds);
-
-			ICTimestamp newNewTime = new(newTime.NanoSeconds + (UnboundedUInt)1_000);
-			await pocketIc.SetTimeAsync(newNewTime);
+			ICTimestamp newTime = new(initialTime.NanoSeconds + (UnboundedUInt)1_000);
+			await pocketIc.SetTimeAsync(newTime);
 
 			ICTimestamp resetTime = await pocketIc.GetTimeAsync();
 
-			Assert.Equal(newNewTime.NanoSeconds, resetTime.NanoSeconds);
+			Assert.Equal(newTime.NanoSeconds, resetTime.NanoSeconds);
+
+			// Test auto progress time
+			await using (await pocketIc.AutoProgressTimeAsync())
+			{
+				await Task.Delay(100);
+				ICTimestamp autoProgressedTime = await pocketIc.GetTimeAsync();
+				Assert.True(autoProgressedTime.NanoSeconds > resetTime.NanoSeconds);
+			}
+
+			// Verify time is stopped
+			ICTimestamp stopProgressTime = await pocketIc.GetTimeAsync();
+			await Task.Delay(100);
+			ICTimestamp stopProgressTime2 = await pocketIc.GetTimeAsync();
+			Assert.Equal(stopProgressTime.NanoSeconds, stopProgressTime2.NanoSeconds);
 
 			// Test subnet id
 			Principal subnetId = await pocketIc.GetSubnetIdForCanisterAsync(canisterId);
