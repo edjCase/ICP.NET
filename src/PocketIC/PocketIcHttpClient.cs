@@ -7,14 +7,17 @@ using System.Diagnostics;
 
 namespace EdjCase.ICP.PocketIC.Client;
 
-internal class PocketIcHttpClient : IPocketIcHttpClient
+/// <summary>
+/// The default implementation of the <see cref="IPocketIcHttpClient"/> interface.
+/// </summary>
+public class PocketIcHttpClient : IPocketIcHttpClient
 {
 	private readonly HttpClient httpClient;
 	private readonly string baseUrl;
 	private const int POLLING_PERIOD_MS = 10;
 	private readonly TimeSpan requestTimeout;
 
-	public PocketIcHttpClient(
+	private PocketIcHttpClient(
 		HttpClient httpClient,
 		string url,
 		TimeSpan requestTimeout
@@ -25,11 +28,13 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		this.requestTimeout = requestTimeout;
 	}
 
+	/// <inheritdoc />
 	public Uri GetServerUrl()
 	{
 		return new Uri(this.baseUrl);
 	}
 
+	/// <inheritdoc />
 	public async Task<string> UploadBlobAsync(byte[] blob)
 	{
 		var content = new ByteArrayContent(blob);
@@ -37,14 +42,14 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		response.EnsureSuccessStatusCode();
 		return await response.Content.ReadAsStringAsync();
 	}
-
+	/// <inheritdoc />
 	public async Task<byte[]> DownloadBlobAsync(string blobId)
 	{
 		HttpResponseMessage response = await this.httpClient.GetAsync($"{this.baseUrl}/blobstore/{blobId}");
 		response.EnsureSuccessStatusCode();
 		return await response.Content.ReadAsByteArrayAsync();
 	}
-
+	/// <inheritdoc />
 	public async Task<bool> VerifySignatureAsync(
 		byte[] message,
 		Principal publicKey,
@@ -75,7 +80,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 
 		return true;
 	}
-
+	/// <inheritdoc />
 	public async Task<List<Instance>> GetInstancesAsync()
 	{
 		// Doesn't use the ApiResponse<T> pattern
@@ -90,7 +95,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		!.AsArray()
 		.Select((s, i) => new Instance { Id = i, Status = Enum.Parse<InstanceStatus>(s!.Deserialize<string>()!) }).ToList();
 	}
-
+	/// <inheritdoc />
 	public async Task<(int Id, List<SubnetTopology> Topology)> CreateInstanceAsync(
 		List<SubnetConfig>? applicationSubnets = null,
 		SubnetConfig? bitcoinSubnet = null,
@@ -201,12 +206,12 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 			?? [];
 		return (instanceId, topology);
 	}
-
+	/// <inheritdoc />
 	public async Task DeleteInstanceAsync(int id)
 	{
 		await this.DeleteAsync($"/instances/{id}");
 	}
-
+	/// <inheritdoc />
 	public async Task<CandidArg> QueryCallAsync(
 		int instanceId,
 		Principal sender,
@@ -224,7 +229,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 			effectivePrincipal
 		);
 	}
-
+	/// <inheritdoc />
 	public async Task<List<SubnetTopology>> GetTopologyAsync(int instanceId)
 	{
 		JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/topology");
@@ -239,7 +244,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 			?.ToList()
 			?? [];
 	}
-
+	/// <inheritdoc />
 	public async Task<ICTimestamp> GetTimeAsync(int instanceId)
 	{
 		JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/get_time");
@@ -249,7 +254,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		return ICTimestamp.FromNanoSeconds(response!["nanos_since_epoch"].Deserialize<ulong>()!);
 	}
-
+	/// <inheritdoc />
 	public async Task<CanisterHttpRequest> GetCanisterHttpAsync(int instanceId)
 	{
 		JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/get_canister_http");
@@ -273,7 +278,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 			RequestId = response!["request_id"].Deserialize<ulong>()!
 		};
 	}
-
+	/// <inheritdoc />
 	public async Task<ulong> GetCyclesBalanceAsync(int instanceId, Principal canisterId)
 	{
 		var request = new JsonObject
@@ -287,7 +292,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		return response!["cycles"].Deserialize<ulong>()!;
 	}
-
+	/// <inheritdoc />
 	public async Task<byte[]> GetStableMemoryAsync(int instanceId, Principal canisterId)
 	{
 		var request = new JsonObject
@@ -301,7 +306,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		return response!["blob"].Deserialize<byte[]>()!;
 	}
-
+	/// <inheritdoc />
 	public async Task<Principal> GetSubnetIdForCanisterAsync(int instanceId, Principal canisterId)
 	{
 		var request = new JsonObject
@@ -316,7 +321,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		byte[] subnetId = response!["subnet_id"].Deserialize<byte[]>()!;
 		return Principal.FromBytes(subnetId);
 	}
-
+	/// <inheritdoc />
 	public async Task<Principal> GetPublicKeyForSubnetAsync(int instanceId, Principal subnetId)
 	{
 		var request = new JsonObject
@@ -331,7 +336,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		byte[] publicKey = response!.AsArray().Select(r => r.Deserialize<byte>()!).ToArray();
 		return Principal.FromBytes(publicKey);
 	}
-
+	/// <inheritdoc />
 	public async Task<CandidArg> SubmitIngressMessageAsync(
 		int instanceId,
 		Principal sender,
@@ -349,7 +354,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 			effectivePrincipal
 		);
 	}
-
+	/// <inheritdoc />
 	public async Task<CandidArg> ExecuteIngressMessageAsync(
 		int instanceId,
 		Principal sender,
@@ -417,7 +422,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		return CandidArg.FromBytes(candidBytes);
 	}
-
+	/// <inheritdoc />
 	public async Task AwaitIngressMessageAsync(int instanceId, byte[] messageId, Principal? effectivePrincipal = null)
 	{
 		var request = new JsonObject
@@ -428,7 +433,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		await this.PostJsonAsync($"/instances/{instanceId}/update/await_ingress_message", request);
 		// TODO
 	}
-
+	/// <inheritdoc />
 	public async Task SetTimeAsync(int instanceId, ICTimestamp timestamp)
 	{
 		if (!timestamp.NanoSeconds.TryToUInt64(out ulong nanosSinceEpoch))
@@ -442,7 +447,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		await this.PostJsonAsync($"/instances/{instanceId}/update/set_time", request);
 	}
 
-
+	/// <inheritdoc />
 	public async Task AutoProgressTimeAsync(int instanceId, TimeSpan? artificialDelay = null)
 	{
 		var request = new JsonObject();
@@ -452,12 +457,12 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		await this.PostJsonAsync($"/instances/{instanceId}/auto_progress", request);
 	}
-
+	/// <inheritdoc />
 	public async Task StopProgressTimeAsync(int instanceId)
 	{
 		await this.PostJsonAsync($"/instances/{instanceId}/stop_progress", null);
 	}
-
+	/// <inheritdoc />
 	public async Task<ulong> AddCyclesAsync(int instanceId, Principal canisterId, ulong amount)
 	{
 		var request = new JsonObject
@@ -472,7 +477,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		return response["cycles"].Deserialize<ulong>()!;
 	}
-
+	/// <inheritdoc />
 	public async Task SetStableMemoryAsync(int instanceId, Principal canisterId, byte[] memory)
 	{
 		string blobId = await this.UploadBlobAsync(memory);
@@ -483,12 +488,12 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		};
 		await this.PostJsonAsync($"/instances/{instanceId}/update/set_stable_memory", request);
 	}
-
+	/// <inheritdoc />
 	public async Task TickAsync(int instanceId)
 	{
 		await this.PostJsonAsync($"/instances/{instanceId}/update/tick", null);
 	}
-
+	/// <inheritdoc />
 	public async Task MockCanisterHttpResponseAsync(
 		int instanceId,
 		ulong requestId,
@@ -510,7 +515,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		};
 		await this.PostJsonAsync($"/instances/{instanceId}/update/mock_canister_http", request);
 	}
-
+	/// <inheritdoc />
 	public async Task<Uri> StartHttpGatewayAsync(
 		int instanceId,
 		int? port = null,
@@ -562,7 +567,7 @@ internal class PocketIcHttpClient : IPocketIcHttpClient
 		string url = $"{protocol}://{domain}:{actualPort}/";
 		return new Uri(url);
 	}
-
+	/// <inheritdoc />
 	public async Task StopHttpGatewayAsync(int instanceId)
 	{
 		HttpResponseMessage response = await this.MakeHttpRequestAsync(HttpMethod.Post,
