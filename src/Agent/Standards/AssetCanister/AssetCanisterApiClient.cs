@@ -328,7 +328,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<CreateBatchResult> CreateBatchAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.EmptyRecord());
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "create_batch", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "create_batch", arg);
 			return reply.ToObjects<CreateBatchResult>(this.Converter);
 		}
 
@@ -342,7 +342,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			CreateChunkRequest request = new(batchId, content);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "create_chunk", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "create_chunk", arg);
 			return reply.ToObjects<CreateChunkResult>(this.Converter);
 		}
 
@@ -355,7 +355,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			CommitBatchArguments request = new(batchId, operations);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "commit_batch", arg);
+			await this.Agent.CallAsync(this.CanisterId, "commit_batch", arg);
 		}
 
 		/// <summary>
@@ -367,7 +367,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			CommitBatchArguments request = new(batchId, operations);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "propose_commit_batch", arg);
+			await this.Agent.CallAsync(this.CanisterId, "propose_commit_batch", arg);
 		}
 
 		/// <summary>
@@ -379,7 +379,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			CommitProposedBatchRequest request = new(batchId, evidence);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "commit_proposed_batch", arg);
+			await this.Agent.CallAsync(this.CanisterId, "commit_proposed_batch", arg);
 		}
 
 		/// <summary>
@@ -395,7 +395,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 				: OptionalValue<ushort>.WithValue(maxIterations.Value);
 			ComputeEvidenceArguments request = new ComputeEvidenceArguments(batchId, maxIterationsOpt);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "compute_evidence", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "compute_evidence", arg);
 			return reply.ToObjects<OptionalValue<byte[]>>(this.Converter);
 		}
 
@@ -407,7 +407,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			DeleteBatchArguments request = new(batchId);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "delete_batch", arg);
+			await this.Agent.CallAsync(this.CanisterId, "delete_batch", arg);
 		}
 
 		/// <summary>
@@ -453,7 +453,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 				allowRawAccessOpt
 			);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "create_asset", arg);
+			await this.Agent.CallAsync(this.CanisterId, "create_asset", arg);
 		}
 
 		/// <summary>
@@ -475,7 +475,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 				: OptionalValue<byte[]>.WithValue(sha256);
 			SetAssetContentArguments request = new(key, contentEncoding, chunkIds, sha256Opt);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "set_asset_content", arg);
+			await this.Agent.CallAsync(this.CanisterId, "set_asset_content", arg);
 		}
 
 		/// <summary>
@@ -488,7 +488,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			UnsetAssetContentArguments request = new(key, contentEncoding);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "unset_asset_content", arg);
+			await this.Agent.CallAsync(this.CanisterId, "unset_asset_content", arg);
 		}
 
 		/// <summary>
@@ -499,7 +499,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			DeleteAssetArguments request = new(key);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "delete_asset", arg);
+			await this.Agent.CallAsync(this.CanisterId, "delete_asset", arg);
 		}
 
 		/// <summary>
@@ -508,7 +508,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task ClearAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.EmptyRecord());
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "clear", arg);
+			await this.Agent.CallAsync(this.CanisterId, "clear", arg);
 		}
 
 		/// <summary>
@@ -532,7 +532,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 				: OptionalValue<byte[]>.WithValue(sha256);
 			StoreRequest request = new(key, contentType, contextEncoding, content, sha256Opt);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "store", arg);
+			await this.Agent.CallAsync(this.CanisterId, "store", arg);
 		}
 
 		/// <summary>
@@ -542,7 +542,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task AuthorizeAsync(Principal principal)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(principal, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "authorize", arg);
+			await this.Agent.CallAsync(this.CanisterId, "authorize", arg);
 		}
 
 		/// <summary>
@@ -552,7 +552,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task DeauthorizeAsync(Principal principal)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(principal, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "deauthorize", arg);
+			await this.Agent.CallAsync(this.CanisterId, "deauthorize", arg);
 		}
 
 		/// <summary>
@@ -562,7 +562,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<List<Principal>> ListAuthorizedAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "list_authorized", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "list_authorized", arg);
 			return reply.ToObjects<List<Principal>>(this.Converter);
 		}
 
@@ -575,7 +575,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			GrantPermission request = new(principal, permission);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "grant_permission", arg);
+			await this.Agent.CallAsync(this.CanisterId, "grant_permission", arg);
 		}
 
 		/// <summary>
@@ -587,7 +587,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			RevokePermission request = new RevokePermission(principal, permission);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "revoke_permission", arg);
+			await this.Agent.CallAsync(this.CanisterId, "revoke_permission", arg);
 		}
 
 		/// <summary>
@@ -599,7 +599,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			ListPermitted request = new ListPermitted(withPermission);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "list_permitted", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "list_permitted", arg);
 			return reply.ToObjects<List<Principal>>(this.Converter);
 		}
 
@@ -609,7 +609,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task TakeOwnershipAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "take_ownership", arg);
+			await this.Agent.CallAsync(this.CanisterId, "take_ownership", arg);
 		}
 
 		/// <summary>
@@ -632,7 +632,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task SetAssetPropertiesAsync(SetAssetPropertiesRequest request)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "set_asset_properties", arg);
+			await this.Agent.CallAsync(this.CanisterId, "set_asset_properties", arg);
 		}
 
 		/// <summary>
@@ -642,7 +642,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<ConfigurationResponse> GetConfigurationAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "get_configuration", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "get_configuration", arg);
 			return reply.ToObjects<ConfigurationResponse>(this.Converter);
 		}
 
@@ -653,7 +653,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task ConfigureAsync(ConfigureRequest request)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			await this.Agent.CallAndWaitAsync(this.CanisterId, "configure", arg);
+			await this.Agent.CallAsync(this.CanisterId, "configure", arg);
 		}
 
 		/// <summary>
@@ -666,7 +666,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			GrantPermission request = new(principal, permission);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "validate_grant_permission", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "validate_grant_permission", arg);
 			return reply.ToObjects<ValidationResult>(this.Converter);
 		}
 
@@ -680,7 +680,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			RevokePermission request = new(principal, permission);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "validate_revoke_permission", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "validate_revoke_permission", arg);
 			return reply.ToObjects<ValidationResult>(this.Converter);
 		}
 
@@ -691,7 +691,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<ValidationResult> ValidateTakeOwnershipAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "validate_take_ownership", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "validate_take_ownership", arg);
 			return reply.ToObjects<ValidationResult>(this.Converter);
 		}
 
@@ -703,7 +703,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<ValidationResult> ValidateCommitProposedBatchAsync(CommitProposedBatchRequest request)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "validate_commit_proposed_batch", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "validate_commit_proposed_batch", arg);
 			return reply.ToObjects<ValidationResult>(this.Converter);
 		}
 
@@ -715,7 +715,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<ValidationResult> ValidateConfigureAsync(ConfigureRequest request)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "validate_configure", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "validate_configure", arg);
 			return reply.ToObjects<ValidationResult>(this.Converter);
 		}
 	}

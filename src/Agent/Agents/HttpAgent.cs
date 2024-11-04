@@ -68,14 +68,74 @@ namespace EdjCase.ICP.Agent.Agents
 			this.bls = bls ?? new DefaultBlsCryptograhy();
 		}
 
-
 		/// <inheritdoc/>
-		public async Task<RequestId> CallAsync(
+		public async Task<CandidArg> CallAsync(
 			Principal canisterId,
 			string method,
 			CandidArg arg,
 			Principal? effectiveCanisterId = null,
-			CancellationToken? cancellationToken = null)
+			CancellationToken? cancellationToken = null
+		)
+		{
+			effectiveCanisterId ??= canisterId;
+			(HttpResponse httpResponse, RequestId requestId) = await this.SendAsync($"/api/v3/canister/{effectiveCanisterId.ToText()}/call", BuildRequest, cancellationToken);
+
+			if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+			{
+				// If v3 is not available, fall back to v2
+				return await this.CallV2AndWaitAsync(canisterId, method, arg, effectiveCanisterId, cancellationToken);
+			}
+			// TODO
+			// if (httpResponse.StatusCode == System.Net.HttpStatusCode.Accepted){
+			// 	// If request takes too long, then it will return 202 Accepted
+			// 	// and polling is required
+			// 	return await this.WaitAsync();
+			// }
+			await httpResponse.ThrowIfErrorAsync();
+
+			byte[] cborBytes = await httpResponse.GetContentAsync();
+			var reader = new CborReader(cborBytes);
+			Certificate certificate = Certificate.FromCbor(reader);
+
+			SubjectPublicKeyInfo rootPublicKey = await this.GetRootKeyAsync(cancellationToken);
+			if (!certificate.IsValid(this.bls, rootPublicKey))
+			{
+				throw new InvalidCertificateException("Certificate signature does not match the IC public key");
+			}
+			HashTree? requestStatusData = certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", requestId.RawValue));
+			RequestStatus? requestStatus = ParseRequestStatus(requestStatusData);
+			switch (requestStatus?.Type)
+			{
+				case RequestStatus.StatusType.Replied:
+					return requestStatus.AsReplied();
+				case RequestStatus.StatusType.Rejected:
+					(RejectCode code, string message, string? errorCode) = requestStatus.AsRejected();
+					throw new CallRejectedException(code, message, errorCode);
+				case RequestStatus.StatusType.Done:
+					throw new RequestCleanedUpException();
+				case null:
+				case RequestStatus.StatusType.Received:
+				case RequestStatus.StatusType.Processing:
+					throw new InvalidOperationException("V3 calls should not return null/received/processing status");
+				default:
+					throw new NotImplementedException($"Invalid request status '{requestStatus.Type}'");
+			}
+
+			CallRequest BuildRequest(Principal sender, ICTimestamp now)
+			{
+				return new CallRequest(canisterId, method, arg, sender, now);
+			}
+		}
+
+
+		/// <inheritdoc/>
+		public async Task<RequestId> CallV2Async(
+			Principal canisterId,
+			string method,
+			CandidArg arg,
+			Principal? effectiveCanisterId = null,
+			CancellationToken? cancellationToken = null
+		)
 		{
 			if (effectiveCanisterId == null)
 			{
@@ -170,6 +230,11 @@ namespace EdjCase.ICP.Agent.Agents
 			var paths = new List<StatePath> { pathRequestStatus };
 			ReadStateResponse response = await this.ReadStateAsync(canisterId, paths, cancellationToken);
 			HashTree? requestStatus = response.Certificate.Tree.GetValueOrDefault(pathRequestStatus);
+			return ParseRequestStatus(requestStatus);
+		}
+
+		private static RequestStatus? ParseRequestStatus(HashTree? requestStatus)
+		{
 			string? status = requestStatus?.GetValueOrDefault("status")?.AsLeaf().AsUtf8();
 			//received, processing, replied, rejected or done
 			switch (status)

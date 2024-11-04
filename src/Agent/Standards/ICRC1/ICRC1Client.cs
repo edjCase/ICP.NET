@@ -137,7 +137,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<TransferResult> Transfer(TransferArgs args)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(args));
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "icrc1_transfer", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "icrc1_transfer", arg);
 			return reply.ToObjects<TransferResult>();
 		}
 

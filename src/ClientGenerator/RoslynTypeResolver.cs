@@ -1345,7 +1345,7 @@ namespace EdjCase.ICP.ClientGenerator
 			}
 			else
 			{
-				// `CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, {methodName}, arg)`
+				// `CandidArg reply = await this.Agent.CallAsync(this.CanisterId, {methodName}, arg)`
 				string? replyVariableName = returnTypes.Any() ? variableName : null; // Dont include reply variable if its not used
 				StatementSyntax invokeCallAndWait = this.GenerateCallAndWait(candidName, argName, replyVariableName);
 				statements.Add(invokeCallAndWait);
@@ -1480,7 +1480,7 @@ namespace EdjCase.ICP.ClientGenerator
 							SyntaxFactory.ThisExpression(),
 							SyntaxFactory.IdentifierName("Agent")
 						),
-						SyntaxFactory.IdentifierName("CallAndWaitAsync")
+						SyntaxFactory.IdentifierName("CallAsync")
 					)
 				)
 				.WithArgumentList(
