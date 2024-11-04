@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Agent.Responses;
 using EdjCase.ICP.Candid.Models;
-using EdjCase.ICP.PocketIC;
 using EdjCase.ICP.PocketIC.Client;
 using EdjCase.ICP.PocketIC.Models;
 using Xunit;

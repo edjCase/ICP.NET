@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EdjCase.ICP.PocketIC</name>
+    </assembly>
+    <members>
+        <member name="T:EdjCase.ICP.PocketIC.PocketIc">
+            <summary>
+            The main interface for interacting with a PocketIC instance.
+            PocketIC is a local canister smart contract testing platform for the Internet Computer.
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.PocketIc.HttpClient">
+            <summary>
+            TODO: Document HTTP Client interface
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.PocketIc.InstanceId">
+            <summary>
+            The unique identifier for this PocketIC instance
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.CreateAndInstallCanisterAsync(System.Byte[],EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Models.CanisterSettings,EdjCase.ICP.Candid.Models.UnboundedUInt,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Creates and installs a new canister with the provided WASM module and initialization arguments.
+            </summary>
+            <param name="wasmModule">The WASM module bytes to install</param>
+            <param name="arg">The initialization arguments in candid format</param>
+            <param name="settings">Optional canister settings</param>
+            <param name="cyclesAmount">Optional amount of cycles to add to the canister</param>
+            <param name="specifiedId">Optional specific canister ID to use</param>
+            <returns>The Principal ID of the created canister</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.CreateCanisterAsync(EdjCase.ICP.PocketIC.Models.CanisterSettings,EdjCase.ICP.Candid.Models.UnboundedUInt,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Creates a new canister with optional settings
+            </summary>
+            <param name="settings">Optional canister settings</param>
+            <param name="cyclesAmount">Optional amount of cycles to add</param>
+            <param name="specifiedId">Optional specific canister ID to use</param>
+            <returns>The response containing the created canister's info</returns>
+        </member>
+    </members>
+</doc>
