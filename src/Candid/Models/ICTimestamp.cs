@@ -99,15 +99,39 @@ namespace EdjCase.ICP.Candid.Models
 		}
 
 		/// <inheritdoc />
-		public static bool operator >= (ICTimestamp a, ICTimestamp b)
+		public static bool operator >=(ICTimestamp a, ICTimestamp b)
 		{
 			return a.NanoSeconds >= b.NanoSeconds;
+		}
+
+		/// <inheritdoc />
+		public static bool operator >(ICTimestamp a, ICTimestamp b)
+		{
+			return a.NanoSeconds > b.NanoSeconds;
 		}
 
 		/// <inheritdoc />
 		public static bool operator <=(ICTimestamp a, ICTimestamp b)
 		{
 			return a.NanoSeconds <= b.NanoSeconds;
+		}
+
+		/// <inheritdoc />
+		public static bool operator <(ICTimestamp a, ICTimestamp b)
+		{
+			return a.NanoSeconds < b.NanoSeconds;
+		}
+
+		/// <inheritdoc />
+		public static ICTimestamp operator +(ICTimestamp timestamp, TimeSpan timeSpan)
+		{
+			return new ICTimestamp(timestamp.NanoSeconds + GetNanosecondsFromTimeSpan(timeSpan));
+		}
+
+		/// <inheritdoc />
+		public static ICTimestamp operator -(ICTimestamp timestamp, TimeSpan timeSpan)
+		{
+			return new ICTimestamp(timestamp.NanoSeconds - GetNanosecondsFromTimeSpan(timeSpan));
 		}
 
 		private static UnboundedUInt EpochNowInNanoseconds()

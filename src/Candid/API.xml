@@ -665,6 +665,134 @@
             </summary>
             <returns>Candid arg value</returns>
         </member>
+        <member name="M:EdjCase.ICP.Candid.Models.CandidArg.FromObjects``1(``0,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Helper method to create a candid arg with typed values
+            </summary>
+            <typeparam name="T1">The type of the first parameter</typeparam>
+            <param name="value1">The value of the first paramter</param>
+            <param name="candidConverter">(Optional) Override to the default candid converter</param>
+            <returns>A raw candid arg with the converted parameters</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.CandidArg.FromObjects``2(``0,``1,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Helper method to create a candid arg with typed values
+            </summary>
+            <typeparam name="T1">The type of the first parameter</typeparam>
+            <typeparam name="T2">The type of the second parameter</typeparam>
+            <param name="value1">The value of the first paramter</param>
+            <param name="value2">The value of the second paramter</param>
+            <param name="candidConverter">(Optional) Override to the default candid converter</param>
+            <returns>A raw candid arg with the converted parameters</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.CandidArg.FromObjects``3(``0,``1,``2,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Helper method to create a candid arg with typed values
+            </summary>
+            <typeparam name="T1">The type of the first parameter</typeparam>
+            <typeparam name="T2">The type of the second parameter</typeparam>
+            <typeparam name="T3">The type of the third parameter</typeparam>
+            <param name="value1">The value of the first paramter</param>
+            <param name="value2">The value of the second paramter</param>
+            <param name="value3">The value of the third paramter</param>
+            <param name="candidConverter">(Optional) Override to the default candid converter</param>
+            <returns>A raw candid arg with the converted parameters</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.CandidArg.FromObjects``4(``0,``1,``2,``3,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Helper method to create a candid arg with typed values
+            </summary>
+            <typeparam name="T1">The type of the first parameter</typeparam>
+            <typeparam name="T2">The type of the second parameter</typeparam>
+            <typeparam name="T3">The type of the third parameter</typeparam>
+            <typeparam name="T4">The type of the fourth parameter</typeparam>
+            <param name="value1">The value of the first paramter</param>
+            <param name="value2">The value of the second paramter</param>
+            <param name="value3">The value of the third paramter</param>
+            <param name="value4">The value of the fourth paramter</param>
+            <param name="candidConverter">(Optional) Override to the default candid converter</param>
+            <returns>A raw candid arg with the converted parameters</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.CandidArg.FromObjects``5(``0,``1,``2,``3,``4,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Helper method to create a candid arg with typed values
+            </summary>
+            <typeparam name="T1">The type of the first parameter</typeparam>
+            <typeparam name="T2">The type of the second parameter</typeparam>
+            <typeparam name="T3">The type of the third parameter</typeparam>
+            <typeparam name="T4">The type of the fourth parameter</typeparam>
+            <typeparam name="T5">The type of the fifth parameter</typeparam>
+            <param name="value1">The value of the first paramter</param>
+            <param name="value2">The value of the second paramter</param>
+            <param name="value3">The value of the third paramter</param>
+            <param name="value4">The value of the fourth paramter</param>
+            <param name="value5">The value of the fifth paramter</param>
+            <param name="candidConverter">(Optional) Override to the default candid converter</param>
+            <returns>A raw candid arg with the converted parameters</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.CandidArg.FromObjects``6(``0,``1,``2,``3,``4,``5,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Helper method to create a candid arg with typed values
+            </summary>
+            <typeparam name="T1">The type of the first parameter</typeparam>
+            <typeparam name="T2">The type of the second parameter</typeparam>
+            <typeparam name="T3">The type of the third parameter</typeparam>
+            <typeparam name="T4">The type of the fourth parameter</typeparam>
+            <typeparam name="T5">The type of the fifth parameter</typeparam>
+            <typeparam name="T6">The type of the sixth parameter</typeparam>
+            <param name="value1">The value of the first paramter</param>
+            <param name="value2">The value of the second paramter</param>
+            <param name="value3">The value of the third paramter</param>
+            <param name="value4">The value of the fourth paramter</param>
+            <param name="value5">The value of the fifth paramter</param>
+            <param name="value6">The value of the sixth paramter</param>
+            <param name="candidConverter">(Optional) Override to the default candid converter</param>
+            <returns>A raw candid arg with the converted parameters</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.CandidArg.FromObjects``7(``0,``1,``2,``3,``4,``5,``6,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Helper method to create a candid arg with typed values
+            </summary>
+            <typeparam name="T1">The type of the first parameter</typeparam>
+            <typeparam name="T2">The type of the second parameter</typeparam>
+            <typeparam name="T3">The type of the third parameter</typeparam>
+            <typeparam name="T4">The type of the fourth parameter</typeparam>
+            <typeparam name="T5">The type of the fifth parameter</typeparam>
+            <typeparam name="T6">The type of the sixth parameter</typeparam>
+            <typeparam name="T7">The type of the seventh parameter</typeparam>
+            <param name="value1">The value of the first paramter</param>
+            <param name="value2">The value of the second paramter</param>
+            <param name="value3">The value of the third paramter</param>
+            <param name="value4">The value of the fourth paramter</param>
+            <param name="value5">The value of the fifth paramter</param>
+            <param name="value6">The value of the sixth paramter</param>
+            <param name="value7">The value of the seventh paramter</param>
+            <param name="candidConverter">(Optional) Override to the default candid converter</param>
+            <returns>A raw candid arg with the converted parameters</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.CandidArg.FromObjects``8(``0,``1,``2,``3,``4,``5,``6,``7,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Helper method to create a candid arg with typed values
+            </summary>
+            <typeparam name="T1">The type of the first parameter</typeparam>
+            <typeparam name="T2">The type of the second parameter</typeparam>
+            <typeparam name="T3">The type of the third parameter</typeparam>
+            <typeparam name="T4">The type of the fourth parameter</typeparam>
+            <typeparam name="T5">The type of the fifth parameter</typeparam>
+            <typeparam name="T6">The type of the sixth parameter</typeparam>
+            <typeparam name="T7">The type of the seventh parameter</typeparam>
+            <typeparam name="T8">The type of the eighth parameter</typeparam>
+            <param name="value1">The value of the first paramter</param>
+            <param name="value2">The value of the second paramter</param>
+            <param name="value3">The value of the third paramter</param>
+            <param name="value4">The value of the fourth paramter</param>
+            <param name="value5">The value of the fifth paramter</param>
+            <param name="value6">The value of the sixth paramter</param>
+            <param name="value7">The value of the seventh paramter</param>
+            <param name="value8">The value of the eighth paramter</param>
+            <param name="candidConverter">(Optional) Override to the default candid converter</param>
+            <returns>A raw candid arg with the converted parameters</returns>
+        </member>
         <member name="M:EdjCase.ICP.Candid.Models.CandidArg.ToString">
             <inheritdoc />
         </member>
@@ -1438,7 +1566,19 @@
         <member name="M:EdjCase.ICP.Candid.Models.ICTimestamp.op_GreaterThanOrEqual(EdjCase.ICP.Candid.Models.ICTimestamp,EdjCase.ICP.Candid.Models.ICTimestamp)">
             <inheritdoc />
         </member>
+        <member name="M:EdjCase.ICP.Candid.Models.ICTimestamp.op_GreaterThan(EdjCase.ICP.Candid.Models.ICTimestamp,EdjCase.ICP.Candid.Models.ICTimestamp)">
+            <inheritdoc />
+        </member>
         <member name="M:EdjCase.ICP.Candid.Models.ICTimestamp.op_LessThanOrEqual(EdjCase.ICP.Candid.Models.ICTimestamp,EdjCase.ICP.Candid.Models.ICTimestamp)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.ICTimestamp.op_LessThan(EdjCase.ICP.Candid.Models.ICTimestamp,EdjCase.ICP.Candid.Models.ICTimestamp)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.ICTimestamp.op_Addition(EdjCase.ICP.Candid.Models.ICTimestamp,System.TimeSpan)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.ICTimestamp.op_Subtraction(EdjCase.ICP.Candid.Models.ICTimestamp,System.TimeSpan)">
             <inheritdoc />
         </member>
         <member name="T:EdjCase.ICP.Candid.Models.IHashable">
@@ -1765,6 +1905,9 @@
         <member name="M:EdjCase.ICP.Candid.Models.RequestId.ComputeHash(EdjCase.ICP.Candid.Crypto.IHashFunction)">
             <inheritdoc />
         </member>
+        <member name="M:EdjCase.ICP.Candid.Models.RequestId.ToString">
+            <inheritdoc />
+        </member>
         <member name="T:EdjCase.ICP.Candid.Models.ReservedValue">
             <summary>
             Dummy struct to represent the `reserved` candid type's value
@@ -1791,6 +1934,9 @@
             <returns>A path object</returns>
         </member>
         <member name="M:EdjCase.ICP.Candid.Models.StatePath.ComputeHash(EdjCase.ICP.Candid.Crypto.IHashFunction)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.StatePath.ToString">
             <inheritdoc />
         </member>
         <member name="T:EdjCase.ICP.Candid.Models.StatePathSegment">
@@ -1833,6 +1979,9 @@
             A helper method to implicitly convert a string to a path segment
             </summary>
             <param name="value">String value to convert</param>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.StatePathSegment.ToString">
+            <inheritdoc />
         </member>
         <member name="T:EdjCase.ICP.Candid.Models.Types.CandidKnownType">
             <summary>

@@ -90,7 +90,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="arg">The candid arg to send with the request</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
 		/// <param name="cancellationToken">Optional. Token to cancel request</param>
-		/// <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
+		/// <returns>The raw candid arg response</returns>
 		public static async Task<CandidArg> CallAndWaitAsync(
 			this IAgent agent,
 			Principal canisterId,
@@ -100,12 +100,31 @@ namespace EdjCase.ICP.Agent.Agents
 			CancellationToken? cancellationToken = null)
 		{
 			RequestId id = await agent.CallAsync(canisterId, method, arg, effectiveCanisterId);
+			return await agent.WaitForRequestAsync(canisterId, id, cancellationToken);
+		}
 
+		/// <summary>
+		/// Waits for a request to be processed and returns the candid response to the call. This is a helper
+		/// method built on top of `GetRequestStatusAsync` to wait for the response so it doesn't need to be
+		/// implemented manually
+		/// </summary>
+		/// <param name="agent">The agent to use for the call</param>
+		/// <param name="canisterId">Canister to read state for</param>
+		/// <param name="requestId">The unique identifier for the request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <returns>The raw candid arg response</returns>
+		public static async Task<CandidArg> WaitForRequestAsync(
+			this IAgent agent,
+			Principal canisterId,
+			RequestId requestId,
+			CancellationToken? cancellationToken = null
+		)
+		{
 			while (true)
 			{
 				cancellationToken?.ThrowIfCancellationRequested();
 
-				RequestStatus? requestStatus = await agent.GetRequestStatusAsync(canisterId, id);
+				RequestStatus? requestStatus = await agent.GetRequestStatusAsync(canisterId, requestId);
 
 				cancellationToken?.ThrowIfCancellationRequested();
 

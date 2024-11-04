@@ -448,6 +448,40 @@ public class SubnetConfig
 	/// The subnet state configuration
 	/// </summary>
 	public required SubnetStateConfig State { get; set; }
+
+	/// <summary>
+	/// Helper function to create a new/blank subnet configuration
+	/// </summary>
+	/// <param name="enableDts">(Optional) If true, will enable DTS. Null value will use the IC default</param>
+	/// <param name="enableBenchmarkInstructionLimits">(Optional) If true, will enable benchamrk instruction limits. Null value will use the IC default</param>
+	/// <returns>A config for a new subnet</returns>
+	public static SubnetConfig New(bool? enableDts = null, bool? enableBenchmarkInstructionLimits = null)
+	{
+		return new SubnetConfig
+		{
+			EnableDeterministicTimeSlicing = enableDts,
+			EnableBenchmarkingInstructionLimits = enableBenchmarkInstructionLimits,
+			State = SubnetStateConfig.New()
+		};
+	}
+
+	/// <summary>
+	/// Helper function to create a subnet configuration from an existing state path
+	/// </summary>
+	/// <param name="path">The filesystem path to the ic_state directory to load data from</param>
+	/// <param name="subnetId">The id of the subnet being restored</param>
+	/// <param name="enableDts">(Optional) If true, will enable DTS. Null value will use the IC default</param>
+	/// <param name="enableBenchmarkInstructionLimits">(Optional) If true, will enable benchamrk instruction limits. Null value will use the IC default</param>
+	/// <returns></returns>
+	public static SubnetConfig FromPath(string path, Principal subnetId, bool? enableDts = null, bool? enableBenchmarkInstructionLimits = null)
+	{
+		return new SubnetConfig
+		{
+			EnableDeterministicTimeSlicing = enableDts,
+			EnableBenchmarkingInstructionLimits = enableBenchmarkInstructionLimits,
+			State = SubnetStateConfig.FromPath(path, subnetId)
+		};
+	}
 }
 
 /// <summary>

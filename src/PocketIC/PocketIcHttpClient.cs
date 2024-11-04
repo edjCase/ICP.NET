@@ -111,10 +111,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		// Default to a single application subnet
 		applicationSubnets ??= new List<SubnetConfig>
 			{
-				new SubnetConfig
-				{
-					State = SubnetStateConfig.New()
-				}
+				SubnetConfig.New()
 			};
 
 		JsonNode? MapSubnet(SubnetConfig? subnetConfig)

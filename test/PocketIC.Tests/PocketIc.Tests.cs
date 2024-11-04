@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Agent.Responses;
@@ -25,10 +26,7 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 	[Fact]
 	public async Task Test()
 	{
-		SubnetConfig nnsSubnet = new SubnetConfig
-		{
-			State = SubnetStateConfig.New()
-		};
+		SubnetConfig nnsSubnet = SubnetConfig.New();
 
 		IPocketIcHttpClient httpClient = new PocketIcHttpClient(new System.Net.Http.HttpClient(), this.url, TimeSpan.FromSeconds(5));
 		int? instanceId = null;
@@ -165,10 +163,20 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			await using (HttpGateway httpGateway = await pocketIc.RunHttpGatewayAsync())
 			{
 				HttpAgent agent = httpGateway.BuildHttpAgent();
-				QueryResponse queryResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-				CandidArg responseArg = queryResponse.ThrowOrGetReply();
-				UnboundedUInt queryCounterValue = responseArg.ToObjects<UnboundedUInt>();
-				Assert.Equal((UnboundedUInt)1, queryCounterValue);
+				QueryResponse getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
+				CandidArg getResponseArg = getResponse.ThrowOrGetReply();
+				UnboundedUInt getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
+				Assert.Equal((UnboundedUInt)1, getResponseValue);
+
+				CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
+				CandidArg incResponseArg = await agent.CallAndWaitAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
+				Assert.Equal(CandidArg.Empty(), incResponseArg);
+
+				getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
+				getResponseArg = getResponse.ThrowOrGetReply();
+				getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
+				Assert.Equal((UnboundedUInt)2, getResponseValue);
+
 			}
 
 

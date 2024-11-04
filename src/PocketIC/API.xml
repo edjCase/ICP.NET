@@ -411,6 +411,24 @@
             The subnet state configuration
             </summary>
         </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.SubnetConfig.New(System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Helper function to create a new/blank subnet configuration
+            </summary>
+            <param name="enableDts">(Optional) If true, will enable DTS. Null value will use the IC default</param>
+            <param name="enableBenchmarkInstructionLimits">(Optional) If true, will enable benchamrk instruction limits. Null value will use the IC default</param>
+            <returns>A config for a new subnet</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.SubnetConfig.FromPath(System.String,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Helper function to create a subnet configuration from an existing state path
+            </summary>
+            <param name="path">The filesystem path to the ic_state directory to load data from</param>
+            <param name="subnetId">The id of the subnet being restored</param>
+            <param name="enableDts">(Optional) If true, will enable DTS. Null value will use the IC default</param>
+            <param name="enableBenchmarkInstructionLimits">(Optional) If true, will enable benchamrk instruction limits. Null value will use the IC default</param>
+            <returns></returns>
+        </member>
         <member name="T:EdjCase.ICP.PocketIC.Client.SubnetStateConfig">
             <summary>
             Configuration for subnet state initialization

@@ -1,4 +1,5 @@
 using EdjCase.ICP.Candid.Crypto;
+using EdjCase.ICP.Candid.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,12 @@ namespace EdjCase.ICP.Candid.Models
 			return this.Segments
 				.ToHashable()
 				.ComputeHash(hashFunction);
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return string.Join("/", this.Segments.Select(s => s.ToString()));
 		}
 	}
 
@@ -106,6 +113,23 @@ namespace EdjCase.ICP.Candid.Models
 		public static implicit operator StatePathSegment(string value)
 		{
 			return FromString(value);
+		}
+
+
+		private static UTF8Encoding utf8Encoding = new(false, true); // Throw on invalid bytes
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			try
+			{
+				return utf8Encoding.GetString(this.Value);
+			}
+			catch (DecoderFallbackException)
+			{
+				// If not valid UTF-8, return hex string
+				return ByteUtil.ToHexString(this.Value);
+			}
 		}
 	}
 }
