@@ -100,14 +100,14 @@ namespace EdjCase.ICP.Agent.Agents
 
 			byte[] cborBytes = await httpResponse.GetContentAsync();
 			var reader = new CborReader(cborBytes);
-			Certificate certificate = Certificate.FromCbor(reader);
+			V3CallResponse v3CallResponse = V3CallResponse.ReadCbor(reader);
 
 			SubjectPublicKeyInfo rootPublicKey = await this.GetRootKeyAsync(cancellationToken);
-			if (!certificate.IsValid(this.bls, rootPublicKey))
+			if (!v3CallResponse.Certificate.IsValid(this.bls, rootPublicKey))
 			{
 				throw new InvalidCertificateException("Certificate signature does not match the IC public key");
 			}
-			HashTree? requestStatusData = certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", requestId.RawValue));
+			HashTree? requestStatusData = v3CallResponse.Certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", requestId.RawValue));
 			RequestStatus? requestStatus = ParseRequestStatus(requestStatusData);
 			switch (requestStatus?.Type)
 			{

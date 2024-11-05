@@ -120,7 +120,7 @@ namespace Sample.PocketIC
 
 
 						CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
-						CandidArg incResponseArg = await agent.CallAndWaitAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
+						CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
 						Assert.Equal(CandidArg.Empty(), incResponseArg);
 
 						// This alternative also doesnt work
@@ -137,7 +137,7 @@ namespace Sample.PocketIC
 						Assert.Equal((UnboundedUInt)1, getResponseValue);
 
 						CandidArg setRequestArg = CandidArg.FromObjects((UnboundedUInt)10);
-						CandidArg setResponseArg = await agent.CallAndWaitAsync(canisterId, "set", setRequestArg);
+						CandidArg setResponseArg = await agent.CallAsync(canisterId, "set", setRequestArg);
 						Assert.Equal(CandidArg.Empty(), setResponseArg);
 
 						getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());

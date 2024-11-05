@@ -22,5 +22,13 @@ namespace Sample.RestAPI.Controllers
 			OptionalValue<ProposalInfo> info = await this.Client.GetProposalInfo(id);
 			return this.Ok(info);
 		}
+
+		[Route("rewards")]
+		[HttpGet]
+		public async Task<IActionResult> GetRewards()
+		{
+			Result4 rewards = await this.Client.GetMonthlyNodeProviderRewards();
+			return this.Ok(rewards);
+		}
 	}
 }

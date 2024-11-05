@@ -96,7 +96,7 @@
         <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <inheritdoc/>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallV2Async(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallAsynchronousAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <inheritdoc/>
         </member>
         <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.QueryAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,System.Nullable{System.Threading.CancellationToken})">
@@ -156,7 +156,7 @@
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallV2Async(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsynchronousAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a call request to a specified canister method and gets back an id of the
             request that is being processed using /v2/../call. This call does NOT wait for the request to be complete.
@@ -211,10 +211,10 @@
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallV2AndWaitAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAndWaitAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a call request to a specified canister method, waits for the request to be processed,
-            the returns the candid response to the call. This is helper method built on top of `CallV2Async`
+            the returns the candid response to the call. This is helper method built on top of `CallAsynchronousAsync`
             to wait for the response so it doesn't need to be implemented manually
             </summary>
             <param name="agent">The agent to use for the call</param>
@@ -1222,6 +1222,26 @@
             development instances, to allow the agent to fetch the public key. For the
             Internet Computer, agents must have an independent trustworthy source for this data,
             and must not be tempted to fetch it from this insecure location</param>
+        </member>
+        <member name="T:EdjCase.ICP.Agent.Responses.V3CallResponse">
+            <summary>
+            Model for a reponse to a read state request
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.Agent.Responses.V3CallResponse.Status">
+            <summary>
+            The status of the call ('replied', 'rejected', 'done)
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.Agent.Responses.V3CallResponse.Certificate">
+            <summary>
+            The certificate data of the current canister state
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Responses.V3CallResponse.#ctor(System.String,EdjCase.ICP.Agent.Models.Certificate)">
+            <param name="status">The status of the call ('replied', 'rejected', 'done)</param>
+            <param name="certificate">The certificate data of the current canister state</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="T:EdjCase.ICP.Agent.Standards.AssetCanister.AssetCanisterApiClient">
             <summary>

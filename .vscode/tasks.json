@@ -12,7 +12,11 @@
 				"${workspaceFolder}",
 				"/property:GenerateFullPaths=true"
 			],
-			"problemMatcher": "$msCompile"
+			"problemMatcher": "$msCompile",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
 		}
 	]
 }
