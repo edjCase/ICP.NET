@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+    <PackageId>EdjCase.ICP.PocketIC</PackageId>
+		<RepositoryUrl>https://github.com/EdjCase/ICP.NET</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>.net;blazor;ICP;IC;PocketIC</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/EdjCase/ICP.NET</PackageProjectUrl>
+		<Product>EdjCase.ICP.PocketIC</Product>
+		<Company>Edjcase</Company>
+		<Authors>Gekctek</Authors>
+		<PackageId>EdjCase.ICP.PocketIC</PackageId>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<DocumentationFile>API.xml</DocumentationFile>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<None Include="README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+
+  <ItemGroup>
+    <Content Include="runtimes\**\*">
+      <Pack>true</Pack>
+      <PackagePath>runtimes</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Agent\EdjCase.ICP.Agent.csproj" />
+  </ItemGroup>
+
+</Project>

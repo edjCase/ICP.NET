@@ -1,4 +1,5 @@
 using EdjCase.ICP.Candid.Crypto;
+using EdjCase.ICP.Candid.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -48,6 +49,12 @@ namespace EdjCase.ICP.Candid.Models
 		public byte[] ComputeHash(IHashFunction hashFunction)
 		{
 			return hashFunction.ComputeHash(this.RawValue);
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return ByteUtil.ToHexString(this.RawValue);
 		}
 	}
 }
