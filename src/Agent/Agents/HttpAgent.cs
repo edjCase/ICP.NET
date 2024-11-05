@@ -36,6 +36,7 @@ namespace EdjCase.ICP.Agent.Agents
 
 		private readonly IHttpClient httpClient;
 		private readonly IBlsCryptography bls;
+		private bool v3CallSupported = true;
 
 		/// <param name="identity">Optional. Identity to use for each request. If unspecified, will use anonymous identity</param>
 		/// <param name="bls">Optional. Bls crypto implementation to validate signatures. If unspecified, will use default implementation</param>
@@ -77,13 +78,18 @@ namespace EdjCase.ICP.Agent.Agents
 			CancellationToken? cancellationToken = null
 		)
 		{
+			if (!this.v3CallSupported)
+			{
+				return await this.CallAsynchronousAndWaitAsync(canisterId, method, arg, effectiveCanisterId, cancellationToken);
+			}
 			effectiveCanisterId ??= canisterId;
 			(HttpResponse httpResponse, RequestId requestId) = await this.SendAsync($"/api/v3/canister/{effectiveCanisterId.ToText()}/call", BuildRequest, cancellationToken);
 
 			if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
 			{
 				// If v3 is not available, fall back to v2
-				return await this.CallV2AndWaitAsync(canisterId, method, arg, effectiveCanisterId, cancellationToken);
+				this.v3CallSupported = false;
+				return await this.CallAsynchronousAndWaitAsync(canisterId, method, arg, effectiveCanisterId, cancellationToken);
 			}
 			// TODO
 			// if (httpResponse.StatusCode == System.Net.HttpStatusCode.Accepted){
@@ -129,7 +135,7 @@ namespace EdjCase.ICP.Agent.Agents
 
 
 		/// <inheritdoc/>
-		public async Task<RequestId> CallV2Async(
+		public async Task<RequestId> CallAsynchronousAsync(
 			Principal canisterId,
 			string method,
 			CandidArg arg,

@@ -61,7 +61,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
 		/// <param name="cancellationToken">Optional. Token to cancel request</param>
 		/// <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
-		Task<RequestId> CallV2Async(Principal canisterId, string method, CandidArg arg, Principal? effectiveCanisterId = null, CancellationToken? cancellationToken = null);
+		Task<RequestId> CallAsynchronousAsync(Principal canisterId, string method, CandidArg arg, Principal? effectiveCanisterId = null, CancellationToken? cancellationToken = null);
 
 		/// <summary>
 		/// Gets the status of the IC replica. This includes versioning information
@@ -104,7 +104,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
 		/// <param name="cancellationToken">Optional. Token to cancel request</param>
 		/// <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
-		[Obsolete("Use CallAsync or CallV2AndWaitAsync instead")]
+		[Obsolete("Use CallAsync or CallAsynchronousAndWaitAsync instead")]
 		public static async Task<CandidArg> CallAndWaitAsync(
 			this IAgent agent,
 			Principal canisterId,
@@ -117,7 +117,7 @@ namespace EdjCase.ICP.Agent.Agents
 		}
 		/// <summary>
 		/// Sends a call request to a specified canister method, waits for the request to be processed,
-		/// the returns the candid response to the call. This is helper method built on top of `CallV2Async`
+		/// the returns the candid response to the call. This is helper method built on top of `CallAsynchronousAsync`
 		/// to wait for the response so it doesn't need to be implemented manually
 		/// </summary>
 		/// <param name="agent">The agent to use for the call</param>
@@ -127,7 +127,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
 		/// <param name="cancellationToken">Optional. Token to cancel request</param>
 		/// <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
-		public static async Task<CandidArg> CallV2AndWaitAsync(
+		public static async Task<CandidArg> CallAsynchronousAndWaitAsync(
 			this IAgent agent,
 			Principal canisterId,
 			string method,
@@ -135,7 +135,7 @@ namespace EdjCase.ICP.Agent.Agents
 			Principal? effectiveCanisterId = null,
 			CancellationToken? cancellationToken = null)
 		{
-			RequestId id = await agent.CallV2Async(canisterId, method, arg, effectiveCanisterId);
+			RequestId id = await agent.CallAsynchronousAsync(canisterId, method, arg, effectiveCanisterId);
 
 			while (true)
 			{
