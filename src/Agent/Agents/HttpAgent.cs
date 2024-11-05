@@ -36,6 +36,7 @@ namespace EdjCase.ICP.Agent.Agents
 
 		private readonly IHttpClient httpClient;
 		private readonly IBlsCryptography bls;
+		private bool v3CallSupported = true;
 
 		/// <param name="identity">Optional. Identity to use for each request. If unspecified, will use anonymous identity</param>
 		/// <param name="bls">Optional. Bls crypto implementation to validate signatures. If unspecified, will use default implementation</param>
@@ -68,14 +69,78 @@ namespace EdjCase.ICP.Agent.Agents
 			this.bls = bls ?? new DefaultBlsCryptograhy();
 		}
 
-
 		/// <inheritdoc/>
-		public async Task<RequestId> CallAsync(
+		public async Task<CandidArg> CallAsync(
 			Principal canisterId,
 			string method,
 			CandidArg arg,
 			Principal? effectiveCanisterId = null,
-			CancellationToken? cancellationToken = null)
+			CancellationToken? cancellationToken = null
+		)
+		{
+			if (!this.v3CallSupported)
+			{
+				return await this.CallAsynchronousAndWaitAsync(canisterId, method, arg, effectiveCanisterId, cancellationToken);
+			}
+			effectiveCanisterId ??= canisterId;
+			(HttpResponse httpResponse, RequestId requestId) = await this.SendAsync($"/api/v3/canister/{effectiveCanisterId.ToText()}/call", BuildRequest, cancellationToken);
+
+			if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+			{
+				// If v3 is not available, fall back to v2
+				this.v3CallSupported = false;
+				return await this.CallAsynchronousAndWaitAsync(canisterId, method, arg, effectiveCanisterId, cancellationToken);
+			}
+			if (httpResponse.StatusCode == System.Net.HttpStatusCode.Accepted)
+			{
+				// If request takes too long, then it will return 202 Accepted and polling is required
+				return await this.WaitForRequestAsync(canisterId, requestId, cancellationToken);
+			}
+			await httpResponse.ThrowIfErrorAsync();
+
+			byte[] cborBytes = await httpResponse.GetContentAsync();
+			var reader = new CborReader(cborBytes);
+			V3CallResponse v3CallResponse = V3CallResponse.ReadCbor(reader);
+
+			SubjectPublicKeyInfo rootPublicKey = await this.GetRootKeyAsync(cancellationToken);
+			if (!v3CallResponse.Certificate.IsValid(this.bls, rootPublicKey))
+			{
+				throw new InvalidCertificateException("Certificate signature does not match the IC public key");
+			}
+			HashTree? requestStatusData = v3CallResponse.Certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", requestId.RawValue));
+			RequestStatus? requestStatus = ParseRequestStatus(requestStatusData);
+			switch (requestStatus?.Type)
+			{
+				case RequestStatus.StatusType.Replied:
+					return requestStatus.AsReplied();
+				case RequestStatus.StatusType.Rejected:
+					(RejectCode code, string message, string? errorCode) = requestStatus.AsRejected();
+					throw new CallRejectedException(code, message, errorCode);
+				case RequestStatus.StatusType.Done:
+					throw new RequestCleanedUpException();
+				case null:
+				case RequestStatus.StatusType.Received:
+				case RequestStatus.StatusType.Processing:
+					throw new InvalidOperationException("V3 calls should not return null/received/processing status");
+				default:
+					throw new NotImplementedException($"Invalid request status '{requestStatus.Type}'");
+			}
+
+			CallRequest BuildRequest(Principal sender, ICTimestamp now)
+			{
+				return new CallRequest(canisterId, method, arg, sender, now);
+			}
+		}
+
+
+		/// <inheritdoc/>
+		public async Task<RequestId> CallAsynchronousAsync(
+			Principal canisterId,
+			string method,
+			CandidArg arg,
+			Principal? effectiveCanisterId = null,
+			CancellationToken? cancellationToken = null
+		)
 		{
 			if (effectiveCanisterId == null)
 			{
@@ -170,6 +235,11 @@ namespace EdjCase.ICP.Agent.Agents
 			var paths = new List<StatePath> { pathRequestStatus };
 			ReadStateResponse response = await this.ReadStateAsync(canisterId, paths, cancellationToken);
 			HashTree? requestStatus = response.Certificate.Tree.GetValueOrDefault(pathRequestStatus);
+			return ParseRequestStatus(requestStatus);
+		}
+
+		private static RequestStatus? ParseRequestStatus(HashTree? requestStatus)
+		{
 			string? status = requestStatus?.GetValueOrDefault("status")?.AsLeaf().AsUtf8();
 			//received, processing, replied, rejected or done
 			switch (status)
