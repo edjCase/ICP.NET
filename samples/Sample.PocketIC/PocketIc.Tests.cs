@@ -26,8 +26,8 @@ namespace Sample.PocketIC
 			// Stop the server after all tests
 			if (this.Server != null)
 			{
-				this.Server.Stop().GetAwaiter().GetResult();
-				this.Server.Dispose();
+				this.Server.StopAsync().GetAwaiter().GetResult();
+				this.Server.DisposeAsync().GetAwaiter().GetResult();
 			}
 		}
 	}
