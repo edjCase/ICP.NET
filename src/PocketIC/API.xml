@@ -1,0 +1,1214 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EdjCase.ICP.PocketIC</name>
+    </assembly>
+    <members>
+        <member name="T:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient">
+            <summary>
+            Interface for communicating with a PocketIC server and managing IC instances
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetServerUrl">
+            <summary>
+            Gets the base URL of the PocketIC server
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.UploadBlobAsync(System.Byte[])">
+            <summary>
+            Uploads a binary blob to the PocketIC server
+            </summary>
+            <param name="blob">The binary data to upload</param>
+            <returns>The blob id for later retrieval</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.DownloadBlobAsync(System.String)">
+            <summary>
+            Downloads a previously uploaded blob from the PocketIC server
+            </summary>
+            <param name="blobId">The id of the blob to download</param>
+            <returns>The binary data of the blob</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.VerifySignatureAsync(System.Byte[],EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.Byte[])">
+            <summary>
+            Verifies a canister signature
+            </summary>
+            <param name="message">The message that was signed</param>
+            <param name="publicKey">The public key to verify against</param>
+            <param name="rootPublicKey">The root public key</param>
+            <param name="signature">The signature to verify</param>
+            <returns>True if signature is valid, false otherwise</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetInstancesAsync">
+            <summary>
+            Gets all PocketIC instances
+            </summary>
+            <returns>List of all instances and their status</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.CreateInstanceAsync(System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},System.Boolean)">
+            <summary>
+            Creates a new PocketIC instance with the specified subnet configuration
+            </summary>
+            <param name="applicationSubnets">Optional application subnet configurations. Will create a single application subnet if not specified</param>
+            <param name="bitcoinSubnet">Optional Bitcoin subnet configuration. Will not create if not specified</param>
+            <param name="fiduciarySubnet">Optional fiduciary subnet configuration. Will not create if not specified</param>
+            <param name="iiSubnet">Optional Internet Identity subnet configuration. Will not create if not specified</param>
+            <param name="nnsSubnet">Optional Network Nervous System subnet configuration. Will not create if not specified</param>
+            <param name="snsSubnet">Optional Service Nervous System subnet configuration. Will not create if not specified</param>
+            <param name="systemSubnets">Optional system subnet configurations. Will not create if not specified</param>
+            <param name="verifiedApplicationSubnets">Optional verified application subnet configurations</param>
+            <param name="nonmainnetFeatures">Whether to enable non-mainnet features. Defaults to false</param>
+            <returns>A tuple containing the new instance id and topology information</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.DeleteInstanceAsync(System.Int32)">
+            <summary>
+            Deletes a PocketIC instance
+            </summary>
+            <param name="id">The id of the instance to delete</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.QueryCallAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Makes a query call to a canister
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister id</param>
+            <param name="method">The method name to call</param>
+            <param name="request">The raw candid request argument</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The raw candid response from the canister</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetTopologyAsync(System.Int32)">
+            <summary>
+            Gets the topology information for a PocketIC instance
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <returns>List of subnet topologies</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetTimeAsync(System.Int32)">
+            <summary>
+            Gets the current timestamp of a PocketIC instance
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <returns>The current timestamp</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetCanisterHttpAsync(System.Int32)">
+            <summary>
+            Gets pending canister HTTP requests
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <returns>The pending canister HTTP request</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetCyclesBalanceAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Gets the cycles balance of a canister
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="canisterId">The canister id</param>
+            <returns>The cycles balance of the canister</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetStableMemoryAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Gets the stable memory of a canister
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="canisterId">The canister id</param>
+            <returns>The stable memory bytes of the canister</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetSubnetIdForCanisterAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Gets the subnet id for a canister
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="canisterId">The canister id</param>
+            <returns>The subnet id of the canister</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetPublicKeyForSubnetAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Gets the public key for a subnet
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="subnetId">The subnet id</param>
+            <returns>The public key principal of the subnet</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.SubmitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Submits an ingress message to a canister without waiting for execution
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="sender">The principal sending the message</param>
+            <param name="canisterId">The target canister id</param>
+            <param name="method">The method name to call</param>
+            <param name="request">The raw candid request argument</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The raw candid response</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.ExecuteIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an ingress message on a canister and waits for the response
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="sender">The principal sending the message</param>
+            <param name="canisterId">The target canister id</param>
+            <param name="method">The method name to call</param>
+            <param name="request">The raw candid request argument</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The raw candid response</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.AwaitIngressMessageAsync(System.Int32,System.Byte[],EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Waits for an ingress message to complete execution
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="messageId">The id of the ingress message</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.SetTimeAsync(System.Int32,EdjCase.ICP.Candid.Models.ICTimestamp)">
+            <summary>
+            Sets the current time of the IC instance
+            </summary>
+            <param name="instanceId">The IC instance</param>
+            <param name="timestamp">The new timestamp</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.AutoProgressTimeAsync(System.Int32,System.Nullable{System.TimeSpan})">
+            <summary>
+            Configures automatic time progression for the IC instance
+            </summary>
+            <param name="instanceId">The IC instance</param>
+            <param name="artificialDelay">Optional delay between time updates</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.StopProgressTimeAsync(System.Int32)">
+            <summary>
+            Stops automatic time progression for the IC instance
+            </summary>
+            <param name="instanceId">The IC instance</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.AddCyclesAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,System.UInt64)">
+            <summary>
+            Adds cycles to a canister
+            </summary>
+            <param name="instanceId">The id of the IC instance</param>
+            <param name="canisterId">The canister id</param>
+            <param name="amount">The amount of cycles to add</param>
+            <returns>The new cycles balance of the canister</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.SetStableMemoryAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,System.Byte[])">
+            <summary>
+            Sets the stable memory of a canister
+            </summary>
+            <param name="instanceId">The id of the IC instance</param>
+            <param name="canisterId">The canister id</param>
+            <param name="memory">The new stable memory bytes</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.TickAsync(System.Int32)">
+            <summary>
+            Makes the IC produce and progress by one block
+            </summary>
+            <param name="instanceId">The id of the IC instance</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.MockCanisterHttpResponseAsync(System.Int32,System.UInt64,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.PocketIC.Client.CanisterHttpResponse,System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.CanisterHttpResponse})">
+            <summary>
+            Mocks a response to a canister HTTP request
+            </summary>
+            <param name="instanceId">The id of the IC instance</param>
+            <param name="requestId">The id of the HTTP request</param>
+            <param name="subnetId">The subnet id of the canister</param>
+            <param name="response">The response to send</param>
+            <param name="additionalResponses">Additional responses to send</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.StartHttpGatewayAsync(System.Int32,System.Nullable{System.Int32},System.Collections.Generic.List{System.String},EdjCase.ICP.PocketIC.Client.HttpsConfig)">
+            <summary>
+            Starts an HTTP gateway for handling requests to the IC instance
+            </summary>
+            <param name="instanceId">The id of the IC instance</param>
+            <param name="port">Optional port number to listen on</param>
+            <param name="domains">Optional list of domains to accept requests from</param>
+            <param name="httpsConfig">Optional HTTPS configuration</param>
+            <returns>The URL of the HTTP gateway</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.StopHttpGatewayAsync(System.Int32)">
+            <summary>
+            Stops the HTTP gateway for an IC instance
+            </summary>
+            <param name="instanceId">The id of the IC instance</param>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.Instance">
+            <summary>
+            Information about a PocketIC instance
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.Instance.Id">
+            <summary>
+            The unique identifier for this instance
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.Instance.Status">
+            <summary>
+            The current status of this instance
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.InstanceStatus">
+            <summary>
+            The status of a PocketIC instance
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.InstanceStatus.Available">
+            <summary>
+            The instance is available for use
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.InstanceStatus.Deleted">
+            <summary>
+            The instance has been deleted
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.HttpsConfig">
+            <summary>
+            Configuration for HTTPS support
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.HttpsConfig.CertPath">
+            <summary>
+            Path to the TLS certificate file
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.HttpsConfig.KeyPath">
+            <summary>
+            Path to the private key file
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.SubnetTopology">
+            <summary>
+            Represents the topology information for a subnet
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetTopology.Id">
+            <summary>
+            The subnet's principal id
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetTopology.Type">
+            <summary>
+            The type of subnet
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetTopology.SubnetSeed">
+            <summary>
+            The subnet's seed bytes
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetTopology.NodeIds">
+            <summary>
+            The node ids in this subnet
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetTopology.CanisterRanges">
+            <summary>
+            The canister id ranges for this subnet
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.CanisterRange">
+            <summary>
+            Represents a range of canister ids
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterRange.Start">
+            <summary>
+            The start of the canister id range
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterRange.End">
+            <summary>
+            The end of the canister id range
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.SubnetType">
+            <summary>
+            The type of subnet
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetType.Application">
+            <summary>
+            Application subnet
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetType.Bitcoin">
+            <summary>
+            Bitcoin subnet
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetType.Fiduciary">
+            <summary>
+            Fiduciary subnet
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetType.InternetIdentity">
+            <summary>
+            Internet Identity subnet
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetType.NNS">
+            <summary>
+            Network Nervous System subnet
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetType.SNS">
+            <summary>
+            Social Network System subnet
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetType.System">
+            <summary>
+            System subnet
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.EffectivePrincipal">
+            <summary>
+            Specifies an effective principal for message routing
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.EffectivePrincipal.Type">
+            <summary>
+            The type of effective principal
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.EffectivePrincipal.Id">
+            <summary>
+            The principal id
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.EffectivePrincipalType">
+            <summary>
+            Types of effective principals
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.EffectivePrincipalType.Subnet">
+            <summary>
+            Subnet
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.EffectivePrincipalType.Canister">
+            <summary>
+            Canister
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.SubnetConfig">
+            <summary>
+            Configuration for a subnet
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetConfig.EnableDeterministicTimeSlicing">
+            <summary>
+            Whether to enable deterministic time slicing
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetConfig.EnableBenchmarkingInstructionLimits">
+            <summary>
+            Whether to enable high instruction limits for benchmarking
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetConfig.State">
+            <summary>
+            The subnet state configuration
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.SubnetConfig.New(System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Helper function to create a new/blank subnet configuration
+            </summary>
+            <param name="enableDts">(Optional) If true, will enable DTS. Null value will use the IC default</param>
+            <param name="enableBenchmarkInstructionLimits">(Optional) If true, will enable benchamrk instruction limits. Null value will use the IC default</param>
+            <returns>A config for a new subnet</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.SubnetConfig.FromPath(System.String,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Helper function to create a subnet configuration from an existing state path
+            </summary>
+            <param name="path">The filesystem path to the ic_state directory to load data from</param>
+            <param name="subnetId">The id of the subnet being restored</param>
+            <param name="enableDts">(Optional) If true, will enable DTS. Null value will use the IC default</param>
+            <param name="enableBenchmarkInstructionLimits">(Optional) If true, will enable benchamrk instruction limits. Null value will use the IC default</param>
+            <returns></returns>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.SubnetStateConfig">
+            <summary>
+            Configuration for subnet state initialization
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetStateConfig.Type">
+            <summary>
+            The type of state configuration
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetStateConfig.Path">
+            <summary>
+            Path to existing state, if loading from path
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.SubnetStateConfig.SubnetId">
+            <summary>
+            Subnet id if loading existing state
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.SubnetStateConfig.New">
+            <summary>
+            Creates configuration for a new subnet with empty state
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.SubnetStateConfig.FromPath(System.String,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Creates configuration for loading existing state from a path
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.SubnetStateType">
+            <summary>
+            The type of subnet state configuration
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetStateType.New">
+            <summary>
+            Create a new subnet with empty state
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.SubnetStateType.FromPath">
+            <summary>
+            Load existing state from a path
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.CanisterHttpRequest">
+            <summary>
+            HTTP request from a canister
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpRequest.SubnetId">
+            <summary>
+            The subnet id where the request originated
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpRequest.RequestId">
+            <summary>
+            Unique identifier for this request
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpRequest.HttpMethod">
+            <summary>
+            The HTTP method for the request
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpRequest.Url">
+            <summary>
+            The target URL for the request
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpRequest.Headers">
+            <summary>
+            The HTTP headers for the request
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpRequest.Body">
+            <summary>
+            The body of the request
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpRequest.MaxResponseBytes">
+            <summary>
+            Optional maximum size for the response
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.CanisterHttpHeader">
+            <summary>
+            HTTP header for canister requests/responses
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpHeader.Name">
+            <summary>
+            The header name
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpHeader.Value">
+            <summary>
+            The header value
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.CanisterHttpMethod">
+            <summary>
+            HTTP methods supported for canister HTTP calls
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.CanisterHttpMethod.Get">
+            <summary>
+            HTTP GET method
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.CanisterHttpMethod.Post">
+            <summary>
+            HTTP POST method
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.CanisterHttpMethod.Head">
+            <summary>
+            HTTP HEAD method
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.CanisterHttpResponse">
+            <summary>
+            Base class for HTTP responses to canister HTTP requests
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.CanisterHttpReply">
+            <summary>
+            Successful HTTP response to a canister HTTP request
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpReply.Status">
+            <summary>
+            The HTTP status code
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpReply.Headers">
+            <summary>
+            The response headers
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpReply.Body">
+            <summary>
+            The response body
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.CanisterHttpReject">
+            <summary>
+            Error response to a canister HTTP request
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpReject.RejectCode">
+            <summary>
+            The reject code indicating the type of error
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.CanisterHttpReject.Message">
+            <summary>
+            A message describing the error
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient">
+            <summary>
+            The default implementation of the <see cref="T:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient"/> interface.
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetServerUrl">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.UploadBlobAsync(System.Byte[])">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.DownloadBlobAsync(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.VerifySignatureAsync(System.Byte[],EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.Byte[])">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetInstancesAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.CreateInstanceAsync(System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.DeleteInstanceAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.QueryCallAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetTopologyAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetTimeAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetCanisterHttpAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetCyclesBalanceAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetStableMemoryAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetSubnetIdForCanisterAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetPublicKeyForSubnetAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.SubmitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.ExecuteIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.AwaitIngressMessageAsync(System.Int32,System.Byte[],EdjCase.ICP.Candid.Models.Principal)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.SetTimeAsync(System.Int32,EdjCase.ICP.Candid.Models.ICTimestamp)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.AutoProgressTimeAsync(System.Int32,System.Nullable{System.TimeSpan})">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.StopProgressTimeAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.AddCyclesAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,System.UInt64)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.SetStableMemoryAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,System.Byte[])">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.TickAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.MockCanisterHttpResponseAsync(System.Int32,System.UInt64,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.PocketIC.Client.CanisterHttpResponse,System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.CanisterHttpResponse})">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.StartHttpGatewayAsync(System.Int32,System.Nullable{System.Int32},System.Collections.Generic.List{System.String},EdjCase.ICP.PocketIC.Client.HttpsConfig)">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.StopHttpGatewayAsync(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Models.CreateCanisterRequest">
+            <summary>
+            Request model for creating a new canister with optional settings
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CreateCanisterRequest.Settings">
+            <summary>
+            Optional canister settings to configure the new canister with
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CreateCanisterRequest.Amount">
+            <summary>
+            Optional amount of cycles to add to the new canister
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CreateCanisterRequest.SpecifiedId">
+            <summary>
+            Optional specific canister ID to create the canister with
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Models.CanisterSettings">
+            <summary>
+            Configuration settings for a canister
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CanisterSettings.Controllers">
+            <summary>
+            Optional list of principal IDs that can control this canister
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CanisterSettings.ComputeAllocation">
+            <summary>
+            Optional compute allocation in percentage of subnet capacity
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CanisterSettings.MemoryAllocation">
+            <summary>
+            Optional memory allocation in bytes
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CanisterSettings.FreezingThreshold">
+            <summary>
+            Optional freezing threshold in seconds
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CanisterSettings.ReservedCyclesLimit">
+            <summary>
+            Optional reserved cycles limit in cycles
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Models.StartCanisterRequest">
+            <summary>
+            Request model for starting a canister
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.StartCanisterRequest.CanisterId">
+            <summary>
+            The ID of the canister to start
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Models.StopCanisterRequest">
+            <summary>
+            Request model for stopping a canister
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.StopCanisterRequest.CanisterId">
+            <summary>
+            The ID of the canister to stop
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Models.InstallCodeRequest">
+            <summary>
+            Request model for installing code on a canister
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.InstallCodeRequest.CanisterId">
+            <summary>
+            The ID of the target canister 
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.InstallCodeRequest.Arg">
+            <summary>
+            The initialization/upgrade arguments in raw bytes
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.InstallCodeRequest.WasmModule">
+            <summary>
+            The WASM module bytes to install
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.InstallCodeRequest.Mode">
+            <summary>
+            The installation mode (install, reinstall, or upgrade)
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Models.InstallCodeMode">
+            <summary>
+            The mode for installing code on a canister
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Models.InstallCodeMode.Install">
+            <summary>
+            Install new code on an empty canister
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Models.InstallCodeMode.Reinstall">
+            <summary>
+            Replace existing code and clear state
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Models.InstallCodeMode.Upgrade">
+            <summary>
+            Upgrade existing code while preserving state
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Models.UpdateCanisterSettingsRequest">
+            <summary>
+            Request model for updating canister settings
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.UpdateCanisterSettingsRequest.CanisterId">
+            <summary>
+            The ID of the canister to update
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.UpdateCanisterSettingsRequest.Settings">
+            <summary>
+            The new settings to apply to the canister
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Models.CreateCanisterResponse">
+            <summary>
+            Response model returned when creating a new canister
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Models.CreateCanisterResponse.CanisterId">
+            <summary>
+            The principal ID of the newly created canister
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.PocketIc">
+            <summary>
+            The main interface for interacting with a PocketIC instance.
+            PocketIC is a local canister smart contract testing platform for the Internet Computer.
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.PocketIc.HttpClient">
+            <summary>
+            The REST HTTP client for making requests to the PocketIC server
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.PocketIc.InstanceId">
+            <summary>
+            The unique identifier for this PocketIC instance
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.CreateAndInstallCanisterAsync(System.Byte[],EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Models.CanisterSettings,EdjCase.ICP.Candid.Models.UnboundedUInt,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Creates and installs a new canister with the provided WASM module and initialization arguments.
+            </summary>
+            <param name="wasmModule">The WASM module bytes to install</param>
+            <param name="arg">The initialization arguments in candid format</param>
+            <param name="settings">Optional canister settings</param>
+            <param name="cyclesAmount">Optional amount of cycles to add to the canister</param>
+            <param name="specifiedId">Optional specific canister ID to use</param>
+            <returns>The Principal ID of the created canister</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.CreateCanisterAsync(EdjCase.ICP.PocketIC.Models.CanisterSettings,EdjCase.ICP.Candid.Models.UnboundedUInt,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Creates a new canister with optional settings
+            </summary>
+            <param name="settings">Optional canister settings</param>
+            <param name="cyclesAmount">Optional amount of cycles to add</param>
+            <param name="specifiedId">Optional specific canister ID to use</param>
+            <returns>The response containing the created canister's info</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.StartCanisterAsync(EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Starts an idle canister
+            </summary>
+            <param name="canisterId">The ID of the canister to start</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.StopCanisterAsync(EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Stops a running canister
+            </summary>
+            <param name="canisterId">The ID of the canister to stop</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.InstallCodeAsync(EdjCase.ICP.Candid.Models.Principal,System.Byte[],EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Models.InstallCodeMode)">
+            <summary>
+            Installs WASM code on a canister
+            </summary>
+            <param name="canisterId">The target canister ID</param>
+            <param name="wasmModule">The WASM module bytes to install</param>
+            <param name="arg">The installation arguments in candid format</param>
+            <param name="mode">The installation mode (install, upgrade, reinstall)</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.RunHttpGatewayAsync(System.Nullable{System.Int32},System.Collections.Generic.List{System.String},EdjCase.ICP.PocketIC.Client.HttpsConfig)">
+            <summary>
+            Creates and starts an HTTP gateway for this PocketIC instance for handling HTTP requests.
+            The gateway will expose an API endpoint for making HTTP requests to the IC instance.
+            When disposed, the gateway will be stopped.
+            NOTE: The gateway requires an NNS subnet to be running in the IC instance.
+            </summary>
+            <param name="port">Optional port number to listen on. If not specified, will choose an available port</param>
+            <param name="domains">Optional list of domains the gateway should accept requests from. Defaults to localhost if not specified</param>
+            <param name="httpsConfig">Optional HTTPS configuration if TLS support is needed</param>
+            <returns>A disposable HttpGateway object that represents the running gateway and provides access to the gateway URL</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.TickAsync(System.Int32)">
+            <summary>
+            Makes the IC produce and progress by one or more blocks
+            </summary>
+            <param name="times">Number of ticks to execute</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.GetTimeAsync">
+            <summary>
+            Gets the current time of the IC
+            </summary>
+            <returns>The current IC timestamp</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.SetTimeAsync(EdjCase.ICP.Candid.Models.ICTimestamp)">
+            <summary>
+            Sets the current time of the IC
+            </summary>
+            <param name="time">The timestamp to set</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.AutoProgressTimeAsync(System.Nullable{System.TimeSpan})">
+            <summary>
+            Enables automatic time progression for the IC instance until disposed
+            </summary>
+            <param name="artificalDelay">Optional delay between time updates</param>
+            <returns>A disposable object that will stop auto progression when disposed</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.GetPublicKeyForSubnetAsync(EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Gets the public key for the given subnet
+            </summary>
+            <param name="subnetId">The subnet id to look up</param>
+            <returns>The subnet public key principal</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.GetSubnetIdForCanisterAsync(EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Gets the subnet Id for a given canister
+            </summary>
+            <param name="canisterId">The canister Id to look up</param>
+            <returns>The subnet principal where the canister is hosted</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.GetTopologyAsync(System.Boolean)">
+            <summary>
+            Gets the topology information for all subnets in this IC instance
+            </summary>
+            <param name="useCache">Whether to use cached topology info. Defaults to true</param>
+            <returns>List of subnet topology information</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.GetCyclesBalanceAsync(EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Gets the cycles balance of a canister
+            </summary>
+            <param name="canisterId">The canister to check</param>
+            <returns>The cycles balance</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.AddCyclesAsync(EdjCase.ICP.Candid.Models.Principal,System.UInt64)">
+            <summary>
+            Adds cycles to a canister
+            </summary>
+            <param name="canisterId">The target canister ID</param>
+            <param name="amount">The amount of cycles to add</param>
+            <returns>The new cycles balance</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.SetStableMemoryAsync(EdjCase.ICP.Candid.Models.Principal,System.Byte[])">
+            <summary>
+            Sets the stable memory contents of a canister
+            </summary>
+            <param name="canisterId">The target canister</param>
+            <param name="stableMemory">The stable memory bytes to set</param>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.GetStableMemoryAsync(EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Gets the stable memory contents of a canister
+            </summary>
+            <param name="canisterId">The canister to read from</param>
+            <returns>The stable memory bytes</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallAsync``1(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes a query call on a canister with no arguments
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The query response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallAsync``2(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes a query call on a canister with a single argument
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The query response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallAsync``3(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes a query call on a canister with two arguments
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="p2">The second candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The query response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallAsync``4(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,``2,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes a query call on a canister with three arguments
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="p2">The second candid argument for the call</param>
+            <param name="p3">The third candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The query response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallRawAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes a query call on a canister with a raw CandidArg
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="arg">The raw candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The query response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallAsync``1(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with no arguments
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The update response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallAsync``2(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with a single argument
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The update response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallAsync``3(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with two arguments
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="p2">The second candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The update response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallAsync``4(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,``2,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with three arguments
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="p2">The second candid argument for the call</param>
+            <param name="p3">The third candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>The update response decoded as type TResponse</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallNoResponseAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with no arguments and no response
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns></returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallNoResponseAsync``1(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with a single argument and no response
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns></returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallNoResponseAsync``2(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with a two arguments and no response
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="p2">The second candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns></returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallNoResponseAsync``3(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,``2,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with a three arguments and no response
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="p1">The first candid argument for the call</param>
+            <param name="p2">The second candid argument for the call</param>
+            <param name="p3">The third candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns></returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallRawAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Executes an update call on a canister with a raw CandidArg and raw CandidArg response
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="arg">The raw candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns>A raw candid argument from the response</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.DisposeAsync">
+            <summary>
+            Disposes of the PocketIC instance by deleting the instance
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.CreateAsync(EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient,System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},System.Boolean,EdjCase.ICP.Candid.CandidConverter)">
+            <summary>
+            Creates a new PocketIC instance using an IPocketIcHttpClient instance
+            </summary>
+            <param name="httpClient">The HTTP client to use</param>
+            <param name="applicationSubnets">Optional application subnet configurations. Will create a single application subnet if not specified</param>
+            <param name="bitcoinSubnet">Optional Bitcoin subnet configuration. Will not create if not specified</param>
+            <param name="fiduciarySubnet">Optional fiduciary subnet configuration. Will not create if not specified</param>
+            <param name="iiSubnet">Optional Internet Identity subnet configuration. Will not create if not specified</param>
+            <param name="nnsSubnet">Optional Network Nervous System subnet configuration. Will not create if not specified</param>
+            <param name="snsSubnet">Optional Service Nervous System subnet configuration. Will not create if not specified</param>
+            <param name="systemSubnets">Optional system subnet configurations. Will not create if not specified</param>
+            <param name="verifiedApplicationSubnets">Optional verified application subnet configurations</param>
+            <param name="nonmainnetFeatures">Whether to enable non-mainnet features. Defaults to false</param>
+            <param name="candidConverter">Optional candid converter to use, otherwise will use the default</param>
+            <returns>A new PocketIC instance</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.CreateAsync(System.String,System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,EdjCase.ICP.PocketIC.Client.SubnetConfig,System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},System.Collections.Generic.List{EdjCase.ICP.PocketIC.Client.SubnetConfig},System.Boolean,EdjCase.ICP.Candid.CandidConverter,System.Nullable{System.TimeSpan})">
+            <summary>
+            Creates a new PocketIC instance
+            </summary>
+            <param name="url">The PocketIC server url</param>
+            <param name="applicationSubnets">Optional application subnet configurations. Will create a single application subnet if not specified</param>
+            <param name="bitcoinSubnet">Optional Bitcoin subnet configuration. Will not create if not specified</param>
+            <param name="fiduciarySubnet">Optional fiduciary subnet configuration. Will not create if not specified</param>
+            <param name="iiSubnet">Optional Internet Identity subnet configuration. Will not create if not specified</param>
+            <param name="nnsSubnet">Optional Network Nervous System subnet configuration. Will not create if not specified</param>
+            <param name="snsSubnet">Optional Service Nervous System subnet configuration. Will not create if not specified</param>
+            <param name="systemSubnets">Optional system subnet configurations. Will not create if not specified</param>
+            <param name="verifiedApplicationSubnets">Optional verified application subnet configurations</param>
+            <param name="nonmainnetFeatures">Whether to enable non-mainnet features. Defaults to false</param>
+            <param name="candidConverter">Optional candid converter to use, otherwise will use the default</param>
+            <param name="requestTimeout">Optional request timeout for http requests. Defaults to 30 seconds</param>
+            <returns>A new PocketIC instance</returns>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.HttpGateway">
+            <summary>
+            Represents an HTTP gateway for accessing the Internet Computer. Disposing of this object will stop the gateway
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.HttpGateway.Url">
+            <summary>
+            The URL of the HTTP gateway
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.HttpGateway.BuildHttpAgent(EdjCase.ICP.Agent.Identities.IIdentity)">
+            <summary>
+            Creates a new HTTP agent configured to use this gateway
+            </summary>
+            <param name="identity">Optional identity to use for the agent, otherwise will use anonymous identity</param>
+            <returns>A configured HTTP agent</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.HttpGateway.DisposeAsync">
+            <summary>
+            Disposes of the HTTP gateway
+            </summary>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.PocketIcServer">
+            <summary>
+            A class to help start the pocket-ic server process
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.GetUrl">
+            <summary>
+            Gets the URL of the server
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.StopAsync">
+            <summary>
+            Stops the server process
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.DisposeAsync">
+            <summary>
+            Disposes of the server process
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.Start(System.Boolean,System.Boolean)">
+            <summary>
+            Starts the pocket-ic server process
+            </summary>
+            <param name="showRuntimeLogs">Outputs the runtime logs using Debug.WriteLine(...)</param>
+            <param name="showErrorLogs">Outputs the error logs using Debug.WriteLine(...)</param>
+            <returns>The instance of the PocketIcServer with the running process</returns>
+        </member>
+    </members>
+</doc>

@@ -237,7 +237,7 @@ namespace EdjCase.ICP.Candid.Models
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			switch(this.Type)
+			switch (this.Type)
 			{
 				case HashTreeType.Empty:
 					return "Empty";
@@ -250,7 +250,7 @@ namespace EdjCase.ICP.Candid.Models
 					return $"Fork: {{ Left: {left}, Right: {right} }}";
 				case HashTreeType.Labeled:
 					(EncodedValue label, HashTree tree) = this.AsLabeled();
-					return $"Labeled: {label.AsUtf8()}/{ByteUtil.ToHexString(label.Value)} {tree}";
+					return $"Labeled: {label} {tree}";
 				default:
 					throw new NotImplementedException();
 			}
@@ -291,10 +291,20 @@ namespace EdjCase.ICP.Candid.Models
 				return LEB128.DecodeUnsigned(this.Value);
 			}
 
+			private static Encoding utf8Encoding = new UTF8Encoding(false, true);
+
 			/// <inheritdoc />
 			public override string ToString()
 			{
-				return this.AsUtf8();
+				try
+				{
+					return utf8Encoding.GetString(this.Value);
+				}
+				catch (DecoderFallbackException)
+				{
+					// If the string is not valid utf8, then return the hex string
+					return ByteUtil.ToHexString(this.Value);
+				}
 			}
 
 			/// <inheritdoc />

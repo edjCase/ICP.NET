@@ -275,7 +275,247 @@ namespace EdjCase.ICP.Candid.Models
 		/// <returns>Candid arg value</returns>
 		public static CandidArg Empty()
 		{
-			return new CandidArg(new List<CandidTypedValue>());
+			return new CandidArg([]);
+		}
+
+		/// <summary>
+		/// Helper method to create a candid arg with typed values
+		/// </summary>
+		/// <typeparam name="T1">The type of the first parameter</typeparam>
+		/// <param name="value1">The value of the first paramter</param>
+		/// <param name="candidConverter">(Optional) Override to the default candid converter</param>
+		/// <returns>A raw candid arg with the converted parameters</returns>
+		public static CandidArg FromObjects<T1>(T1 value1, CandidConverter? candidConverter = null)
+			where T1 : notnull
+		{
+			return new CandidArg(
+			[
+				 CandidTypedValue.FromObject(value1, candidConverter)
+			]);
+		}
+
+		/// <summary>
+		/// Helper method to create a candid arg with typed values
+		/// </summary>
+		/// <typeparam name="T1">The type of the first parameter</typeparam>
+		/// <typeparam name="T2">The type of the second parameter</typeparam>
+		/// <param name="value1">The value of the first paramter</param>
+		/// <param name="value2">The value of the second paramter</param>
+		/// <param name="candidConverter">(Optional) Override to the default candid converter</param>
+		/// <returns>A raw candid arg with the converted parameters</returns>
+		public static CandidArg FromObjects<T1, T2>(T1 value1, T2 value2, CandidConverter? candidConverter = null)
+			where T1 : notnull
+			where T2 : notnull
+		{
+			return new CandidArg(
+			[
+				 CandidTypedValue.FromObject(value1, candidConverter),
+				 CandidTypedValue.FromObject(value2, candidConverter)
+			]);
+		}
+
+		/// <summary>
+		/// Helper method to create a candid arg with typed values
+		/// </summary>
+		/// <typeparam name="T1">The type of the first parameter</typeparam>
+		/// <typeparam name="T2">The type of the second parameter</typeparam>
+		/// <typeparam name="T3">The type of the third parameter</typeparam>
+		/// <param name="value1">The value of the first paramter</param>
+		/// <param name="value2">The value of the second paramter</param>
+		/// <param name="value3">The value of the third paramter</param>
+		/// <param name="candidConverter">(Optional) Override to the default candid converter</param>
+		/// <returns>A raw candid arg with the converted parameters</returns>
+		public static CandidArg FromObjects<T1, T2, T3>(T1 value1, T2 value2, T3 value3, CandidConverter? candidConverter = null)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+		{
+			return new CandidArg(
+			[
+				 CandidTypedValue.FromObject(value1, candidConverter),
+				 CandidTypedValue.FromObject(value2, candidConverter),
+				 CandidTypedValue.FromObject(value3, candidConverter)
+			]);
+		}
+
+		/// <summary>
+		/// Helper method to create a candid arg with typed values
+		/// </summary>
+		/// <typeparam name="T1">The type of the first parameter</typeparam>
+		/// <typeparam name="T2">The type of the second parameter</typeparam>
+		/// <typeparam name="T3">The type of the third parameter</typeparam>
+		/// <typeparam name="T4">The type of the fourth parameter</typeparam>
+		/// <param name="value1">The value of the first paramter</param>
+		/// <param name="value2">The value of the second paramter</param>
+		/// <param name="value3">The value of the third paramter</param>
+		/// <param name="value4">The value of the fourth paramter</param>
+		/// <param name="candidConverter">(Optional) Override to the default candid converter</param>
+		/// <returns>A raw candid arg with the converted parameters</returns>
+		public static CandidArg FromObjects<T1, T2, T3, T4>(T1 value1, T2 value2, T3 value3, T4 value4, CandidConverter? candidConverter = null)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+			where T4 : notnull
+		{
+			return new CandidArg(
+			[
+				 CandidTypedValue.FromObject(value1, candidConverter),
+				 CandidTypedValue.FromObject(value2, candidConverter),
+				 CandidTypedValue.FromObject(value3, candidConverter),
+				 CandidTypedValue.FromObject(value4, candidConverter)
+			]);
+		}
+
+		/// <summary>
+		/// Helper method to create a candid arg with typed values
+		/// </summary>
+		/// <typeparam name="T1">The type of the first parameter</typeparam>
+		/// <typeparam name="T2">The type of the second parameter</typeparam>
+		/// <typeparam name="T3">The type of the third parameter</typeparam>
+		/// <typeparam name="T4">The type of the fourth parameter</typeparam>
+		/// <typeparam name="T5">The type of the fifth parameter</typeparam>
+		/// <param name="value1">The value of the first paramter</param>
+		/// <param name="value2">The value of the second paramter</param>
+		/// <param name="value3">The value of the third paramter</param>
+		/// <param name="value4">The value of the fourth paramter</param>
+		/// <param name="value5">The value of the fifth paramter</param>
+		/// <param name="candidConverter">(Optional) Override to the default candid converter</param>
+		/// <returns>A raw candid arg with the converted parameters</returns>
+		public static CandidArg FromObjects<T1, T2, T3, T4, T5>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, CandidConverter? candidConverter = null)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+			where T4 : notnull
+			where T5 : notnull
+		{
+			return new CandidArg(
+			[
+				 CandidTypedValue.FromObject(value1, candidConverter),
+				 CandidTypedValue.FromObject(value2, candidConverter),
+				 CandidTypedValue.FromObject(value3, candidConverter),
+				 CandidTypedValue.FromObject(value4, candidConverter),
+				 CandidTypedValue.FromObject(value5, candidConverter)
+			]);
+		}
+
+		/// <summary>
+		/// Helper method to create a candid arg with typed values
+		/// </summary>
+		/// <typeparam name="T1">The type of the first parameter</typeparam>
+		/// <typeparam name="T2">The type of the second parameter</typeparam>
+		/// <typeparam name="T3">The type of the third parameter</typeparam>
+		/// <typeparam name="T4">The type of the fourth parameter</typeparam>
+		/// <typeparam name="T5">The type of the fifth parameter</typeparam>
+		/// <typeparam name="T6">The type of the sixth parameter</typeparam>
+		/// <param name="value1">The value of the first paramter</param>
+		/// <param name="value2">The value of the second paramter</param>
+		/// <param name="value3">The value of the third paramter</param>
+		/// <param name="value4">The value of the fourth paramter</param>
+		/// <param name="value5">The value of the fifth paramter</param>
+		/// <param name="value6">The value of the sixth paramter</param>
+		/// <param name="candidConverter">(Optional) Override to the default candid converter</param>
+		/// <returns>A raw candid arg with the converted parameters</returns>
+		public static CandidArg FromObjects<T1, T2, T3, T4, T5, T6>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, CandidConverter? candidConverter = null)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+			where T4 : notnull
+			where T5 : notnull
+			where T6 : notnull
+		{
+			return new CandidArg(
+			[
+				 CandidTypedValue.FromObject(value1, candidConverter),
+				 CandidTypedValue.FromObject(value2, candidConverter),
+				 CandidTypedValue.FromObject(value3, candidConverter),
+				 CandidTypedValue.FromObject(value4, candidConverter),
+				 CandidTypedValue.FromObject(value5, candidConverter),
+				 CandidTypedValue.FromObject(value6, candidConverter)
+			]);
+		}
+
+		/// <summary>
+		/// Helper method to create a candid arg with typed values
+		/// </summary>
+		/// <typeparam name="T1">The type of the first parameter</typeparam>
+		/// <typeparam name="T2">The type of the second parameter</typeparam>
+		/// <typeparam name="T3">The type of the third parameter</typeparam>
+		/// <typeparam name="T4">The type of the fourth parameter</typeparam>
+		/// <typeparam name="T5">The type of the fifth parameter</typeparam>
+		/// <typeparam name="T6">The type of the sixth parameter</typeparam>
+		/// <typeparam name="T7">The type of the seventh parameter</typeparam>
+		/// <param name="value1">The value of the first paramter</param>
+		/// <param name="value2">The value of the second paramter</param>
+		/// <param name="value3">The value of the third paramter</param>
+		/// <param name="value4">The value of the fourth paramter</param>
+		/// <param name="value5">The value of the fifth paramter</param>
+		/// <param name="value6">The value of the sixth paramter</param>
+		/// <param name="value7">The value of the seventh paramter</param>
+		/// <param name="candidConverter">(Optional) Override to the default candid converter</param>
+		/// <returns>A raw candid arg with the converted parameters</returns>
+		public static CandidArg FromObjects<T1, T2, T3, T4, T5, T6, T7>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7, CandidConverter? candidConverter = null)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+			where T4 : notnull
+			where T5 : notnull
+			where T6 : notnull
+			where T7 : notnull
+		{
+			return new CandidArg(
+			[
+				 CandidTypedValue.FromObject(value1, candidConverter),
+				 CandidTypedValue.FromObject(value2, candidConverter),
+				 CandidTypedValue.FromObject(value3, candidConverter),
+				 CandidTypedValue.FromObject(value4, candidConverter),
+				 CandidTypedValue.FromObject(value5, candidConverter),
+				 CandidTypedValue.FromObject(value6, candidConverter),
+				 CandidTypedValue.FromObject(value7, candidConverter)
+			]);
+		}
+
+		/// <summary>
+		/// Helper method to create a candid arg with typed values
+		/// </summary>
+		/// <typeparam name="T1">The type of the first parameter</typeparam>
+		/// <typeparam name="T2">The type of the second parameter</typeparam>
+		/// <typeparam name="T3">The type of the third parameter</typeparam>
+		/// <typeparam name="T4">The type of the fourth parameter</typeparam>
+		/// <typeparam name="T5">The type of the fifth parameter</typeparam>
+		/// <typeparam name="T6">The type of the sixth parameter</typeparam>
+		/// <typeparam name="T7">The type of the seventh parameter</typeparam>
+		/// <typeparam name="T8">The type of the eighth parameter</typeparam>
+		/// <param name="value1">The value of the first paramter</param>
+		/// <param name="value2">The value of the second paramter</param>
+		/// <param name="value3">The value of the third paramter</param>
+		/// <param name="value4">The value of the fourth paramter</param>
+		/// <param name="value5">The value of the fifth paramter</param>
+		/// <param name="value6">The value of the sixth paramter</param>
+		/// <param name="value7">The value of the seventh paramter</param>
+		/// <param name="value8">The value of the eighth paramter</param>
+		/// <param name="candidConverter">(Optional) Override to the default candid converter</param>
+		/// <returns>A raw candid arg with the converted parameters</returns>
+		public static CandidArg FromObjects<T1, T2, T3, T4, T5, T6, T7, T8>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7, T8 value8, CandidConverter? candidConverter = null)
+			where T1 : notnull
+			where T2 : notnull
+			where T3 : notnull
+			where T4 : notnull
+			where T5 : notnull
+			where T6 : notnull
+			where T7 : notnull
+			where T8 : notnull
+		{
+			return new CandidArg(
+			[
+				 CandidTypedValue.FromObject(value1, candidConverter),
+				 CandidTypedValue.FromObject(value2, candidConverter),
+				 CandidTypedValue.FromObject(value3, candidConverter),
+				 CandidTypedValue.FromObject(value4, candidConverter),
+				 CandidTypedValue.FromObject(value5, candidConverter),
+				 CandidTypedValue.FromObject(value6, candidConverter),
+				 CandidTypedValue.FromObject(value7, candidConverter),
+				 CandidTypedValue.FromObject(value8, candidConverter)
+			]);
 		}
 
 		/// <inheritdoc />
