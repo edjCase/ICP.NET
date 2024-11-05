@@ -135,7 +135,7 @@ namespace EdjCase.ICP.Agent.Agents
 			Principal? effectiveCanisterId = null,
 			CancellationToken? cancellationToken = null)
 		{
-			RequestId id = await agent.CallAsync(canisterId, method, arg, effectiveCanisterId);
+			RequestId id = await agent.CallAsynchronousAsync(canisterId, method, arg, effectiveCanisterId);
 			return await agent.WaitForRequestAsync(canisterId, id, cancellationToken);
 		}
 

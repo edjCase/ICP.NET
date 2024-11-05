@@ -91,12 +91,11 @@ namespace EdjCase.ICP.Agent.Agents
 				this.v3CallSupported = false;
 				return await this.CallAsynchronousAndWaitAsync(canisterId, method, arg, effectiveCanisterId, cancellationToken);
 			}
-			// TODO
-			// if (httpResponse.StatusCode == System.Net.HttpStatusCode.Accepted){
-			// 	// If request takes too long, then it will return 202 Accepted
-			// 	// and polling is required
-			// 	return await this.WaitAsync();
-			// }
+			if (httpResponse.StatusCode == System.Net.HttpStatusCode.Accepted)
+			{
+				// If request takes too long, then it will return 202 Accepted and polling is required
+				return await this.WaitForRequestAsync(canisterId, requestId, cancellationToken);
+			}
 			await httpResponse.ThrowIfErrorAsync();
 
 			byte[] cborBytes = await httpResponse.GetContentAsync();
