@@ -8,6 +8,8 @@ Collection of Internet Computer Protocol (ICP) libraries for .NET/Blazor/Unity
 
 - [Client Generator](src/ClientGenerator/README.md) - Client source code generator for ICP canisters
 
+- [PocketIC](src/PocketIC/README.md) - [PocketIC Server](https://github.com/dfinity/pocketic) client and runner for automating tests for canisters
+
 ## See each individual project README for more in depth guides
 
 # 🎮 Unity Integration
