@@ -69,7 +69,7 @@ namespace EdjCase.ICP.PocketIC
 			var startInfo = new ProcessStartInfo
 			{
 				FileName = binPath,
-				Arguments = $"--pid {pid}",
+				Arguments = $"--port-file {portFilePath}",
 				RedirectStandardOutput = showRuntimeLogs,
 				RedirectStandardError = showErrorLogs,
 				UseShellExecute = false,
@@ -115,7 +115,7 @@ namespace EdjCase.ICP.PocketIC
 				try
 				{
 					string portString = await File.ReadAllTextAsync(portFilePath);
-					if (int.TryParse(portString, out port))
+					if (int.TryParse(portString.Trim(), out port))
 					{
 						break;
 					}

@@ -196,11 +196,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 
 		int instanceId = created["instance_id"]!.Deserialize<int>()!;
 
-		List<SubnetTopology> topology = created["topology"]
-			?.Deserialize<Dictionary<string, JsonNode>>()
-			?.Select(kv => MapSubnetTopology(kv.Key, kv.Value))
-			?.ToList()
-			?? [];
+		List<SubnetTopology> topology = MapTopology(created["topology"]);
 		return (instanceId, topology);
 	}
 	/// <inheritdoc />
@@ -234,12 +230,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		{
 			throw new Exception("There was no json response from the server");
 		}
-		return response
-			.AsObject()
-			?.Deserialize<Dictionary<string, JsonNode>>()
-			?.Select(kv => MapSubnetTopology(kv.Key, kv.Value))
-			?.ToList()
-			?? [];
+		return MapTopology(response);
 	}
 	/// <inheritdoc />
 	public async Task<ICTimestamp> GetTimeAsync(int instanceId)
@@ -759,6 +750,14 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		}
 	}
 
+	private static List<SubnetTopology> MapTopology(JsonNode? value)
+	{
+		return value?["subnet_configs"]
+			?.Deserialize<Dictionary<string, JsonNode>>()
+			?.Select(kv => MapSubnetTopology(kv.Key, kv.Value))
+			?.ToList()
+			?? [];
+	}
 
 	private static SubnetTopology MapSubnetTopology(string subnetId, JsonNode value)
 	{

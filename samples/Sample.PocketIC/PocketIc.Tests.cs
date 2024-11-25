@@ -18,7 +18,7 @@ namespace Sample.PocketIC
 		public PocketIcServerFixture()
 		{
 			// Start the server for all tests
-			this.Server = PocketIcServer.Start().GetAwaiter().GetResult();
+			this.Server = PocketIcServer.Start(showRuntimeLogs: true, showErrorLogs: true).GetAwaiter().GetResult();
 		}
 
 		public void Dispose()
@@ -124,7 +124,7 @@ namespace Sample.PocketIC
 						Assert.Equal(CandidArg.Empty(), incResponseArg);
 
 						// This alternative also doesnt work
-						// RequestId requestId = await agent.CallAsync(canisterId, "inc", CandidArg.Empty());
+						// RequestId requestId = await agent.CallAsynchronousAsync(canisterId, "inc", CandidArg.Empty());
 						// ICTimestamp currentTime = await pocketIc.GetTimeAsync();
 						// await pocketIc.SetTimeAsync(currentTime + TimeSpan.FromSeconds(5));
 						// await pocketIc.TickAsync(5);
