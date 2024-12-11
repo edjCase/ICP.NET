@@ -1202,13 +1202,43 @@
             Disposes of the server process
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.Start(System.Boolean,System.Boolean)">
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.Start(System.Nullable{EdjCase.ICP.PocketIC.LogLevel},System.Boolean)">
             <summary>
             Starts the pocket-ic server process
             </summary>
-            <param name="showRuntimeLogs">Outputs the runtime logs using Debug.WriteLine(...)</param>
+            <param name="runtimeLogLevel">Outputs the runtime logs using Debug.WriteLine(...) with the specified log level. Null value disables the logging</param>
             <param name="showErrorLogs">Outputs the error logs using Debug.WriteLine(...)</param>
             <returns>The instance of the PocketIcServer with the running process</returns>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.LogLevel">
+            <summary>
+            Specifies the level of logging.
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.LogLevel.Error">
+            <summary>
+            Error level, used for logging error messages.
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.LogLevel.Warn">
+            <summary>
+            Warn level, used for logging warning messages.
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.LogLevel.Info">
+            <summary>
+            Info level, used for logging informational messages.
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.LogLevel.Debug">
+            <summary>
+            Debug level, used for logging debug messages.
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.LogLevel.Trace">
+            <summary>
+            Trace level, used for logging trace messages.
+            </summary>
         </member>
     </members>
 </doc>

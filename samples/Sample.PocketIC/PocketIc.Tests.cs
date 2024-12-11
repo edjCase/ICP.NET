@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Agent.Responses;
@@ -18,7 +19,7 @@ namespace Sample.PocketIC
 		public PocketIcServerFixture()
 		{
 			// Start the server for all tests
-			this.Server = PocketIcServer.Start(showRuntimeLogs: true, showErrorLogs: true).GetAwaiter().GetResult();
+			this.Server = PocketIcServer.Start(runtimeLogLevel: LogLevel.Trace, showErrorLogs: true).GetAwaiter().GetResult();
 		}
 
 		public void Dispose()
@@ -107,6 +108,7 @@ namespace Sample.PocketIC
 
 				await pocketIc.StartCanisterAsync(canisterId);
 
+				await pocketIc.SetTimeAsync(ICTimestamp.Now());
 				// Let time progress so that update calls get processed
 				await using (await pocketIc.AutoProgressTimeAsync())
 				{
@@ -119,17 +121,45 @@ namespace Sample.PocketIC
 						Assert.Equal((UnboundedUInt)0, getResponseValue);
 
 
+						// Add this at the "Here" comment
+						var processInfo = new ProcessStartInfo
+						{
+							FileName = "dfx",
+							Arguments = $"canister call {canisterId} inc () --network {httpGateway.Url} --identity anonymous --verbose --async",
+							RedirectStandardOutput = true,
+							RedirectStandardError = true,
+							UseShellExecute = false,
+							CreateNoWindow = true,
+							WorkingDirectory = "/home/gekctek/git/ICP.NET",
+						};
+						Debug.WriteLine("dfx " + processInfo.Arguments);
+						RequestId requestId;
+						using (var process = Process.Start(processInfo))
+						{
+							string output = process!.StandardOutput.ReadToEnd();
+							string error = process.StandardError.ReadToEnd();
+							process.WaitForExit();
+
+							// Optionally log or handle the output/error
+							Debug.WriteLine($"Output: {output}");
+							Debug.WriteLine($"Error: {error}");
+							requestId = new RequestId(Convert.FromHexString(output.Trim().Substring(2)));
+						}
+						Debug.WriteLine("---Start-----\n\n\n\n\n\n\n\n\n\n\n");
 						CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
-						CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
-						Assert.Equal(CandidArg.Empty(), incResponseArg);
+
+						// CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
+						// Assert.Equal(CandidArg.Empty(), incResponseArg);
 
 						// This alternative also doesnt work
 						// RequestId requestId = await agent.CallAsynchronousAsync(canisterId, "inc", CandidArg.Empty());
 						// ICTimestamp currentTime = await pocketIc.GetTimeAsync();
 						// await pocketIc.SetTimeAsync(currentTime + TimeSpan.FromSeconds(5));
 						// await pocketIc.TickAsync(5);
-						// CandidArg incResponseArg = await agent.WaitForRequestAsync(canisterId, requestId);
-						// Assert.Equal(CandidArg.Empty(), incResponseArg);
+
+
+						CandidArg incResponseArg = await agent.WaitForRequestAsync(canisterId, requestId, cts.Token); // Waits indefinitely here
+						Assert.Equal(CandidArg.Empty(), incResponseArg);
 
 						getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 						getResponseArg = getResponse.ThrowOrGetReply();

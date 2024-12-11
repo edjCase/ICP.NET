@@ -51,11 +51,11 @@ namespace EdjCase.ICP.PocketIC
 		/// <summary>
 		/// Starts the pocket-ic server process
 		/// </summary>
-		/// <param name="showRuntimeLogs">Outputs the runtime logs using Debug.WriteLine(...)</param>
+		/// <param name="runtimeLogLevel">Outputs the runtime logs using Debug.WriteLine(...) with the specified log level. Null value disables the logging</param>
 		/// <param name="showErrorLogs">Outputs the error logs using Debug.WriteLine(...)</param>
 		/// <returns>The instance of the PocketIcServer with the running process</returns>
 		public static async Task<PocketIcServer> Start(
-			bool showRuntimeLogs = false,
+			LogLevel? runtimeLogLevel = null,
 			bool showErrorLogs = true
 		)
 		{
@@ -70,10 +70,14 @@ namespace EdjCase.ICP.PocketIC
 			{
 				FileName = binPath,
 				Arguments = $"--port-file {portFilePath}",
-				RedirectStandardOutput = showRuntimeLogs,
+				RedirectStandardOutput = runtimeLogLevel != null,
 				RedirectStandardError = showErrorLogs,
-				UseShellExecute = false,
+				UseShellExecute = false
 			};
+			if (runtimeLogLevel != null)
+			{
+				startInfo.EnvironmentVariables["RUST_LOG"] = runtimeLogLevel.Value.ToString().ToLower();
+			}
 
 			Process? serverProcess = Process.Start(startInfo);
 
@@ -81,7 +85,7 @@ namespace EdjCase.ICP.PocketIC
 			{
 				throw new Exception("Failed to start PocketIC server process");
 			}
-			if (showRuntimeLogs)
+			if (runtimeLogLevel != null)
 			{
 				serverProcess.OutputDataReceived += (sender, e) =>
 				{
@@ -220,5 +224,36 @@ namespace EdjCase.ICP.PocketIC
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Specifies the level of logging.
+	/// </summary>
+	public enum LogLevel
+	{
+		/// <summary>
+		/// Error level, used for logging error messages.
+		/// </summary>
+		Error,
+
+		/// <summary>
+		/// Warn level, used for logging warning messages.
+		/// </summary>
+		Warn,
+
+		/// <summary>
+		/// Info level, used for logging informational messages.
+		/// </summary>
+		Info,
+
+		/// <summary>
+		/// Debug level, used for logging debug messages.
+		/// </summary>
+		Debug,
+
+		/// <summary>
+		/// Trace level, used for logging trace messages.
+		/// </summary>
+		Trace,
 	}
 }
