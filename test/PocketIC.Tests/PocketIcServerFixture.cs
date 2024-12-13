@@ -11,7 +11,7 @@ public class PocketIcServerFixture : IDisposable
 	public PocketIcServerFixture()
 	{
 		// Start the server for all tests
-		this.Server = PocketIcServer.Start(runtimeLogLevel: LogLevel.Debug).GetAwaiter().GetResult();
+		this.Server = PocketIcServer.StartAsync(runtimeLogLevel: LogLevel.Debug).GetAwaiter().GetResult();
 	}
 
 	public void Dispose()

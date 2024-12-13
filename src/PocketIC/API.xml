@@ -1202,7 +1202,7 @@
             Disposes of the server process
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.Start(System.Nullable{EdjCase.ICP.PocketIC.LogLevel},System.Boolean)">
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.StartAsync(System.Nullable{EdjCase.ICP.PocketIC.LogLevel},System.Boolean)">
             <summary>
             Starts the pocket-ic server process
             </summary>

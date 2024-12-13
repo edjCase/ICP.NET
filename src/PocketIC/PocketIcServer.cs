@@ -54,7 +54,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="runtimeLogLevel">Outputs the runtime logs using Debug.WriteLine(...) with the specified log level. Null value disables the logging</param>
 		/// <param name="showErrorLogs">Outputs the error logs using Debug.WriteLine(...)</param>
 		/// <returns>The instance of the PocketIcServer with the running process</returns>
-		public static async Task<PocketIcServer> Start(
+		public static async Task<PocketIcServer> StartAsync(
 			LogLevel? runtimeLogLevel = null,
 			bool showErrorLogs = true
 		)

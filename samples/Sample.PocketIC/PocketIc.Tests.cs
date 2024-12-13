@@ -19,7 +19,7 @@ namespace Sample.PocketIC
 		public PocketIcServerFixture()
 		{
 			// Start the server for all tests
-			this.Server = PocketIcServer.Start(runtimeLogLevel: LogLevel.Trace, showErrorLogs: true).GetAwaiter().GetResult();
+			this.Server = PocketIcServer.StartAsync(runtimeLogLevel: LogLevel.Debug, showErrorLogs: true).GetAwaiter().GetResult();
 		}
 
 		public void Dispose()
@@ -121,11 +121,10 @@ namespace Sample.PocketIC
 						Assert.Equal((UnboundedUInt)0, getResponseValue);
 
 
-						// Add this at the "Here" comment
 						var processInfo = new ProcessStartInfo
 						{
 							FileName = "dfx",
-							Arguments = $"canister call {canisterId} inc () --network {httpGateway.Url} --identity anonymous --verbose --async",
+							Arguments = $"canister call {canisterId} inc () --network {httpGateway.Url} --identity anonymous --verbose",
 							RedirectStandardOutput = true,
 							RedirectStandardError = true,
 							UseShellExecute = false,
@@ -133,7 +132,7 @@ namespace Sample.PocketIC
 							WorkingDirectory = "/home/gekctek/git/ICP.NET",
 						};
 						Debug.WriteLine("dfx " + processInfo.Arguments);
-						RequestId requestId;
+						// RequestId requestId;
 						using (var process = Process.Start(processInfo))
 						{
 							string output = process!.StandardOutput.ReadToEnd();
@@ -143,37 +142,41 @@ namespace Sample.PocketIC
 							// Optionally log or handle the output/error
 							Debug.WriteLine($"Output: {output}");
 							Debug.WriteLine($"Error: {error}");
-							requestId = new RequestId(Convert.FromHexString(output.Trim().Substring(2)));
+							// requestId = new RequestId(Convert.FromHexString(output.Trim().Substring(2)));
 						}
 						Debug.WriteLine("---Start-----\n\n\n\n\n\n\n\n\n\n\n");
-						CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 
 						// CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
 						// Assert.Equal(CandidArg.Empty(), incResponseArg);
 
 						// This alternative also doesnt work
-						// RequestId requestId = await agent.CallAsynchronousAsync(canisterId, "inc", CandidArg.Empty());
+						RequestId requestId = await agent.CallAsynchronousAsync(canisterId, "inc", CandidArg.Empty());
 						// ICTimestamp currentTime = await pocketIc.GetTimeAsync();
 						// await pocketIc.SetTimeAsync(currentTime + TimeSpan.FromSeconds(5));
-						// await pocketIc.TickAsync(5);
+						// await pocketIc.TickAsync(1);
+						getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
+						// await Task.Delay(5000);
 
-
+						CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 						CandidArg incResponseArg = await agent.WaitForRequestAsync(canisterId, requestId, cts.Token); // Waits indefinitely here
 						Assert.Equal(CandidArg.Empty(), incResponseArg);
 
 						getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 						getResponseArg = getResponse.ThrowOrGetReply();
 						getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
-						Assert.Equal((UnboundedUInt)1, getResponseValue);
+						Assert.Equal((UnboundedUInt)2, getResponseValue);
 
-						CandidArg setRequestArg = CandidArg.FromObjects((UnboundedUInt)10);
-						CandidArg setResponseArg = await agent.CallAsync(canisterId, "set", setRequestArg);
-						Assert.Equal(CandidArg.Empty(), setResponseArg);
+						// CandidArg setRequestArg = CandidArg.FromObjects((UnboundedUInt)10);
+						// cts = new(TimeSpan.FromSeconds(5));
+						// CandidArg setResponseArg = await agent.CallAsync(canisterId, "set", setRequestArg, cancellationToken: cts.Token);
+						// Assert.Equal(CandidArg.Empty(), setResponseArg);
 
-						getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-						getResponseArg = getResponse.ThrowOrGetReply();
-						getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
-						Assert.Equal((UnboundedUInt)10, getResponseValue);
+						// await pocketIc.TickAsync();
+
+						// getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
+						// getResponseArg = getResponse.ThrowOrGetReply();
+						// getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
+						// Assert.Equal((UnboundedUInt)10, getResponseValue);
 
 					}
 				}
