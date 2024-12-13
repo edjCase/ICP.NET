@@ -94,7 +94,8 @@ namespace EdjCase.ICP.PocketIC
 				Principal.Anonymous(),
 				MANAGEMENT_CANISTER_ID,
 				"provisional_create_canister_with_cycles",
-				request
+				request,
+				EffectivePrincipal.None()
 			);
 		}
 
@@ -109,7 +110,8 @@ namespace EdjCase.ICP.PocketIC
 				Principal.Anonymous(),
 				MANAGEMENT_CANISTER_ID,
 				"start_canister",
-				request
+				request,
+				EffectivePrincipal.None()
 			);
 		}
 
@@ -125,7 +127,8 @@ namespace EdjCase.ICP.PocketIC
 				Principal.Anonymous(),
 				MANAGEMENT_CANISTER_ID,
 				"stop_canister",
-				request
+				request,
+				EffectivePrincipal.None()
 			);
 		}
 
@@ -154,7 +157,8 @@ namespace EdjCase.ICP.PocketIC
 				Principal.Anonymous(),
 				MANAGEMENT_CANISTER_ID,
 				"install_code",
-				request
+				request,
+				EffectivePrincipal.None()
 			);
 		}
 
@@ -258,6 +262,11 @@ namespace EdjCase.ICP.PocketIC
 			return topologies;
 		}
 
+		public async Task<IngressStatus> GetIngressStatusAsync(RequestId messageId, EffectivePrincipal effectivePrincipal)
+		{
+			return await this.HttpClient.GetIngressStatusAsync(this.InstanceId, messageId, effectivePrincipal);
+		}
+
 		/// <summary>
 		/// Gets the cycles balance of a canister
 		/// </summary>
@@ -306,7 +315,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="sender">The principal making the call</param>
 		/// <param name="canisterId">The target canister ID</param>
 		/// <param name="method">The method name to call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The query response decoded as type TResponse</returns>
 		public async Task<TResponse> QueryCallAsync<TResponse>(
 			Principal sender,
@@ -333,7 +342,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="canisterId">The target canister ID</param>
 		/// <param name="method">The method name to call</param>
 		/// <param name="p1">The first candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The query response decoded as type TResponse</returns>
 		public async Task<TResponse> QueryCallAsync<T1, TResponse>(
 			Principal sender,
@@ -365,7 +374,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="method">The method name to call</param>
 		/// <param name="p1">The first candid argument for the call</param>
 		/// <param name="p2">The second candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The query response decoded as type TResponse</returns>
 		public async Task<TResponse> QueryCallAsync<T1, T2, TResponse>(
 			Principal sender,
@@ -401,7 +410,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="p1">The first candid argument for the call</param>
 		/// <param name="p2">The second candid argument for the call</param>
 		/// <param name="p3">The third candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The query response decoded as type TResponse</returns>
 		public async Task<TResponse> QueryCallAsync<T1, T2, T3, TResponse>(
 			Principal sender,
@@ -438,7 +447,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="canisterId">The target canister ID</param>
 		/// <param name="method">The method name to call</param>
 		/// <param name="arg">The raw candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The query response decoded as type TResponse</returns>
 		public async Task<CandidArg> QueryCallRawAsync(
 			Principal sender,
@@ -464,7 +473,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="sender">The principal making the call</param>
 		/// <param name="canisterId">The target canister ID</param>
 		/// <param name="method">The method name to call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The update response decoded as type TResponse</returns>
 		public async Task<TResponse> UpdateCallAsync<TResponse>(
 			Principal sender,
@@ -491,7 +500,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="canisterId">The target canister ID</param>
 		/// <param name="method">The method name to call</param>
 		/// <param name="p1">The first candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The update response decoded as type TResponse</returns>
 		public async Task<TResponse> UpdateCallAsync<T1, TResponse>(
 			Principal sender,
@@ -523,7 +532,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="method">The method name to call</param>
 		/// <param name="p1">The first candid argument for the call</param>
 		/// <param name="p2">The second candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The update response decoded as type TResponse</returns>
 		public async Task<TResponse> UpdateCallAsync<T1, T2, TResponse>(
 			Principal sender,
@@ -559,7 +568,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="p1">The first candid argument for the call</param>
 		/// <param name="p2">The second candid argument for the call</param>
 		/// <param name="p3">The third candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>The update response decoded as type TResponse</returns>
 		public async Task<TResponse> UpdateCallAsync<T1, T2, T3, TResponse>(
 			Principal sender,
@@ -595,7 +604,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="sender">The principal making the call</param>
 		/// <param name="canisterId">The target canister ID</param>
 		/// <param name="method">The method name to call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns></returns>
 		public async Task UpdateCallNoResponseAsync(
 			Principal sender,
@@ -621,7 +630,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="canisterId">The target canister ID</param>
 		/// <param name="method">The method name to call</param>
 		/// <param name="p1">The first candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns></returns>
 		public async Task UpdateCallNoResponseAsync<T1>(
 			Principal sender,
@@ -652,7 +661,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="method">The method name to call</param>
 		/// <param name="p1">The first candid argument for the call</param>
 		/// <param name="p2">The second candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns></returns>
 		public async Task UpdateCallNoResponseAsync<T1, T2>(
 			Principal sender,
@@ -687,7 +696,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="p1">The first candid argument for the call</param>
 		/// <param name="p2">The second candid argument for the call</param>
 		/// <param name="p3">The third candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns></returns>
 		public async Task UpdateCallNoResponseAsync<T1, T2, T3>(
 			Principal sender,
@@ -724,7 +733,7 @@ namespace EdjCase.ICP.PocketIC
 		/// <param name="canisterId">The target canister ID</param>
 		/// <param name="method">The method name to call</param>
 		/// <param name="arg">The raw candid argument for the call</param>
-		/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 		/// <returns>A raw candid argument from the response</returns>
 		public async Task<CandidArg> UpdateCallRawAsync(
 			Principal sender,

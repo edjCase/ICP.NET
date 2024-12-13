@@ -4,6 +4,7 @@ using EdjCase.ICP.Candid.Models;
 using System.Text.Json.Nodes;
 using System.Net;
 using System.Diagnostics;
+using EdjCase.ICP.Agent.Responses;
 
 namespace EdjCase.ICP.PocketIC.Client;
 
@@ -211,7 +212,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal? effectivePrincipal = null)
+		EffectivePrincipal effectivePrincipal)
 	{
 		return await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/read/query",
@@ -324,6 +325,55 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		byte[] publicKey = response!.AsArray().Select(r => r.Deserialize<byte>()!).ToArray();
 		return Principal.FromBytes(publicKey);
 	}
+
+	public async Task<IngressStatus> GetIngressStatusAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal)
+	{
+		var data = new JsonObject
+		{
+			["message_id"] = Convert.ToBase64String(messageId.RawValue),
+			["effective_principal"] = EffectivePrincipalToJson(effectivePrincipal)
+		};
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/read/ingress_status", data);
+		if (response == null)
+		{
+			return IngressStatus.NotFound();
+		}
+		JsonNode? okResponse = response["Ok"];
+		if (okResponse != null)
+		{
+			var vartiantValue = okResponse.AsObject().First();
+			RequestStatus requestStatus;
+			switch (vartiantValue.Key)
+			{
+				case "Reply":
+					var arg = vartiantValue.Value.Deserialize<byte[]>()!;
+					requestStatus = RequestStatus.Replied(CandidArg.FromBytes(arg));
+					break;
+				case "Processing":
+					requestStatus = RequestStatus.Processing();
+					break;
+				case "Rejected":
+					JsonObject reject = vartiantValue.Value!.AsObject();
+					RejectCode rejectCode = reject["reject_code"].Deserialize<RejectCode>()!;
+					string rejectMessage = reject["message"].Deserialize<string>()!;
+					string? errorCode = reject["error_code"]?.Deserialize<string>();
+					requestStatus = RequestStatus.Rejected(rejectCode, rejectMessage, errorCode);
+					break;
+				case "Received":
+					requestStatus = RequestStatus.Received();
+					break;
+				case "Done":
+					requestStatus = RequestStatus.Done();
+					break;
+				default:
+					throw new Exception("Unknown Ok response variant type: " + vartiantValue.Key);
+			}
+			return IngressStatus.Ok(requestStatus);
+		}
+		// TODO
+		throw new Exception("Unknown ingress_status response type: " + response.ToJsonString());
+	}
+
 	/// <inheritdoc />
 	public async Task<CandidArg> SubmitIngressMessageAsync(
 		int instanceId,
@@ -331,7 +381,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal? effectivePrincipal = null)
+		EffectivePrincipal effectivePrincipal)
 	{
 		return await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/update/submit_ingress_message",
@@ -349,7 +399,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal? effectivePrincipal = null)
+		EffectivePrincipal effectivePrincipal)
 	{
 		return await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/update/execute_ingress_message",
@@ -361,6 +411,26 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		);
 	}
 
+	private static JsonNode EffectivePrincipalToJson(EffectivePrincipal effectivePrincipal)
+	{
+		switch (effectivePrincipal.Type)
+		{
+			case EffectivePrincipalType.None:
+				return JsonValue.Create("None")!;
+			case EffectivePrincipalType.Subnet:
+				return new JsonObject
+				{
+					["SubnetId"] = Convert.ToBase64String(effectivePrincipal.Id.Raw)
+				};
+			case EffectivePrincipalType.Canister:
+				return new JsonObject
+				{
+					["CanisterId"] = Convert.ToBase64String(effectivePrincipal.Id.Raw)
+				};
+			default:
+				throw new NotImplementedException();
+		}
+	}
 
 	private async Task<CandidArg> ProcessIngressMessageInternalAsync(
 		string route,
@@ -368,17 +438,11 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg arg,
-		EffectivePrincipal? effectivePrincipal = null)
+		EffectivePrincipal effectivePrincipal)
 	{
 		byte[] payload = arg.Encode();
 
-		JsonNode effectivePrincipalJson = effectivePrincipal == null ?
-			JsonValue.Create("None")! :
-			new JsonObject
-			{
-				[effectivePrincipal.Type == EffectivePrincipalType.Subnet ? "SubnetId" : "CanisterId"] =
-					Convert.ToBase64String(effectivePrincipal.Id.Raw)
-			};
+		JsonNode effectivePrincipalJson = EffectivePrincipalToJson(effectivePrincipal);
 
 		var options = new JsonObject
 		{
@@ -411,12 +475,12 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		return CandidArg.FromBytes(candidBytes);
 	}
 	/// <inheritdoc />
-	public async Task AwaitIngressMessageAsync(int instanceId, byte[] messageId, Principal? effectivePrincipal = null)
+	public async Task AwaitIngressMessageAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal)
 	{
 		var request = new JsonObject
 		{
-			["message_id"] = Convert.ToBase64String(messageId),
-			["effective_principal"] = effectivePrincipal == null ? null : Convert.ToBase64String(effectivePrincipal.Raw)
+			["message_id"] = Convert.ToBase64String(messageId.RawValue),
+			["effective_principal"] = EffectivePrincipalToJson(effectivePrincipal)
 		};
 		await this.PostJsonAsync($"/instances/{instanceId}/update/await_ingress_message", request);
 		// TODO
@@ -713,10 +777,21 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 	{
 		HttpResponseMessage response = await this.MakeHttpRequestAsync(method, endpoint, data);
 		Stream stream = await response.Content.ReadAsStreamAsync();
+		string a = await new StreamReader(stream).ReadToEndAsync();
+		stream.Position = 0;
 		JsonNode? node = null;
 		if (stream.Length > 0)
 		{
-			node = await JsonNode.ParseAsync(stream);
+			try
+			{
+				node = await JsonNode.ParseAsync(stream);
+			}
+			catch (Exception e)
+			{
+				stream.Position = 0;
+				string json = await new StreamReader(stream).ReadToEndAsync();
+				throw new Exception("Failed to parse json response from the server. Response: " + json, e);
+			}
 		}
 		switch (response.StatusCode)
 		{

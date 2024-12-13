@@ -74,7 +74,7 @@
             <param name="canisterId">The target canister id</param>
             <param name="method">The method name to call</param>
             <param name="request">The raw candid request argument</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The raw candid response from the canister</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetTopologyAsync(System.Int32)">
@@ -139,7 +139,7 @@
             <param name="canisterId">The target canister id</param>
             <param name="method">The method name to call</param>
             <param name="request">The raw candid request argument</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The raw candid response</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.ExecuteIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -151,16 +151,16 @@
             <param name="canisterId">The target canister id</param>
             <param name="method">The method name to call</param>
             <param name="request">The raw candid request argument</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The raw candid response</returns>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.AwaitIngressMessageAsync(System.Int32,System.Byte[],EdjCase.ICP.Candid.Models.Principal)">
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.AwaitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
             <summary>
             Waits for an ingress message to complete execution
             </summary>
             <param name="instanceId">The id of the PocketIC instance</param>
             <param name="messageId">The id of the ingress message</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Effective principal for the call</param>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.SetTimeAsync(System.Int32,EdjCase.ICP.Candid.Models.ICTimestamp)">
             <summary>
@@ -379,6 +379,11 @@
         <member name="T:EdjCase.ICP.PocketIC.Client.EffectivePrincipalType">
             <summary>
             Types of effective principals
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.EffectivePrincipalType.None">
+            <summary>
+            No effective principal
             </summary>
         </member>
         <member name="F:EdjCase.ICP.PocketIC.Client.EffectivePrincipalType.Subnet">
@@ -645,7 +650,7 @@
         <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.ExecuteIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
             <inheritdoc />
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.AwaitIngressMessageAsync(System.Int32,System.Byte[],EdjCase.ICP.Candid.Models.Principal)">
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.AwaitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
             <inheritdoc />
         </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.SetTimeAsync(System.Int32,EdjCase.ICP.Candid.Models.ICTimestamp)">
@@ -966,7 +971,7 @@
             <param name="sender">The principal making the call</param>
             <param name="canisterId">The target canister ID</param>
             <param name="method">The method name to call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The query response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallAsync``2(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -977,7 +982,7 @@
             <param name="canisterId">The target canister ID</param>
             <param name="method">The method name to call</param>
             <param name="p1">The first candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The query response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallAsync``3(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -989,7 +994,7 @@
             <param name="method">The method name to call</param>
             <param name="p1">The first candid argument for the call</param>
             <param name="p2">The second candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The query response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallAsync``4(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,``2,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1002,7 +1007,7 @@
             <param name="p1">The first candid argument for the call</param>
             <param name="p2">The second candid argument for the call</param>
             <param name="p3">The third candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The query response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.QueryCallRawAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1013,7 +1018,7 @@
             <param name="canisterId">The target canister ID</param>
             <param name="method">The method name to call</param>
             <param name="arg">The raw candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The query response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallAsync``1(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1023,7 +1028,7 @@
             <param name="sender">The principal making the call</param>
             <param name="canisterId">The target canister ID</param>
             <param name="method">The method name to call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The update response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallAsync``2(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1034,7 +1039,7 @@
             <param name="canisterId">The target canister ID</param>
             <param name="method">The method name to call</param>
             <param name="p1">The first candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The update response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallAsync``3(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1046,7 +1051,7 @@
             <param name="method">The method name to call</param>
             <param name="p1">The first candid argument for the call</param>
             <param name="p2">The second candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The update response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallAsync``4(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,``2,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1059,7 +1064,7 @@
             <param name="p1">The first candid argument for the call</param>
             <param name="p2">The second candid argument for the call</param>
             <param name="p3">The third candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The update response decoded as type TResponse</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallNoResponseAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1069,7 +1074,7 @@
             <param name="sender">The principal making the call</param>
             <param name="canisterId">The target canister ID</param>
             <param name="method">The method name to call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns></returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallNoResponseAsync``1(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1080,7 +1085,7 @@
             <param name="canisterId">The target canister ID</param>
             <param name="method">The method name to call</param>
             <param name="p1">The first candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns></returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallNoResponseAsync``2(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1092,7 +1097,7 @@
             <param name="method">The method name to call</param>
             <param name="p1">The first candid argument for the call</param>
             <param name="p2">The second candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns></returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallNoResponseAsync``3(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,``0,``1,``2,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1105,7 +1110,7 @@
             <param name="p1">The first candid argument for the call</param>
             <param name="p2">The second candid argument for the call</param>
             <param name="p3">The third candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns></returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallRawAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
@@ -1116,7 +1121,7 @@
             <param name="canisterId">The target canister ID</param>
             <param name="method">The method name to call</param>
             <param name="arg">The raw candid argument for the call</param>
-            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>A raw candid argument from the response</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.DisposeAsync">

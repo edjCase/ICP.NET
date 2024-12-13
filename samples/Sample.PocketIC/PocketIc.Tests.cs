@@ -153,9 +153,19 @@ namespace Sample.PocketIC
 						RequestId requestId = await agent.CallAsynchronousAsync(canisterId, "inc", CandidArg.Empty());
 						// ICTimestamp currentTime = await pocketIc.GetTimeAsync();
 						// await pocketIc.SetTimeAsync(currentTime + TimeSpan.FromSeconds(5));
-						// await pocketIc.TickAsync(1);
-						getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
+						await pocketIc.TickAsync(1);
 						// await Task.Delay(5000);
+						IngressStatus ingressStatus = await pocketIc.GetIngressStatusAsync(requestId, EffectivePrincipal.Canister(canisterId));
+
+						switch (ingressStatus.Type)
+						{
+							case IngressStatusType.Ok:
+								break;
+							case IngressStatusType.NotFound:
+								throw new Exception("Ingress message not found");
+							default:
+								throw new Exception("Ingress message ????");
+						}
 
 						CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
 						CandidArg incResponseArg = await agent.WaitForRequestAsync(canisterId, requestId, cts.Token); // Waits indefinitely here

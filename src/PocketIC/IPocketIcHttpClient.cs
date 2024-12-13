@@ -1,3 +1,4 @@
+using EdjCase.ICP.Agent.Responses;
 using EdjCase.ICP.Candid.Models;
 
 namespace EdjCase.ICP.PocketIC.Client;
@@ -86,7 +87,7 @@ public interface IPocketIcHttpClient
 	/// <param name="canisterId">The target canister id</param>
 	/// <param name="method">The method name to call</param>
 	/// <param name="request">The raw candid request argument</param>
-	/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+	/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 	/// <returns>The raw candid response from the canister</returns>
 	Task<CandidArg> QueryCallAsync(
 		int instanceId,
@@ -149,6 +150,8 @@ public interface IPocketIcHttpClient
 	/// <returns>The public key principal of the subnet</returns>
 	Task<Principal> GetPublicKeyForSubnetAsync(int instanceId, Principal subnetId);
 
+	Task<IngressStatus> GetIngressStatusAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal);
+
 	/// <summary>
 	/// Submits an ingress message to a canister without waiting for execution
 	/// </summary>
@@ -157,7 +160,7 @@ public interface IPocketIcHttpClient
 	/// <param name="canisterId">The target canister id</param>
 	/// <param name="method">The method name to call</param>
 	/// <param name="request">The raw candid request argument</param>
-	/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+	/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 	/// <returns>The raw candid response</returns>
 	Task<CandidArg> SubmitIngressMessageAsync(
 		int instanceId,
@@ -175,7 +178,7 @@ public interface IPocketIcHttpClient
 	/// <param name="canisterId">The target canister id</param>
 	/// <param name="method">The method name to call</param>
 	/// <param name="request">The raw candid request argument</param>
-	/// <param name="effectivePrincipal">Optional effective principal for the call</param>
+	/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
 	/// <returns>The raw candid response</returns>
 	Task<CandidArg> ExecuteIngressMessageAsync(
 		int instanceId,
@@ -190,8 +193,8 @@ public interface IPocketIcHttpClient
 	/// </summary>
 	/// <param name="instanceId">The id of the PocketIC instance</param>
 	/// <param name="messageId">The id of the ingress message</param>
-	/// <param name="effectivePrincipal">Optional effective principal for the call</param>
-	Task AwaitIngressMessageAsync(int instanceId, byte[] messageId, Principal? effectivePrincipal = null);
+	/// <param name="effectivePrincipal">Effective principal for the call</param>
+	Task AwaitIngressMessageAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal);
 
 	/// <summary>
 	/// Sets the current time of the IC instance
@@ -300,6 +303,40 @@ public enum InstanceStatus
 	Deleted
 }
 
+public class IngressStatus
+{
+	public IngressStatusType Type { get; }
+
+	private object? value;
+
+	private IngressStatus(IngressStatusType type, object? value)
+	{
+		this.Type = type;
+		this.value = value;
+	}
+
+	public RequestStatus AsOk()
+	{
+		return (RequestStatus)this.value!;
+	}
+
+	public static IngressStatus Ok(RequestStatus status)
+	{
+		return new IngressStatus(IngressStatusType.Ok, status);
+	}
+
+	public static IngressStatus NotFound()
+	{
+		return new IngressStatus(IngressStatusType.NotFound, null);
+	}
+}
+
+public enum IngressStatusType
+{
+	NotFound,
+	Ok
+}
+
 /// <summary>
 /// Configuration for HTTPS support
 /// </summary>
@@ -406,12 +443,33 @@ public class EffectivePrincipal
 	/// <summary>
 	/// The type of effective principal
 	/// </summary>
-	public required EffectivePrincipalType Type { get; set; }
+	public EffectivePrincipalType Type { get; }
 
 	/// <summary>
 	/// The principal id
 	/// </summary>
-	public required Principal Id { get; set; }
+	public Principal Id { get; }
+
+	private EffectivePrincipal(EffectivePrincipalType type, Principal id)
+	{
+		this.Type = type;
+		this.Id = id;
+	}
+
+	public static EffectivePrincipal None()
+	{
+		return new EffectivePrincipal(EffectivePrincipalType.None, Principal.Anonymous());
+	}
+
+	public static EffectivePrincipal Subnet(Principal id)
+	{
+		return new EffectivePrincipal(EffectivePrincipalType.Subnet, id);
+	}
+
+	public static EffectivePrincipal Canister(Principal id)
+	{
+		return new EffectivePrincipal(EffectivePrincipalType.Canister, id);
+	}
 }
 
 /// <summary>
@@ -419,6 +477,10 @@ public class EffectivePrincipal
 /// </summary>
 public enum EffectivePrincipalType
 {
+	/// <summary>
+	/// No effective principal
+	/// </summary>
+	None,
 	/// <summary>
 	/// Subnet
 	/// </summary>
