@@ -205,6 +205,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 	{
 		await this.DeleteAsync($"/instances/{id}");
 	}
+
 	/// <inheritdoc />
 	public async Task<CandidArg> QueryCallAsync(
 		int instanceId,
@@ -326,6 +327,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		return Principal.FromBytes(publicKey);
 	}
 
+	/// <inheritdoc />
 	public async Task<IngressStatus> GetIngressStatusAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal)
 	{
 		var data = new JsonObject

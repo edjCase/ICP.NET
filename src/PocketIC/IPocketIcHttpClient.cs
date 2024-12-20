@@ -95,7 +95,7 @@ public interface IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal? effectivePrincipal = null);
+		EffectivePrincipal effectivePrincipal);
 
 	/// <summary>
 	/// Gets the topology information for a PocketIC instance
@@ -150,7 +150,14 @@ public interface IPocketIcHttpClient
 	/// <returns>The public key principal of the subnet</returns>
 	Task<Principal> GetPublicKeyForSubnetAsync(int instanceId, Principal subnetId);
 
-	Task<IngressStatus> GetIngressStatusAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal);
+	/// <summary>
+	/// Gets the status of an ingress message
+	/// </summary>
+	/// <param name="instanceId">The id of the PocketIC instance</param>
+	/// <param name="requestId">The id of the request to check the status for</param>
+	/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
+	/// <returns></returns>
+	Task<IngressStatus> GetIngressStatusAsync(int instanceId, RequestId requestId, EffectivePrincipal effectivePrincipal);
 
 	/// <summary>
 	/// Submits an ingress message to a canister without waiting for execution
@@ -168,7 +175,7 @@ public interface IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal? effectivePrincipal = null);
+		EffectivePrincipal effectivePrincipal);
 
 	/// <summary>
 	/// Executes an ingress message on a canister and waits for the response
@@ -186,7 +193,7 @@ public interface IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal? effectivePrincipal = null);
+		EffectivePrincipal effectivePrincipal);
 
 	/// <summary>
 	/// Waits for an ingress message to complete execution
