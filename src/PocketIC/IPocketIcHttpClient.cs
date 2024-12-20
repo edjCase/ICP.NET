@@ -95,7 +95,7 @@ public interface IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal effectivePrincipal);
+		EffectivePrincipal? effectivePrincipal = null);
 
 	/// <summary>
 	/// Gets the topology information for a PocketIC instance
@@ -155,9 +155,12 @@ public interface IPocketIcHttpClient
 	/// </summary>
 	/// <param name="instanceId">The id of the PocketIC instance</param>
 	/// <param name="requestId">The id of the request to check the status for</param>
-	/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
+	/// <param name="effectivePrincipal">Optional effective principal for the call</param>
 	/// <returns></returns>
-	Task<IngressStatus> GetIngressStatusAsync(int instanceId, RequestId requestId, EffectivePrincipal effectivePrincipal);
+	Task<IngressStatus> GetIngressStatusAsync(
+		int instanceId,
+		RequestId requestId,
+		EffectivePrincipal effectivePrincipal);
 
 	/// <summary>
 	/// Submits an ingress message to a canister without waiting for execution
@@ -175,7 +178,7 @@ public interface IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal effectivePrincipal);
+		EffectivePrincipal? effectivePrincipal = null);
 
 	/// <summary>
 	/// Executes an ingress message on a canister and waits for the response
@@ -193,7 +196,7 @@ public interface IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal effectivePrincipal);
+		EffectivePrincipal? effectivePrincipal = null);
 
 	/// <summary>
 	/// Waits for an ingress message to complete execution
@@ -309,9 +312,14 @@ public enum InstanceStatus
 	/// </summary>
 	Deleted
 }
-
+/// <summary>
+/// A variant model representing the status of an ingress message
+/// </summary>
 public class IngressStatus
 {
+	/// <summary>
+	/// The type of ingress status
+	/// </summary>
 	public IngressStatusType Type { get; }
 
 	private object? value;
@@ -322,25 +330,46 @@ public class IngressStatus
 		this.value = value;
 	}
 
+	/// <summary>
+	/// Gets the Ok variant data for the status
+	/// </summary>
 	public RequestStatus AsOk()
 	{
 		return (RequestStatus)this.value!;
 	}
 
+	/// <summary>
+	/// Creates a new Ok status with the variant data
+	/// </summary>
+	/// <param name="status">The request status data</param>
+	/// <returns>An Ok ingress variant model</returns>
 	public static IngressStatus Ok(RequestStatus status)
 	{
 		return new IngressStatus(IngressStatusType.Ok, status);
 	}
 
+	/// <summary>
+	/// Creates a new NotFound status
+	/// </summary>
+	/// <returns>A NotFound ingress variant model</returns>
 	public static IngressStatus NotFound()
 	{
 		return new IngressStatus(IngressStatusType.NotFound, null);
 	}
 }
 
+/// <summary>
+/// The variant types of ingress status
+/// </summary>
 public enum IngressStatusType
 {
+	/// <summary>
+	/// Not Found
+	/// </summary>
 	NotFound,
+	/// <summary>
+	/// Ok
+	/// </summary>
 	Ok
 }
 
@@ -463,16 +492,30 @@ public class EffectivePrincipal
 		this.Id = id;
 	}
 
+	/// <summary>
+	/// Creates an empty effective principal
+	/// </summary>
+	/// <returns>An empty effective principal</returns>
 	public static EffectivePrincipal None()
 	{
 		return new EffectivePrincipal(EffectivePrincipalType.None, Principal.Anonymous());
 	}
 
+	/// <summary>
+	/// Creates an effective principal for a subnet
+	/// </summary>
+	/// <param name="id">The subnet id</param>
+	/// <returns>A subnet effective principal</returns>
 	public static EffectivePrincipal Subnet(Principal id)
 	{
 		return new EffectivePrincipal(EffectivePrincipalType.Subnet, id);
 	}
 
+	/// <summary>
+	/// Creates an effective principal for a canister
+	/// </summary>
+	/// <param name="id">The canister id</param>
+	/// <returns>A canister effective principal</returns>
 	public static EffectivePrincipal Canister(Principal id)
 	{
 		return new EffectivePrincipal(EffectivePrincipalType.Canister, id);

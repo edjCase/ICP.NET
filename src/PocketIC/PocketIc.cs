@@ -262,9 +262,15 @@ namespace EdjCase.ICP.PocketIC
 			return topologies;
 		}
 
-		public async Task<IngressStatus> GetIngressStatusAsync(RequestId messageId, EffectivePrincipal effectivePrincipal)
+		/// <summary>
+		/// Gets the ingress status of the specified request
+		/// </summary>
+		/// <param name="requestId">The request ID to check</param>
+		/// <param name="effectivePrincipal">The effective principal for the request</param>
+		/// <returns>The ingress status of the request</returns>
+		public async Task<IngressStatus> GetIngressStatusAsync(RequestId requestId, EffectivePrincipal effectivePrincipal)
 		{
-			return await this.HttpClient.GetIngressStatusAsync(this.InstanceId, messageId, effectivePrincipal);
+			return await this.HttpClient.GetIngressStatusAsync(this.InstanceId, requestId, effectivePrincipal);
 		}
 
 		/// <summary>
