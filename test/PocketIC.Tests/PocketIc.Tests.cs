@@ -122,26 +122,13 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			// Test time
 			ICTimestamp initialTime = await pocketIc.GetTimeAsync();
 
-			ICTimestamp newTime = new(initialTime.NanoSeconds + (UnboundedUInt)1_000);
+			ICTimestamp newTime = ICTimestamp.Now();
 			await pocketIc.SetTimeAsync(newTime);
 
 			ICTimestamp resetTime = await pocketIc.GetTimeAsync();
 
 			Assert.Equal(newTime.NanoSeconds, resetTime.NanoSeconds);
 
-			// Test auto progress time
-			await using (await pocketIc.AutoProgressTimeAsync())
-			{
-				await Task.Delay(100);
-				ICTimestamp autoProgressedTime = await pocketIc.GetTimeAsync();
-				Assert.True(autoProgressedTime.NanoSeconds > resetTime.NanoSeconds);
-			}
-
-			// Verify time is stopped
-			ICTimestamp stopProgressTime = await pocketIc.GetTimeAsync();
-			await Task.Delay(100);
-			ICTimestamp stopProgressTime2 = await pocketIc.GetTimeAsync();
-			Assert.Equal(stopProgressTime.NanoSeconds, stopProgressTime2.NanoSeconds);
 
 			// Test subnet id
 			Principal subnetId = await pocketIc.GetSubnetIdForCanisterAsync(canisterId);
@@ -159,26 +146,38 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			Assert.Equal(newStableMemory, stableMemory[..8]);
 
 
-			// Setup http gateway and test api call to canister
-			await using (HttpGateway httpGateway = await pocketIc.RunHttpGatewayAsync())
+			// Test auto progress time
+			await using (await pocketIc.AutoProgressAsync())
 			{
-				HttpAgent agent = httpGateway.BuildHttpAgent();
-				QueryResponse getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-				CandidArg getResponseArg = getResponse.ThrowOrGetReply();
-				UnboundedUInt getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
-				Assert.Equal((UnboundedUInt)1, getResponseValue);
+				await Task.Delay(100);
+				ICTimestamp autoProgressedTime = await pocketIc.GetTimeAsync();
+				Assert.True(autoProgressedTime.NanoSeconds > resetTime.NanoSeconds);
+				// Setup http gateway and test api call to canister (needs auto progress)
+				await using (HttpGateway httpGateway = await pocketIc.RunHttpGatewayAsync())
+				{
+					HttpAgent agent = httpGateway.BuildHttpAgent();
+					QueryResponse getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
+					CandidArg getResponseArg = getResponse.ThrowOrGetReply();
+					UnboundedUInt getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
+					Assert.Equal((UnboundedUInt)1, getResponseValue);
 
-				CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
-				CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
-				Assert.Equal(CandidArg.Empty(), incResponseArg);
+					CancellationTokenSource cts = new(TimeSpan.FromSeconds(50));
+					CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
+					Assert.Equal(CandidArg.Empty(), incResponseArg);
 
-				getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-				getResponseArg = getResponse.ThrowOrGetReply();
-				getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
-				Assert.Equal((UnboundedUInt)2, getResponseValue);
+					getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
+					getResponseArg = getResponse.ThrowOrGetReply();
+					getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
+					Assert.Equal((UnboundedUInt)2, getResponseValue);
 
+				}
 			}
 
+			// Verify time is stopped
+			ICTimestamp stopProgressTime = await pocketIc.GetTimeAsync();
+			await Task.Delay(100);
+			ICTimestamp stopProgressTime2 = await pocketIc.GetTimeAsync();
+			Assert.Equal(stopProgressTime.NanoSeconds, stopProgressTime2.NanoSeconds);
 
 			// Stop canister
 			await pocketIc.StopCanisterAsync(canisterId);

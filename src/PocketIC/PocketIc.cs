@@ -211,11 +211,11 @@ namespace EdjCase.ICP.PocketIC
 		}
 
 		/// <summary>
-		/// Enables automatic time progression for the IC instance until disposed
+		/// Enables automatic time/tick progression for the IC instance until disposed
 		/// </summary>
 		/// <param name="artificalDelay">Optional delay between time updates</param>
 		/// <returns>A disposable object that will stop auto progression when disposed</returns>
-		public async Task<IAsyncDisposable> AutoProgressTimeAsync(TimeSpan? artificalDelay = null)
+		public async Task<IAsyncDisposable> AutoProgressAsync(TimeSpan? artificalDelay = null)
 		{
 			await this.HttpClient.AutoProgressTimeAsync(this.InstanceId, artificalDelay);
 

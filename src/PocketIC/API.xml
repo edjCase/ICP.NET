@@ -982,9 +982,9 @@
             </summary>
             <param name="time">The timestamp to set</param>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.PocketIc.AutoProgressTimeAsync(System.Nullable{System.TimeSpan})">
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.AutoProgressAsync(System.Nullable{System.TimeSpan})">
             <summary>
-            Enables automatic time progression for the IC instance until disposed
+            Enables automatic time/tick progression for the IC instance until disposed
             </summary>
             <param name="artificalDelay">Optional delay between time updates</param>
             <returns>A disposable object that will stop auto progression when disposed</returns>
@@ -1290,7 +1290,7 @@
             Disposes of the server process
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.StartAsync(System.Nullable{EdjCase.ICP.PocketIC.LogLevel},System.Boolean)">
+        <member name="M:EdjCase.ICP.PocketIC.PocketIcServer.StartAsync(System.Nullable{EdjCase.ICP.PocketIC.LogLevel},System.Boolean,System.Nullable{System.Int32})">
             <summary>
             Starts the pocket-ic server process
             </summary>

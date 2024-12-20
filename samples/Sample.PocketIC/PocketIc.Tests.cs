@@ -16,10 +16,17 @@ namespace Sample.PocketIC
 	{
 		public PocketIcServer Server { get; private set; }
 
+		private static readonly int uniqueId = 0;
+		private static object lockObj = new object();
+
 		public PocketIcServerFixture()
 		{
-			// Start the server for all tests
-			this.Server = PocketIcServer.StartAsync(runtimeLogLevel: LogLevel.Debug, showErrorLogs: true).GetAwaiter().GetResult();
+			lock (lockObj)
+			{
+				// Start the server for all tests
+				this.Server = PocketIcServer.StartAsync(runtimeLogLevel: LogLevel.Debug, showErrorLogs: true, uniqueId: uniqueId).GetAwaiter().GetResult();
+				uniqueId++;
+			}
 		}
 
 		public void Dispose()
@@ -110,7 +117,7 @@ namespace Sample.PocketIC
 
 				await pocketIc.SetTimeAsync(ICTimestamp.Now());
 				// Let time progress so that update calls get processed
-				await using (await pocketIc.AutoProgressTimeAsync())
+				await using (await pocketIc.AutoProgressAsync())
 				{
 					await using (HttpGateway httpGateway = await pocketIc.RunHttpGatewayAsync())
 					{
