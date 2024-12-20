@@ -18,6 +18,7 @@ using EdjCase.ICP.Candid.Encodings;
 using System.Linq;
 using EdjCase.ICP.BLS;
 using System.Threading;
+using System.Security.Cryptography;
 
 namespace EdjCase.ICP.Agent.Agents
 {
@@ -128,7 +129,9 @@ namespace EdjCase.ICP.Agent.Agents
 
 			CallRequest BuildRequest(Principal sender, ICTimestamp now)
 			{
-				return new CallRequest(canisterId, method, arg, sender, now);
+				byte[] nonce = new byte[16];
+				RandomNumberGenerator.Fill(nonce);
+				return new CallRequest(canisterId, method, arg, sender, now, nonce);
 			}
 		}
 
@@ -172,7 +175,9 @@ namespace EdjCase.ICP.Agent.Agents
 
 			CallRequest BuildRequest(Principal sender, ICTimestamp now)
 			{
-				return new CallRequest(canisterId, method, arg, sender, now);
+				byte[] nonce = new byte[16];
+				RandomNumberGenerator.Fill(nonce);
+				return new CallRequest(canisterId, method, arg, sender, now, nonce);
 			}
 		}
 
