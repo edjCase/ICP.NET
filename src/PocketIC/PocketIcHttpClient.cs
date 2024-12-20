@@ -205,6 +205,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 	{
 		await this.DeleteAsync($"/instances/{id}");
 	}
+
 	/// <inheritdoc />
 	public async Task<CandidArg> QueryCallAsync(
 		int instanceId,
@@ -212,7 +213,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal effectivePrincipal)
+		EffectivePrincipal? effectivePrincipal = null)
 	{
 		return await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/read/query",
@@ -326,7 +327,11 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		return Principal.FromBytes(publicKey);
 	}
 
-	public async Task<IngressStatus> GetIngressStatusAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal)
+	/// <inheritdoc />
+	public async Task<IngressStatus> GetIngressStatusAsync(
+		int instanceId,
+		RequestId messageId,
+		EffectivePrincipal effectivePrincipal)
 	{
 		var data = new JsonObject
 		{
@@ -381,7 +386,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal effectivePrincipal)
+		EffectivePrincipal? effectivePrincipal = null)
 	{
 		return await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/update/submit_ingress_message",
@@ -399,7 +404,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg request,
-		EffectivePrincipal effectivePrincipal)
+		EffectivePrincipal? effectivePrincipal = null)
 	{
 		return await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/update/execute_ingress_message",
@@ -438,11 +443,11 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		Principal canisterId,
 		string method,
 		CandidArg arg,
-		EffectivePrincipal effectivePrincipal)
+		EffectivePrincipal? effectivePrincipal = null)
 	{
 		byte[] payload = arg.Encode();
 
-		JsonNode effectivePrincipalJson = EffectivePrincipalToJson(effectivePrincipal);
+		JsonNode effectivePrincipalJson = EffectivePrincipalToJson(effectivePrincipal ?? EffectivePrincipal.Canister(canisterId));
 
 		var options = new JsonObject
 		{

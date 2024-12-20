@@ -18,6 +18,8 @@ using EdjCase.ICP.Candid.Encodings;
 using System.Linq;
 using EdjCase.ICP.BLS;
 using System.Threading;
+using System.Security.Cryptography;
+using System.Diagnostics;
 
 namespace EdjCase.ICP.Agent.Agents
 {
@@ -128,7 +130,9 @@ namespace EdjCase.ICP.Agent.Agents
 
 			CallRequest BuildRequest(Principal sender, ICTimestamp now)
 			{
-				return new CallRequest(canisterId, method, arg, sender, now);
+				byte[] nonce = new byte[16];
+				RandomNumberGenerator.Fill(nonce);
+				return new CallRequest(canisterId, method, arg, sender, now, nonce);
 			}
 		}
 
@@ -172,7 +176,9 @@ namespace EdjCase.ICP.Agent.Agents
 
 			CallRequest BuildRequest(Principal sender, ICTimestamp now)
 			{
-				return new CallRequest(canisterId, method, arg, sender, now);
+				byte[] nonce = new byte[16];
+				RandomNumberGenerator.Fill(nonce);
+				return new CallRequest(canisterId, method, arg, sender, now, nonce);
 			}
 		}
 
@@ -313,7 +319,7 @@ namespace EdjCase.ICP.Agent.Agents
 				SubjectPublicKeyInfo publicKey = this.Identity.GetPublicKey();
 				principal = publicKey.ToPrincipal();
 			}
-			TRequest request = getRequest(principal, ICTimestamp.Future(TimeSpan.FromSeconds(10)));
+			TRequest request = getRequest(principal, ICTimestamp.Future(TimeSpan.FromMinutes(3)));
 			Dictionary<string, IHashable> content = request.BuildHashableItem();
 
 			SignedContent signedContent;

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using EdjCase.ICP.Candid.Crypto;
 using EdjCase.ICP.Candid.Encodings;
 using EdjCase.ICP.Candid.Models.Values;
@@ -136,13 +137,13 @@ namespace EdjCase.ICP.Candid.Models
 
 		private static UnboundedUInt EpochNowInNanoseconds()
 		{
-			ulong nanoseconds = (ulong)(((DateTime.UtcNow - epoch).TotalMilliseconds + REPLICA_PERMITTED_DRIFT_MILLISECONDS) * 1_000_000);
+			ulong nanoseconds = (ulong)((DateTime.UtcNow - epoch).TotalMilliseconds * 1_000_000);
 			return UnboundedUInt.FromUInt64(nanoseconds);
 		}
 
 		private static UnboundedUInt GetNanosecondsFromTimeSpan(TimeSpan timespanFromNow)
 		{
-			return (ulong)(timespanFromNow.Ticks / 100L);
+			return (ulong)(timespanFromNow.TotalMilliseconds * 1_000_000);
 		}
 	}
 }

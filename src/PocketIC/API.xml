@@ -130,6 +130,15 @@
             <param name="subnetId">The subnet id</param>
             <returns>The public key principal of the subnet</returns>
         </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.GetIngressStatusAsync(System.Int32,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Gets the status of an ingress message
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="requestId">The id of the request to check the status for</param>
+            <param name="effectivePrincipal">Optional effective principal for the call</param>
+            <returns></returns>
+        </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.SubmitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
             <summary>
             Submits an ingress message to a canister without waiting for execution
@@ -261,6 +270,49 @@
             The instance has been deleted
             </summary>
         </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.IngressStatus">
+            <summary>
+            A variant model representing the status of an ingress message
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.PocketIC.Client.IngressStatus.Type">
+            <summary>
+            The type of ingress status
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IngressStatus.AsOk">
+            <summary>
+            Gets the Ok variant data for the status
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IngressStatus.Ok(EdjCase.ICP.Agent.Responses.RequestStatus)">
+            <summary>
+            Creates a new Ok status with the variant data
+            </summary>
+            <param name="status">The request status data</param>
+            <returns>An Ok ingress variant model</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IngressStatus.NotFound">
+            <summary>
+            Creates a new NotFound status
+            </summary>
+            <returns>A NotFound ingress variant model</returns>
+        </member>
+        <member name="T:EdjCase.ICP.PocketIC.Client.IngressStatusType">
+            <summary>
+            The variant types of ingress status
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.IngressStatusType.NotFound">
+            <summary>
+            Not Found
+            </summary>
+        </member>
+        <member name="F:EdjCase.ICP.PocketIC.Client.IngressStatusType.Ok">
+            <summary>
+            Ok
+            </summary>
+        </member>
         <member name="T:EdjCase.ICP.PocketIC.Client.HttpsConfig">
             <summary>
             Configuration for HTTPS support
@@ -375,6 +427,26 @@
             <summary>
             The principal id
             </summary>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.EffectivePrincipal.None">
+            <summary>
+            Creates an empty effective principal
+            </summary>
+            <returns>An empty effective principal</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.EffectivePrincipal.Subnet(EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Creates an effective principal for a subnet
+            </summary>
+            <param name="id">The subnet id</param>
+            <returns>A subnet effective principal</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.EffectivePrincipal.Canister(EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Creates an effective principal for a canister
+            </summary>
+            <param name="id">The canister id</param>
+            <returns>A canister effective principal</returns>
         </member>
         <member name="T:EdjCase.ICP.PocketIC.Client.EffectivePrincipalType">
             <summary>
@@ -644,6 +716,9 @@
         <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetPublicKeyForSubnetAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal)">
             <inheritdoc />
         </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.GetIngressStatusAsync(System.Int32,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <inheritdoc />
+        </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.PocketIcHttpClient.SubmitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
             <inheritdoc />
         </member>
@@ -907,9 +982,9 @@
             </summary>
             <param name="time">The timestamp to set</param>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.PocketIc.AutoProgressTimeAsync(System.Nullable{System.TimeSpan})">
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.AutoProgressAsync(System.Nullable{System.TimeSpan})">
             <summary>
-            Enables automatic time progression for the IC instance until disposed
+            Enables automatic time/tick progression for the IC instance until disposed
             </summary>
             <param name="artificalDelay">Optional delay between time updates</param>
             <returns>A disposable object that will stop auto progression when disposed</returns>
@@ -934,6 +1009,14 @@
             </summary>
             <param name="useCache">Whether to use cached topology info. Defaults to true</param>
             <returns>List of subnet topology information</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.GetIngressStatusAsync(EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Gets the ingress status of the specified request
+            </summary>
+            <param name="requestId">The request ID to check</param>
+            <param name="effectivePrincipal">The effective principal for the request</param>
+            <returns>The ingress status of the request</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.GetCyclesBalanceAsync(EdjCase.ICP.Candid.Models.Principal)">
             <summary>

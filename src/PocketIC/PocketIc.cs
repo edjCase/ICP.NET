@@ -211,11 +211,11 @@ namespace EdjCase.ICP.PocketIC
 		}
 
 		/// <summary>
-		/// Enables automatic time progression for the IC instance until disposed
+		/// Enables automatic time/tick progression for the IC instance until disposed
 		/// </summary>
 		/// <param name="artificalDelay">Optional delay between time updates</param>
 		/// <returns>A disposable object that will stop auto progression when disposed</returns>
-		public async Task<IAsyncDisposable> AutoProgressTimeAsync(TimeSpan? artificalDelay = null)
+		public async Task<IAsyncDisposable> AutoProgressAsync(TimeSpan? artificalDelay = null)
 		{
 			await this.HttpClient.AutoProgressTimeAsync(this.InstanceId, artificalDelay);
 
@@ -262,9 +262,15 @@ namespace EdjCase.ICP.PocketIC
 			return topologies;
 		}
 
-		public async Task<IngressStatus> GetIngressStatusAsync(RequestId messageId, EffectivePrincipal effectivePrincipal)
+		/// <summary>
+		/// Gets the ingress status of the specified request
+		/// </summary>
+		/// <param name="requestId">The request ID to check</param>
+		/// <param name="effectivePrincipal">The effective principal for the request</param>
+		/// <returns>The ingress status of the request</returns>
+		public async Task<IngressStatus> GetIngressStatusAsync(RequestId requestId, EffectivePrincipal effectivePrincipal)
 		{
-			return await this.HttpClient.GetIngressStatusAsync(this.InstanceId, messageId, effectivePrincipal);
+			return await this.HttpClient.GetIngressStatusAsync(this.InstanceId, requestId, effectivePrincipal);
 		}
 
 		/// <summary>

@@ -62,7 +62,7 @@ namespace EdjCase.ICP.PocketIC
 			string binPath = GetBinPath();
 			EnsureExecutablePermission(binPath);
 
-			int pid = Process.GetCurrentProcess().Id;
+			string pid = Guid.NewGuid().ToString();
 			string picFilePrefix = $"pocket_ic_{pid}";
 			string portFilePath = Path.Combine(Path.GetTempPath(), $"{picFilePrefix}.port");
 
