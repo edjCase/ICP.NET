@@ -53,18 +53,16 @@ namespace EdjCase.ICP.PocketIC
 		/// </summary>
 		/// <param name="runtimeLogLevel">Outputs the runtime logs using Debug.WriteLine(...) with the specified log level. Null value disables the logging</param>
 		/// <param name="showErrorLogs">Outputs the error logs using Debug.WriteLine(...)</param>
-		/// <param name="uniqueId">Unique identifier for the server process. If null, the current process ID is used</param>
 		/// <returns>The instance of the PocketIcServer with the running process</returns>
 		public static async Task<PocketIcServer> StartAsync(
 			LogLevel? runtimeLogLevel = null,
-			bool showErrorLogs = true,
-			int? uniqueId = null
+			bool showErrorLogs = true
 		)
 		{
 			string binPath = GetBinPath();
 			EnsureExecutablePermission(binPath);
 
-			int pid = uniqueId ?? Process.GetCurrentProcess().Id;
+			string pid = Guid.NewGuid().ToString();
 			string picFilePrefix = $"pocket_ic_{pid}";
 			string portFilePath = Path.Combine(Path.GetTempPath(), $"{picFilePrefix}.port");
 

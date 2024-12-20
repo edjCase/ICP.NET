@@ -16,17 +16,12 @@ namespace Sample.PocketIC
 	{
 		public PocketIcServer Server { get; private set; }
 
-		private static readonly int uniqueId = 0;
-		private static object lockObj = new object();
 
 		public PocketIcServerFixture()
 		{
-			lock (lockObj)
-			{
-				// Start the server for all tests
-				this.Server = PocketIcServer.StartAsync(runtimeLogLevel: LogLevel.Debug, showErrorLogs: true, uniqueId: uniqueId).GetAwaiter().GetResult();
-				uniqueId++;
-			}
+			// Start the server for all tests
+			this.Server = PocketIcServer.StartAsync(runtimeLogLevel: LogLevel.Debug, showErrorLogs: true).GetAwaiter().GetResult();
+
 		}
 
 		public void Dispose()

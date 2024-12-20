@@ -319,8 +319,6 @@ namespace EdjCase.ICP.Agent.Agents
 				SubjectPublicKeyInfo publicKey = this.Identity.GetPublicKey();
 				principal = publicKey.ToPrincipal();
 			}
-			Debug.WriteLine("Now: " + ICTimestamp.Now());
-			Debug.WriteLine("Expiry: " + ICTimestamp.Future(TimeSpan.FromMinutes(3)));
 			TRequest request = getRequest(principal, ICTimestamp.Future(TimeSpan.FromMinutes(3)));
 			Dictionary<string, IHashable> content = request.BuildHashableItem();
 
