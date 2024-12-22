@@ -22,6 +22,16 @@ namespace EdjCase.ICP.Candid.Models
 		}
 
 		/// <summary>
+		/// Creates a request id from raw bytes, same as the constructor
+		/// </summary>
+		/// <param name="bytes">Raw request id bytes</param>
+		/// <returns>A request id object</returns>
+		public static RequestId FromBytes(byte[] bytes)
+		{
+			return new RequestId(bytes);
+		}
+
+		/// <summary>
 		/// Converts a hashable object into a request id
 		/// </summary>
 		/// <param name="properties">The properties of the object to hash</param>

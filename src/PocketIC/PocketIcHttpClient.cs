@@ -215,7 +215,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		CandidArg request,
 		EffectivePrincipal? effectivePrincipal = null)
 	{
-		return await this.ProcessIngressMessageInternalAsync(
+		JsonNode response = await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/read/query",
 			sender,
 			canisterId,
@@ -223,6 +223,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			request,
 			effectivePrincipal
 		);
+		return GetCandidReply(response);
 	}
 	/// <inheritdoc />
 	public async Task<List<SubnetTopology>> GetTopologyAsync(int instanceId)
@@ -380,7 +381,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 	}
 
 	/// <inheritdoc />
-	public async Task<CandidArg> SubmitIngressMessageAsync(
+	public async Task<RequestId> SubmitIngressMessageAsync(
 		int instanceId,
 		Principal sender,
 		Principal canisterId,
@@ -388,7 +389,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		CandidArg request,
 		EffectivePrincipal? effectivePrincipal = null)
 	{
-		return await this.ProcessIngressMessageInternalAsync(
+		JsonNode response = await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/update/submit_ingress_message",
 			sender,
 			canisterId,
@@ -396,7 +397,14 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			request,
 			effectivePrincipal
 		);
+		byte[]? requestIdBytes = response["message_id"]!.Deserialize<byte[]>();
+		if (requestIdBytes == null)
+		{
+			throw new Exception("Failed to get a valid response from canister. Response: " + response?.ToJsonString());
+		}
+		return RequestId.FromBytes(requestIdBytes);
 	}
+
 	/// <inheritdoc />
 	public async Task<CandidArg> ExecuteIngressMessageAsync(
 		int instanceId,
@@ -406,7 +414,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		CandidArg request,
 		EffectivePrincipal? effectivePrincipal = null)
 	{
-		return await this.ProcessIngressMessageInternalAsync(
+		JsonNode response = await this.ProcessIngressMessageInternalAsync(
 			$"/instances/{instanceId}/update/execute_ingress_message",
 			sender,
 			canisterId,
@@ -414,6 +422,18 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			request,
 			effectivePrincipal
 		);
+
+		return GetCandidReply(response);
+	}
+
+	private static CandidArg GetCandidReply(JsonNode response)
+	{
+		byte[]? candidBytes = response["Reply"]?.Deserialize<byte[]>();
+		if (candidBytes == null)
+		{
+			throw new Exception("Failed to get a valid response from canister. Response: " + response?.ToJsonString());
+		}
+		return CandidArg.FromBytes(candidBytes);
 	}
 
 	private static JsonNode EffectivePrincipalToJson(EffectivePrincipal effectivePrincipal)
@@ -437,7 +457,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		}
 	}
 
-	private async Task<CandidArg> ProcessIngressMessageInternalAsync(
+	private async Task<JsonNode> ProcessIngressMessageInternalAsync(
 		string route,
 		Principal sender,
 		Principal canisterId,
@@ -458,6 +478,11 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			["sender"] = Convert.ToBase64String(sender.Raw)
 		};
 		JsonNode? response = await this.PostJsonAsync(route, options);
+		return GetIngressReply(response);
+	}
+
+	private static JsonNode GetIngressReply(JsonNode? response)
+	{
 		if (response == null)
 		{
 			throw new Exception("Failed to get response from canister");
@@ -468,28 +493,26 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 			string code = response!["Err"]!["code"]!.Deserialize<string>()!;
 			throw new Exception($"Canister returned an error. Code: {code}, Message: {message}");
 		}
-		if (response["Ok"] == null)
+		JsonNode? okValue = response["Ok"];
+		if (okValue == null)
 		{
 			throw new Exception("Failed to get a valid response from canister. Response: " + response?.ToJsonString());
 		}
-		byte[]? candidBytes = response!["Ok"]!["Reply"]?.Deserialize<byte[]>();
-		if (candidBytes == null)
-		{
-			throw new Exception("Failed to get a valid response from canister. Response: " + response?.ToJsonString());
-		}
-		return CandidArg.FromBytes(candidBytes);
+		return okValue;
 	}
+
 	/// <inheritdoc />
-	public async Task AwaitIngressMessageAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal)
+	public async Task<CandidArg> AwaitIngressMessageAsync(int instanceId, RequestId requestId, EffectivePrincipal effectivePrincipal)
 	{
 		var request = new JsonObject
 		{
-			["message_id"] = Convert.ToBase64String(messageId.RawValue),
+			["message_id"] = Convert.ToBase64String(requestId.RawValue),
 			["effective_principal"] = EffectivePrincipalToJson(effectivePrincipal)
 		};
-		await this.PostJsonAsync($"/instances/{instanceId}/update/await_ingress_message", request);
-		// TODO
+		JsonNode? response = await this.PostJsonAsync($"/instances/{instanceId}/update/await_ingress_message", request);
+		return GetCandidReply(GetIngressReply(response));
 	}
+
 	/// <inheritdoc />
 	public async Task SetTimeAsync(int instanceId, ICTimestamp timestamp)
 	{
@@ -514,11 +537,13 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		await this.PostJsonAsync($"/instances/{instanceId}/auto_progress", request);
 	}
+
 	/// <inheritdoc />
 	public async Task StopProgressTimeAsync(int instanceId)
 	{
 		await this.PostJsonAsync($"/instances/{instanceId}/stop_progress", null);
 	}
+
 	/// <inheritdoc />
 	public async Task<ulong> AddCyclesAsync(int instanceId, Principal canisterId, ulong amount)
 	{
@@ -534,6 +559,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		return response["cycles"].Deserialize<ulong>()!;
 	}
+
 	/// <inheritdoc />
 	public async Task SetStableMemoryAsync(int instanceId, Principal canisterId, byte[] memory)
 	{
@@ -550,6 +576,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 	{
 		await this.PostJsonAsync($"/instances/{instanceId}/update/tick", null);
 	}
+
 	/// <inheritdoc />
 	public async Task MockCanisterHttpResponseAsync(
 		int instanceId,
@@ -572,6 +599,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		};
 		await this.PostJsonAsync($"/instances/{instanceId}/update/mock_canister_http", request);
 	}
+
 	/// <inheritdoc />
 	public async Task<Uri> StartHttpGatewayAsync(
 		int instanceId,
@@ -624,6 +652,7 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		string url = $"{protocol}://{domain}:{actualPort}/";
 		return new Uri(url);
 	}
+
 	/// <inheritdoc />
 	public async Task StopHttpGatewayAsync(int instanceId)
 	{

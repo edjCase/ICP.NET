@@ -116,6 +116,25 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 			);
 			Assert.Equal((UnboundedUInt)1, counterValue);
 
+			RequestId requestId = await pocketIc.UpdateCallRawAsynchronousAsync(
+				Principal.Anonymous(),
+				canisterId,
+				"inc"
+			);
+			CandidArg incResponse = await pocketIc.AwaitUpdateCallAsync(requestId, canisterId);
+			Assert.Equal(CandidArg.Empty(), incResponse);
+
+
+			// Test 'get' counter value after inc
+			counterValue = await pocketIc.QueryCallAsync<UnboundedUInt>(
+				Principal.Anonymous(),
+				canisterId,
+				"get"
+			);
+			Assert.Equal((UnboundedUInt)2, counterValue);
+
+
+
 			// Test tick doesn't throw
 			await pocketIc.TickAsync();
 
@@ -159,7 +178,7 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 					QueryResponse getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 					CandidArg getResponseArg = getResponse.ThrowOrGetReply();
 					UnboundedUInt getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
-					Assert.Equal((UnboundedUInt)1, getResponseValue);
+					Assert.Equal((UnboundedUInt)2, getResponseValue);
 
 					CancellationTokenSource cts = new(TimeSpan.FromSeconds(50));
 					CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
@@ -168,7 +187,7 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 					getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 					getResponseArg = getResponse.ThrowOrGetReply();
 					getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
-					Assert.Equal((UnboundedUInt)2, getResponseValue);
+					Assert.Equal((UnboundedUInt)3, getResponseValue);
 
 				}
 			}

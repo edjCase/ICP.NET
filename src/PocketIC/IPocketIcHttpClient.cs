@@ -163,24 +163,6 @@ public interface IPocketIcHttpClient
 		EffectivePrincipal effectivePrincipal);
 
 	/// <summary>
-	/// Submits an ingress message to a canister without waiting for execution
-	/// </summary>
-	/// <param name="instanceId">The id of the PocketIC instance</param>
-	/// <param name="sender">The principal sending the message</param>
-	/// <param name="canisterId">The target canister id</param>
-	/// <param name="method">The method name to call</param>
-	/// <param name="request">The raw candid request argument</param>
-	/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
-	/// <returns>The raw candid response</returns>
-	Task<CandidArg> SubmitIngressMessageAsync(
-		int instanceId,
-		Principal sender,
-		Principal canisterId,
-		string method,
-		CandidArg request,
-		EffectivePrincipal? effectivePrincipal = null);
-
-	/// <summary>
 	/// Executes an ingress message on a canister and waits for the response
 	/// </summary>
 	/// <param name="instanceId">The id of the PocketIC instance</param>
@@ -199,12 +181,30 @@ public interface IPocketIcHttpClient
 		EffectivePrincipal? effectivePrincipal = null);
 
 	/// <summary>
+	/// Submits an ingress message to a canister without waiting for execution
+	/// </summary>
+	/// <param name="instanceId">The id of the PocketIC instance</param>
+	/// <param name="sender">The principal sending the message</param>
+	/// <param name="canisterId">The target canister id</param>
+	/// <param name="method">The method name to call</param>
+	/// <param name="request">The raw candid request argument</param>
+	/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
+	/// <returns>The request id for the message</returns>
+	Task<RequestId> SubmitIngressMessageAsync(
+		int instanceId,
+		Principal sender,
+		Principal canisterId,
+		string method,
+		CandidArg request,
+		EffectivePrincipal? effectivePrincipal = null);
+
+	/// <summary>
 	/// Waits for an ingress message to complete execution
 	/// </summary>
 	/// <param name="instanceId">The id of the PocketIC instance</param>
-	/// <param name="messageId">The id of the ingress message</param>
+	/// <param name="requestId">The id of the ingress message</param>
 	/// <param name="effectivePrincipal">Effective principal for the call</param>
-	Task AwaitIngressMessageAsync(int instanceId, RequestId messageId, EffectivePrincipal effectivePrincipal);
+	Task<CandidArg> AwaitIngressMessageAsync(int instanceId, RequestId requestId, EffectivePrincipal effectivePrincipal);
 
 	/// <summary>
 	/// Sets the current time of the IC instance

@@ -1894,6 +1894,13 @@
         <member name="M:EdjCase.ICP.Candid.Models.RequestId.#ctor(System.Byte[])">
             <param name="rawValue">The raw id value</param>
         </member>
+        <member name="M:EdjCase.ICP.Candid.Models.RequestId.FromBytes(System.Byte[])">
+            <summary>
+            Creates a request id from raw bytes, same as the constructor
+            </summary>
+            <param name="bytes">Raw request id bytes</param>
+            <returns>A request id object</returns>
+        </member>
         <member name="M:EdjCase.ICP.Candid.Models.RequestId.FromObject(System.Collections.Generic.IDictionary{System.String,EdjCase.ICP.Candid.Models.IHashable},EdjCase.ICP.Candid.Crypto.IHashFunction)">
             <summary>
             Converts a hashable object into a request id

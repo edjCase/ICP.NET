@@ -139,18 +139,6 @@
             <param name="effectivePrincipal">Optional effective principal for the call</param>
             <returns></returns>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.SubmitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
-            <summary>
-            Submits an ingress message to a canister without waiting for execution
-            </summary>
-            <param name="instanceId">The id of the PocketIC instance</param>
-            <param name="sender">The principal sending the message</param>
-            <param name="canisterId">The target canister id</param>
-            <param name="method">The method name to call</param>
-            <param name="request">The raw candid request argument</param>
-            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
-            <returns>The raw candid response</returns>
-        </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.ExecuteIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
             <summary>
             Executes an ingress message on a canister and waits for the response
@@ -163,12 +151,24 @@
             <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>The raw candid response</returns>
         </member>
+        <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.SubmitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Submits an ingress message to a canister without waiting for execution
+            </summary>
+            <param name="instanceId">The id of the PocketIC instance</param>
+            <param name="sender">The principal sending the message</param>
+            <param name="canisterId">The target canister id</param>
+            <param name="method">The method name to call</param>
+            <param name="request">The raw candid request argument</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
+            <returns>The request id for the message</returns>
+        </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.AwaitIngressMessageAsync(System.Int32,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
             <summary>
             Waits for an ingress message to complete execution
             </summary>
             <param name="instanceId">The id of the PocketIC instance</param>
-            <param name="messageId">The id of the ingress message</param>
+            <param name="requestId">The id of the ingress message</param>
             <param name="effectivePrincipal">Effective principal for the call</param>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.Client.IPocketIcHttpClient.SetTimeAsync(System.Int32,EdjCase.ICP.Candid.Models.ICTimestamp)">
@@ -1206,6 +1206,33 @@
             <param name="arg">The raw candid argument for the call</param>
             <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
             <returns>A raw candid argument from the response</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallRawAsynchronousAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Submits an update call on a canister with a raw CandidArg and gets a request id 
+            in the response that can be awaited with <see cref="M:EdjCase.ICP.PocketIC.PocketIc.AwaitUpdateCallAsync(EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.Candid.Models.Principal)"/> method
+            </summary>
+            <param name="sender">The principal making the call</param>
+            <param name="canisterId">The target canister ID</param>
+            <param name="method">The method name to call</param>
+            <param name="arg">The raw candid argument for the call</param>
+            <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
+            <returns>A raw candid argument from the response</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.AwaitUpdateCallAsync(EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)">
+            <summary>
+            Awaits an update call response for a given request id, from the <see cref="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallRawAsynchronousAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)"/> method
+            </summary>
+            <param name="requestId">The request id to await</param>
+            <param name="effectivePrincipal">The effective principal for the request</param>
+            <returns>The response from the update call</returns>
+        </member>
+        <member name="M:EdjCase.ICP.PocketIC.PocketIc.AwaitUpdateCallAsync(EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.Candid.Models.Principal)">
+            <summary>
+            Awaits an update call response for a given request id, from the <see cref="M:EdjCase.ICP.PocketIC.PocketIc.UpdateCallRawAsynchronousAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.PocketIC.Client.EffectivePrincipal)"/> method
+            </summary>
+            <param name="requestId">The request id to await</param>
+            <param name="canisterId">The canister id for the request</param>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.PocketIc.DisposeAsync">
             <summary>

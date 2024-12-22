@@ -4,6 +4,7 @@ using EdjCase.ICP.Candid;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.PocketIC.Client;
 using EdjCase.ICP.PocketIC.Models;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace EdjCase.ICP.PocketIC
 {
@@ -745,7 +746,7 @@ namespace EdjCase.ICP.PocketIC
 			Principal sender,
 			Principal canisterId,
 			string method,
-			CandidArg arg,
+			CandidArg? arg = null,
 			EffectivePrincipal? effectivePrincipal = null
 		)
 		{
@@ -754,9 +755,58 @@ namespace EdjCase.ICP.PocketIC
 				sender,
 				canisterId,
 				method,
-				arg,
+				arg ?? CandidArg.Empty(),
 				effectivePrincipal
 			);
+		}
+
+		/// <summary>
+		/// Submits an update call on a canister with a raw CandidArg and gets a request id 
+		/// in the response that can be awaited with <see cref="AwaitUpdateCallAsync(RequestId, Principal)"/> method
+		/// </summary>
+		/// <param name="sender">The principal making the call</param>
+		/// <param name="canisterId">The target canister ID</param>
+		/// <param name="method">The method name to call</param>
+		/// <param name="arg">The raw candid argument for the call</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
+		/// <returns>A raw candid argument from the response</returns>
+		public async Task<RequestId> UpdateCallRawAsynchronousAsync(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			CandidArg? arg = null,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+		{
+			return await this.HttpClient.SubmitIngressMessageAsync(
+				this.InstanceId,
+				sender,
+				canisterId,
+				method,
+				arg ?? CandidArg.Empty(),
+				effectivePrincipal
+			);
+		}
+
+		/// <summary>
+		/// Awaits an update call response for a given request id, from the <see cref="UpdateCallRawAsynchronousAsync"/> method
+		/// </summary>
+		/// <param name="requestId">The request id to await</param>
+		/// <param name="effectivePrincipal">The effective principal for the request</param>
+		/// <returns>The response from the update call</returns>
+		public async Task<CandidArg> AwaitUpdateCallAsync(RequestId requestId, EffectivePrincipal effectivePrincipal)
+		{
+			return await this.HttpClient.AwaitIngressMessageAsync(this.InstanceId, requestId, effectivePrincipal);
+		}
+
+		/// <summary>
+		/// Awaits an update call response for a given request id, from the <see cref="UpdateCallRawAsynchronousAsync"/> method
+		/// </summary>
+		/// <param name="requestId">The request id to await</param>
+		/// <param name="canisterId">The canister id for the request</param>
+		public async Task<CandidArg> AwaitUpdateCallAsync(RequestId requestId, Principal canisterId)
+		{
+			return await this.AwaitUpdateCallAsync(requestId, EffectivePrincipal.Canister(canisterId));
 		}
 
 		/// <summary>
