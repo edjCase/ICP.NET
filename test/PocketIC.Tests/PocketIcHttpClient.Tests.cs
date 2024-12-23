@@ -81,6 +81,7 @@ public class PocketIcHttpClientTests : IClassFixture<PocketIcServerFixture>
 		// bool validSignature = await client.VerifySignatureAsync(message, publicKey, subnetPublicKey, signature);
 		// Assert.True(validSignature);
 
+
 		// Delete the instance
 		await client.DeleteInstanceAsync(instanceId);
 

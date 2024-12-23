@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using EdjCase.ICP.Agent.Agents;
@@ -205,6 +206,47 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 		{
 			List<Instance> instances = await httpClient.GetInstancesAsync();
 			Assert.Equal(InstanceStatus.Deleted, instances[instanceId.Value].Status);
+		}
+	}
+
+
+	[Fact]
+	public async Task Test_MockHttp()
+	{
+		SubnetConfig nnsSubnet = SubnetConfig.New();
+
+		IPocketIcHttpClient httpClient = new PocketIcHttpClient(new System.Net.Http.HttpClient(), this.url, TimeSpan.FromSeconds(5));
+		// Create new pocketic instance for test, then dispose it
+		await using (PocketIc pocketIc = await PocketIc.CreateAsync(httpClient, nnsSubnet: nnsSubnet))
+		{
+
+			byte[] wasmModule = File.ReadAllBytes("CanisterWasmModules/http_outcall.wasm");
+
+			Principal canisterId = await pocketIc.CreateAndInstallCanisterAsync(
+				wasmModule,
+				CandidArg.Empty(),
+				cyclesAmount: 1_000_000_000_000
+			);
+
+			CanisterHttpReply httpResponse = new CanisterHttpReply
+			{
+				Body = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+				Headers = new List<(string, string)>
+				{
+					("Content-Type", "application/octet-stream")
+				},
+				Status = HttpStatusCode.OK
+			};
+			CandidArg response = await pocketIc.UpdateCallRawWithHttpOutcallMockAsync(
+				Principal.Anonymous(),
+				canisterId,
+				"http_outcall",
+				CandidArg.Empty(),
+				httpResponse
+			);
+
+			byte[] returnedBytes = response.ToObjects<byte[]>();
+			Assert.Equal(httpResponse.Body, returnedBytes);
 		}
 	}
 }

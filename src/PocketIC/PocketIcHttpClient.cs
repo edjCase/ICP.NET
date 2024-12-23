@@ -245,8 +245,9 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		}
 		return ICTimestamp.FromNanoSeconds(response!["nanos_since_epoch"].Deserialize<ulong>()!);
 	}
+
 	/// <inheritdoc />
-	public async Task<CanisterHttpRequest> GetCanisterHttpAsync(int instanceId)
+	public async Task<List<CanisterHttpRequest>> GetCanisterHttpAsync(int instanceId)
 	{
 		JsonNode? response = await this.GetJsonAsync($"/instances/{instanceId}/read/get_canister_http");
 
@@ -254,21 +255,28 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		{
 			throw new Exception("There was no json response from the server");
 		}
+		return response
+		.AsArray()
+		.Select(r => DeserializeCanisterHttpRequest(r!))
+		.ToList();
+	}
+
+	private static CanisterHttpRequest DeserializeCanisterHttpRequest(JsonNode node)
+	{
 		return new CanisterHttpRequest
 		{
-			Body = response!["body"].Deserialize<byte[]>()!,
-			Headers = response!["headers"]!.AsObject()!.Select(kv => new CanisterHttpHeader
-			{
-				Name = kv.Key,
-				Value = kv.Value.Deserialize<string>()!
-			}).ToList(),
-			Url = response!["url"].Deserialize<string>()!,
-			SubnetId = Principal.FromBytes(response!["subnet_id"].Deserialize<byte[]>()!),
-			HttpMethod = Enum.Parse<CanisterHttpMethod>(response!["http_method"].Deserialize<string>()!),
-			MaxResponseBytes = response!["max_response_bytes"].Deserialize<ulong?>()!,
-			RequestId = response!["request_id"].Deserialize<ulong>()!
+			Body = node["body"].Deserialize<byte[]>()!,
+			Headers = node["headers"]!.AsArray()
+				!.Select(h => (h!["name"].Deserialize<string>()!, h!["value"].Deserialize<string>()!))
+				.ToList(),
+			Url = node["url"].Deserialize<string>()!,
+			SubnetId = Principal.FromBytes(node["subnet_id"]!["subnet_id"].Deserialize<byte[]>()!),
+			HttpMethod = Enum.Parse<CanisterHttpMethod>(node["http_method"].Deserialize<string>()!, ignoreCase: true),
+			MaxResponseBytes = node["max_response_bytes"].Deserialize<ulong?>()!,
+			RequestId = node["request_id"].Deserialize<ulong>()!
 		};
 	}
+
 	/// <inheritdoc />
 	public async Task<ulong> GetCyclesBalanceAsync(int instanceId, Principal canisterId)
 	{
@@ -583,18 +591,21 @@ public class PocketIcHttpClient : IPocketIcHttpClient
 		ulong requestId,
 		Principal subnetId,
 		CanisterHttpResponse response,
-		List<CanisterHttpResponse> additionalResponses
+		List<CanisterHttpResponse>? additionalResponses = null
 	)
 	{
 		var request = new JsonObject
 		{
 			["request_id"] = JsonValue.Create(requestId),
-			["subnet_id"] = JsonValue.Create(subnetId.Raw),
+			["subnet_id"] = new JsonObject(new Dictionary<string, JsonNode?>
+			{
+				["subnet_id"] = Convert.ToBase64String(subnetId.Raw)
+			}),
 			["response"] = PocketIcHttpClient.SerializeCanisterHttpResponse(response),
 			["additional_responses"] = JsonValue.Create(
 				additionalResponses
-				.Select(r => PocketIcHttpClient.SerializeCanisterHttpResponse(r))
-				.ToArray()
+				?.Select(r => PocketIcHttpClient.SerializeCanisterHttpResponse(r))
+				.ToArray() ?? []
 			)
 		};
 		await this.PostJsonAsync($"/instances/{instanceId}/update/mock_canister_http", request);

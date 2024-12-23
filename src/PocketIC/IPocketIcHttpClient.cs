@@ -1,3 +1,4 @@
+using System.Net;
 using EdjCase.ICP.Agent.Responses;
 using EdjCase.ICP.Candid.Models;
 
@@ -110,13 +111,6 @@ public interface IPocketIcHttpClient
 	/// <param name="instanceId">The id of the PocketIC instance</param>
 	/// <returns>The current timestamp</returns>
 	Task<ICTimestamp> GetTimeAsync(int instanceId);
-
-	/// <summary>
-	/// Gets pending canister HTTP requests
-	/// </summary>
-	/// <param name="instanceId">The id of the PocketIC instance</param>
-	/// <returns>The pending canister HTTP request</returns>
-	Task<CanisterHttpRequest> GetCanisterHttpAsync(int instanceId);
 
 	/// <summary>
 	/// Gets the cycles balance of a canister
@@ -249,20 +243,28 @@ public interface IPocketIcHttpClient
 	/// <param name="instanceId">The id of the IC instance</param>
 	Task TickAsync(int instanceId);
 
+
 	/// <summary>
-	/// Mocks a response to a canister HTTP request
+	/// Gets pending canister HTTP Outcall requests (not http calls to a canister)
+	/// </summary>
+	/// <param name="instanceId">The id of the PocketIC instance</param>
+	/// <returns>The pending canister HTTP request</returns>
+	Task<List<CanisterHttpRequest>> GetCanisterHttpAsync(int instanceId);
+
+	/// <summary>
+	/// Mocks a response to a canister HTTP Outcall request (not an http call to a canister)
 	/// </summary>
 	/// <param name="instanceId">The id of the IC instance</param>
 	/// <param name="requestId">The id of the HTTP request</param>
 	/// <param name="subnetId">The subnet id of the canister</param>
 	/// <param name="response">The response to send</param>
-	/// <param name="additionalResponses">Additional responses to send</param>
+	/// <param name="additionalResponses">Optional Additional responses to send</param>
 	Task MockCanisterHttpResponseAsync(
 		int instanceId,
 		ulong requestId,
 		Principal subnetId,
 		CanisterHttpResponse response,
-		List<CanisterHttpResponse> additionalResponses
+		List<CanisterHttpResponse>? additionalResponses = null
 	);
 
 	/// <summary>
@@ -683,7 +685,7 @@ public class CanisterHttpRequest
 	/// <summary>
 	/// The HTTP headers for the request
 	/// </summary>
-	public required List<CanisterHttpHeader> Headers { get; set; }
+	public required List<(string Key, string Value)> Headers { get; set; }
 
 	/// <summary>
 	/// The body of the request
@@ -694,22 +696,6 @@ public class CanisterHttpRequest
 	/// Optional maximum size for the response
 	/// </summary>
 	public required ulong? MaxResponseBytes { get; set; }
-}
-
-/// <summary>
-/// HTTP header for canister requests/responses
-/// </summary>
-public class CanisterHttpHeader
-{
-	/// <summary>
-	/// The header name
-	/// </summary>
-	public required string Name { get; set; }
-
-	/// <summary>
-	/// The header value
-	/// </summary>
-	public required string Value { get; set; }
 }
 
 /// <summary>
@@ -734,7 +720,7 @@ public enum CanisterHttpMethod
 /// <summary>
 /// Base class for HTTP responses to canister HTTP requests
 /// </summary>
-public class CanisterHttpResponse { }
+public abstract class CanisterHttpResponse { }
 
 /// <summary>
 /// Successful HTTP response to a canister HTTP request
@@ -744,12 +730,12 @@ public class CanisterHttpReply : CanisterHttpResponse
 	/// <summary>
 	/// The HTTP status code
 	/// </summary>
-	public required ushort Status { get; set; }
+	public required HttpStatusCode Status { get; set; }
 
 	/// <summary>
 	/// The response headers
 	/// </summary>
-	public required List<CanisterHttpHeader> Headers { get; set; }
+	public required List<(string Name, string Value)> Headers { get; set; }
 
 	/// <summary>
 	/// The response body

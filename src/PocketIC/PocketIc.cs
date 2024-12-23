@@ -788,6 +788,60 @@ namespace EdjCase.ICP.PocketIC
 			);
 		}
 
+
+		/// <summary>
+		/// Executes an update call on a canister with a raw CandidArg and raw CandidArg response with a single HTTP outcall mock response.
+		/// If there are multiple outcalls, only one will be mocked, and if there are none, an exception will be thrown.
+		/// NOTE: If you want more advanced outcall mocking, use the <see cref="IPocketIcHttpClient"/> directly
+		/// </summary>
+		/// <param name="sender">The principal making the call</param>
+		/// <param name="canisterId">The target canister ID</param>
+		/// <param name="method">The method name to call</param>
+		/// <param name="arg">The raw candid argument for the call</param>
+		/// <param name="response">The HTTP outcall mock response</param>
+		/// <param name="additionalResponses">Optional additional HTTP outcall mock responses</param>
+		/// <param name="effectivePrincipal">Optional effective principal for the call, defaults to canister id</param>
+		/// <returns>A raw candid argument from the response</returns>
+		public async Task<CandidArg> UpdateCallRawWithHttpOutcallMockAsync(
+			Principal sender,
+			Principal canisterId,
+			string method,
+			CandidArg arg,
+			CanisterHttpResponse response,
+			List<CanisterHttpResponse>? additionalResponses = null,
+			EffectivePrincipal? effectivePrincipal = null
+		)
+		{
+			effectivePrincipal ??= EffectivePrincipal.Canister(canisterId);
+			RequestId requestId = await this.HttpClient.SubmitIngressMessageAsync(
+				this.InstanceId,
+				sender,
+				canisterId,
+				method,
+				arg,
+				effectivePrincipal
+			);
+			await this.TickAsync(2);
+			List<CanisterHttpRequest> outcalls = await this.HttpClient.GetCanisterHttpAsync(this.InstanceId);
+			if (outcalls.Count < 1)
+			{
+				throw new Exception("No outcalls found");
+			}
+			CanisterHttpRequest outcall = outcalls[0];
+
+
+			await this.HttpClient.MockCanisterHttpResponseAsync(
+				this.InstanceId,
+				outcall.RequestId,
+				outcall.SubnetId,
+				response,
+				additionalResponses
+			);
+
+			return await this.HttpClient.AwaitIngressMessageAsync(this.InstanceId, requestId, effectivePrincipal);
+		}
+
+
 		/// <summary>
 		/// Awaits an update call response for a given request id, from the <see cref="UpdateCallRawAsynchronousAsync"/> method
 		/// </summary>
@@ -908,7 +962,6 @@ namespace EdjCase.ICP.PocketIC
 				candidConverter
 			);
 		}
-
 	}
 
 	/// <summary>
