@@ -14,7 +14,7 @@ namespace EdjCase.ICP.Agent.Responses
 		/// The implementation may also return unversioned to indicate that it does not
 		/// comply to a particular version, e.g. in between releases.
 		/// </summary>
-		public string ICApiVersion { get; }
+		public string? ICApiVersion { get; }
 
 		/// <summary>
 		/// Optional. Identifies the implementation of the Internet Computer Protocol,
@@ -44,7 +44,7 @@ namespace EdjCase.ICP.Agent.Responses
 		/// </summary>
 		public byte[]? DevelopmentRootKey { get; }
 
-		/// <param name="icApiVersion">Identifies the interface version supported, i.e. the version of the present
+		/// <param name="icApiVersion">Optional. Identifies the interface version supported, i.e. the version of the present
 		/// document that the internet computer aims to support, e.g. `0.8.1`.
 		/// The implementation may also return unversioned to indicate that it does not
 		/// comply to a particular version, e.g. in between releases.</param>
@@ -61,7 +61,7 @@ namespace EdjCase.ICP.Agent.Responses
 		/// Internet Computer, agents must have an independent trustworthy source for this data,
 		/// and must not be tempted to fetch it from this insecure location</param>
 		public StatusResponse(
-			string icApiVersion,
+			string? icApiVersion,
 			string? implementationSource,
 			string? implementationVersion,
 			string? implementationRevision,
@@ -118,11 +118,6 @@ namespace EdjCase.ICP.Agent.Responses
 			}
 
 			reader.ReadEndMap();
-
-			if (icApiVersion == null)
-			{
-				throw new CborContentException("Missing field: " + Properties.IC_API_VERSION);
-			}
 
 			return new StatusResponse(icApiVersion, implementationSource, implementationVersion, implementationRevision, developmentRootKey);
 		}
