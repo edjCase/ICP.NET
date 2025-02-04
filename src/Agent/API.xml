@@ -1206,7 +1206,7 @@
             </summary>
         </member>
         <member name="M:EdjCase.ICP.Agent.Responses.StatusResponse.#ctor(System.String,System.String,System.String,System.String,System.Byte[])">
-            <param name="icApiVersion">Identifies the interface version supported, i.e. the version of the present
+            <param name="icApiVersion">Optional. Identifies the interface version supported, i.e. the version of the present
             document that the internet computer aims to support, e.g. `0.8.1`.
             The implementation may also return unversioned to indicate that it does not
             comply to a particular version, e.g. in between releases.</param>

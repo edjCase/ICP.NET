@@ -299,15 +299,7 @@ namespace EdjCase.ICP.Agent.Agents
 			HttpResponse httpResponse = await this.httpClient.GetAsync("/api/v2/status", cancellationToken);
 			await httpResponse.ThrowIfErrorAsync();
 			byte[] bytes = await httpResponse.GetContentAsync();
-			try
-			{
-				return StatusResponse.ReadCbor(new CborReader(bytes));
-			}
-			catch (Exception ex)
-			{
-				string textResponse = Encoding.UTF8.GetString(bytes);
-				throw new Exception("Unable to parse status response CBOR.\nUTF-8 content: " + textResponse, ex);
-			}
+			return StatusResponse.ReadCbor(new CborReader(bytes));
 		}
 
 		private async Task<(HttpResponse Response, RequestId RequestId)> SendAsync<TRequest>(
