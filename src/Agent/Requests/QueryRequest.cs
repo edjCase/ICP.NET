@@ -65,7 +65,7 @@ namespace EdjCase.ICP.Agent.Requests
 			this.Arg = arg ?? throw new ArgumentNullException(nameof(arg));
 			this.Sender = sender ?? throw new ArgumentNullException(nameof(sender));
 			this.IngressExpiry = ingressExpiry ?? throw new ArgumentNullException(nameof(ingressExpiry));
-			this.Nonce = nonce ?? throw new ArgumentNullException(nameof(nonce));
+			this.Nonce = nonce;
 		}
 
 		/// <inheritdoc />

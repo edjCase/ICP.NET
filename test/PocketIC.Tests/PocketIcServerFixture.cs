@@ -1,5 +1,6 @@
 
 
+using EdjCase.ICP.BLS;
 using System;
 
 namespace EdjCase.ICP.PocketIC.Tests;
@@ -12,10 +13,12 @@ public class PocketIcServerFixture : IDisposable
 	{
 		// Start the server for all tests
 		this.Server = PocketIcServer.StartAsync(runtimeLogLevel: LogLevel.Debug, showErrorLogs: true).GetAwaiter().GetResult();
+		DefaultBlsCryptograhy.Bypass = true;
 	}
 
 	public void Dispose()
 	{
+		DefaultBlsCryptograhy.Bypass = false;
 		// Stop the server after all tests
 		if (this.Server != null)
 		{

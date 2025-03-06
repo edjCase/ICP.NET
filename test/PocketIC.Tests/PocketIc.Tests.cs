@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Agent.Responses;
+using EdjCase.ICP.BLS;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.PocketIC.Client;
 using EdjCase.ICP.PocketIC.Models;
@@ -23,6 +24,7 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 	{
 		this.fixture = fixture;
 	}
+
 
 	[Fact]
 	public async Task Test()

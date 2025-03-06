@@ -29,6 +29,7 @@ namespace WebSockets.Tests
 		[Fact]
 		public async Task ValidCallAndClose()
 		{
+			DefaultBlsCryptograhy.Bypass = true;
 			int onMessageCallCount = 0;
 			int onOpenCallCount = 0;
 			int onErrorCallCount = 0;
@@ -174,11 +175,13 @@ namespace WebSockets.Tests
 			Assert.Equal(1, onMessageCallCount);
 			Assert.Equal(0, onErrorCallCount);
 			Assert.Equal(1, onCloseCallCount);
+			DefaultBlsCryptograhy.Bypass = false;
 		}
 
 		[Fact]
 		public async Task InvalidAck_Close()
 		{
+			DefaultBlsCryptograhy.Bypass = true;
 			int onMessageCallCount = 0;
 			int onOpenCallCount = 0;
 			int onErrorCallCount = 0;
@@ -312,6 +315,8 @@ namespace WebSockets.Tests
 			Assert.Equal(1, onMessageCallCount);
 			Assert.Equal(1, onErrorCallCount);
 			Assert.Equal(0, onCloseCallCount);
+
+			DefaultBlsCryptograhy.Bypass = false;
 		}
 
 
