@@ -8,8 +8,7 @@ using System.Linq;
 using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.Candid.Mapping;
-using EdjCase.ICP.Candid.Models.Values;
-using EdjCase.ICP.Agent.Responses;
+using EdjCase.ICP.Candid.Models.Values;
 using System.Threading.Tasks;
 using EdjCase.ICP.Candid;
 using Org.BouncyCastle.Asn1.Cms;
@@ -1333,14 +1332,10 @@ namespace EdjCase.ICP.ClientGenerator
 			}
 			if (isQuery)
 			{
-				const string responseName = "response";
-				// `QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, {methodName}, arg);`
+				const string responseName = "reply";
+				// `CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, {methodName}, arg);`
 				StatementSyntax invokeQueryCall = this.GenerateQueryCall(candidName, argName, responseName);
 				statements.Add(invokeQueryCall);
-
-				// `CandidArg reply = response.ThrowOrGetReply();`
-				StatementSyntax invokeThrowOrGetReply = this.GenerateThrowOrGetReply(variableName, responseName);
-				statements.Add(invokeThrowOrGetReply);
 
 			}
 			else
@@ -1384,38 +1379,11 @@ namespace EdjCase.ICP.ClientGenerator
 			return SyntaxFactory.Block(statements);
 		}
 
-		private StatementSyntax GenerateThrowOrGetReply(string variableName, string responseName)
-		{
-			return SyntaxFactory.LocalDeclarationStatement(
-				SyntaxFactory.VariableDeclaration(
-					SyntaxFactory.IdentifierName(typeof(CandidArg).FullName!)
-				)
-				.WithVariables(
-					SyntaxFactory.SingletonSeparatedList(
-						SyntaxFactory.VariableDeclarator(
-							SyntaxFactory.Identifier(variableName)
-						)
-						.WithInitializer(
-							SyntaxFactory.EqualsValueClause(
-								SyntaxFactory.InvocationExpression(
-									SyntaxFactory.MemberAccessExpression(
-										SyntaxKind.SimpleMemberAccessExpression,
-										SyntaxFactory.IdentifierName(responseName),
-										SyntaxFactory.IdentifierName(nameof(QueryResponse.ThrowOrGetReply))
-									)
-								)
-							)
-						)
-					)
-				)
-			);
-		}
-
 		private StatementSyntax GenerateQueryCall(string methodName, string argName, string responseName)
 		{
 			return SyntaxFactory.LocalDeclarationStatement(
 					SyntaxFactory.VariableDeclaration(
-						SyntaxFactory.IdentifierName(typeof(QueryResponse).FullName!)
+						SyntaxFactory.IdentifierName(typeof(CandidArg).FullName!)
 					)
 					.WithVariables(
 						SyntaxFactory.SingletonSeparatedList(

@@ -1,9 +1,8 @@
-﻿using EdjCase.ICP.Agent.Agents;
+using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.Candid;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using EdjCase.ICP.Agent.Responses;
 
 namespace Test
 {
