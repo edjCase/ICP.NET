@@ -1,10 +1,6 @@
 using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Agent.Responses;
-using EdjCase.ICP.Candid.Models;
 using Microsoft.AspNetCore.Mvc;
-using Sample.Shared.Governance;
-using Sample.Shared.Governance.Models;
-using System.Threading;
 
 namespace Sample.RestAPI.Controllers
 {
@@ -30,13 +26,6 @@ namespace Sample.RestAPI.Controllers
 			StatusResponse status = await this.Agent.GetReplicaStatusAsync();
 			return this.Ok(status);
 		}
-
-		[Route("api_boundary_nodes/{nodeId}/domain")]
-		[HttpGet]
-		public async Task<IActionResult> GetApiBoundaryNodeDomain(string nodeId)
-		{
-			HttpResponseMessage httpResponse = await this.HttpClient.GetAsync($"/api_boundary_nodes/{nodeId}/domain");
-			return this.Ok(await httpResponse.Content.ReadAsStringAsync());
-		}
 	}
+
 }

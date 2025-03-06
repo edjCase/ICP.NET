@@ -1,20 +1,14 @@
 using EdjCase.ICP.Agent.Models;
-using EdjCase.ICP.Agent.Identities;
 using EdjCase.ICP.Agent.Requests;
 using EdjCase.ICP.Agent.Responses;
-using EdjCase.ICP.Candid.Crypto;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.Candid.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using EdjCase.ICP.Agent.Agents.Http;
 using System.Formats.Cbor;
-using EdjCase.ICP.BLS;
 using System.Threading;
-using System.Security.Cryptography;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace EdjCase.ICP.Agent.Agents
 {
@@ -41,7 +35,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="skipCertificateValidation">If true, will skip response certificate validation. Defaults to false</param>
 		public HttpAgent(Uri? httpBoundryNodeUrl = null, bool skipCertificateValidation = false)
 		{
-			this.httpClient = new DefaultHttpClient(new HttpClient()
+			this.httpClient = new DefaultHttpClient(new HttpClient
 			{
 				BaseAddress = httpBoundryNodeUrl ?? new Uri("https://icp-api.io/")
 			});
