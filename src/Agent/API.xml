@@ -1244,6 +1244,11 @@
             It is set to just under 2MB.
             </summary>
         </member>
+        <member name="P:EdjCase.ICP.Agent.Standards.AssetCanister.AssetCanisterApiClient.Identity">
+            <summary>
+            The identity to use for requests.
+            </summary>
+        </member>
         <member name="P:EdjCase.ICP.Agent.Standards.AssetCanister.AssetCanisterApiClient.Agent">
             <summary>
             The IC agent
@@ -1259,12 +1264,13 @@
             The optional custom candid converter for request and response objects
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Standards.AssetCanister.AssetCanisterApiClient.#ctor(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.CandidConverter)">
+        <member name="M:EdjCase.ICP.Agent.Standards.AssetCanister.AssetCanisterApiClient.#ctor(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Agent.Identities.IIdentity,EdjCase.ICP.Candid.CandidConverter)">
             <summary>
             Initializes a new instance of the <see cref="T:EdjCase.ICP.Agent.Standards.AssetCanister.AssetCanisterApiClient"/> class.
             </summary>
             <param name="agent">The agent used for communication.</param>
             <param name="canisterId">The ID of the asset canister.</param>
+            <param name="identity">The identity to use for requests (optional).</param>
             <param name="converter">The Candid converter to use for encoding and decoding values (optional).</param>
         </member>
         <member name="M:EdjCase.ICP.Agent.Standards.AssetCanister.AssetCanisterApiClient.UploadAssetSimpleAsync(System.String,System.String,System.String,System.Byte[],System.Byte[])">
@@ -2895,6 +2901,11 @@
             A pre-generated client for the ICRC1 standard
             </summary>
         </member>
+        <member name="P:EdjCase.ICP.Agent.Standards.ICRC1.ICRC1Client.Identity">
+            <summary>
+            Identity to use for requests
+            </summary>
+        </member>
         <member name="P:EdjCase.ICP.Agent.Standards.ICRC1.ICRC1Client.Agent">
             <summary>
             Agent to use to make requests to the IC
@@ -2905,12 +2916,13 @@
             The id of the canister to make requests to
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Standards.ICRC1.ICRC1Client.#ctor(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal)">
+        <member name="M:EdjCase.ICP.Agent.Standards.ICRC1.ICRC1Client.#ctor(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Agent.Identities.IIdentity)">
             <summary>
             Primary constructor
             </summary>
             <param name="agent">Agent to use to make requests to the IC</param>
             <param name="canisterId">The id of the canister to make requests to</param>
+            <param name="identity">Optional. The identity to use for requests</param>
         </member>
         <member name="M:EdjCase.ICP.Agent.Standards.ICRC1.ICRC1Client.MetaData">
             <summary>

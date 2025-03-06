@@ -1,4 +1,5 @@
 using EdjCase.ICP.Agent.Agents;
+using EdjCase.ICP.Agent.Identities;
 using EdjCase.ICP.Agent.Standards.ICRC1.Models;
 using EdjCase.ICP.Candid.Models;
 using System.Collections.Generic;
@@ -11,6 +12,10 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 	/// </summary>
 	public class ICRC1Client
 	{
+		/// <summary>
+		/// Identity to use for requests
+		/// </summary>
+		public IIdentity? Identity { get; set; }
 		/// <summary>
 		/// Agent to use to make requests to the IC
 		/// </summary>
@@ -26,10 +31,12 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		/// </summary>
 		/// <param name="agent">Agent to use to make requests to the IC</param>
 		/// <param name="canisterId">The id of the canister to make requests to</param>
-		public ICRC1Client(IAgent agent, Principal canisterId)
+		/// <param name="identity">Optional. The identity to use for requests</param>
+		public ICRC1Client(IAgent agent, Principal canisterId, IIdentity? identity)
 		{
 			this.Agent = agent;
 			this.CanisterId = canisterId;
+			this.Identity = identity;
 		}
 
 		/// <summary>
@@ -39,7 +46,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<List<MetaData>> MetaData()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_meta_data", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_meta_data", arg, identity: this.Identity);
 			return reply.ToObjects<List<MetaData>>();
 		}
 
@@ -50,7 +57,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<string> Name()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_name", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_name", arg, identity: this.Identity);
 			return reply.ToObjects<string>();
 		}
 
@@ -61,7 +68,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<string> Symbol()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_symbol", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_symbol", arg, identity: this.Identity);
 			return reply.ToObjects<string>();
 		}
 
@@ -72,7 +79,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<int> Decimals()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_decimals", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_decimals", arg, identity: this.Identity);
 			return reply.ToObjects<byte>();
 		}
 
@@ -83,7 +90,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<UnboundedUInt> Fee()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_fee", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_fee", arg, identity: this.Identity);
 			return reply.ToObjects<UnboundedUInt>();
 		}
 
@@ -94,7 +101,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<UnboundedUInt> TotalSupply()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_total_supply", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_total_supply", arg, identity: this.Identity);
 			return reply.ToObjects<UnboundedUInt>();
 		}
 
@@ -105,7 +112,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<OptionalValue<Account>> MintingAccount()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_minting_account", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_minting_account", arg, identity: this.Identity);
 			return reply.ToObjects<OptionalValue<Account>>();
 		}
 
@@ -117,7 +124,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<UnboundedUInt> BalanceOf(Account account)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(account));
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_balance_of", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_balance_of", arg, identity: this.Identity);
 			return reply.ToObjects<UnboundedUInt>();
 		}
 
@@ -129,7 +136,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<TransferResult> Transfer(TransferArgs args)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(args));
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "icrc1_transfer", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "icrc1_transfer", arg, identity: this.Identity);
 			return reply.ToObjects<TransferResult>();
 		}
 
@@ -140,7 +147,7 @@ namespace EdjCase.ICP.Agent.Standards.ICRC1
 		public async Task<List<SupportedStandard>> SupportedStandards()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_supported_standards", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "icrc1_supported_standards", arg, identity: this.Identity);
 			return reply.ToObjects<List<SupportedStandard>>();
 		}
 	}

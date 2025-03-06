@@ -160,7 +160,7 @@ public class Program
 			string outputFilePath
 		)
 		{
-			AssetCanisterApiClient client = new(this.agent, canisterId);
+			AssetCanisterApiClient client = new(this.agent, canisterId, identity: null);
 
 			Console.WriteLine($"Downloading asset '{key}'...");
 			(byte[] assetBytes, string contentEncoding) = await client.DownloadAssetAsync(key);
@@ -210,7 +210,7 @@ public class Program
 			string filePath
 		)
 		{
-			var client = new AssetCanisterApiClient(this.agent, canisterId);
+			var client = new AssetCanisterApiClient(this.agent, canisterId, identity: null);
 
 			Console.WriteLine($"Uploading chunks for asset '{key}'...");
 			Stream? contentStream = null;
