@@ -41,13 +41,12 @@ namespace EdjCase.ICP.Agent.Models
 		}
 
 		/// <summary>
-		/// Checks the validity of the certificate based off the 
+		/// Checks the validity of the certificate based off the
 		/// specified root public key
 		/// </summary>
-		/// <param name="bls">BLS crytography implementation to verify signature</param>
 		/// <param name="rootPublicKey">The root public key (DER encoded) of the internet computer network</param>
 		/// <returns>True if the certificate is valid, otherwise false</returns>
-		public bool IsValid( SubjectPublicKeyInfo rootPublicKey)
+		public bool IsValid(SubjectPublicKeyInfo rootPublicKey)
 		{
 			/*
 				verify_cert(cert) =

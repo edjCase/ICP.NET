@@ -41,7 +41,7 @@ namespace EdjCase.ICP.Agent.Models
 		/// <param name="requestId">The hash of the content used for request identification</param>
 		/// <param name="request">The content that is signed in the form of key value pairs</param>
 		/// <param name="senderPublicKey">Public key used to authenticate this request, unless anonymous, then null</param>
-		/// <param name="delegations">Optional. A chain of delegations, starting with the one signed by sender_pubkey 
+		/// <param name="delegations">Optional. A chain of delegations, starting with the one signed by sender_pubkey
 		/// and ending with the one delegating to the key relating to sender_sig.</param>
 		/// <param name="senderSignature">Signature to authenticate this request, unless anonymous, then null</param>
 		public SignedContent(
@@ -81,10 +81,13 @@ namespace EdjCase.ICP.Agent.Models
 			return properties;
 		}
 
-
+		/// <summary>
+		/// Serializes this signed content object to CBOR (Concise Binary Object Representation) format.
+		/// </summary>
+		/// <returns>A byte array containing the CBOR-encoded representation of this object.</returns>
 		public byte[] ToCborBytes()
 		{
-			CborWriter writer = new ();
+			CborWriter writer = new();
 			writer.WriteTag(CborTag.SelfDescribeCbor);
 			this.WriteCbor(writer);
 			return writer.Encode();

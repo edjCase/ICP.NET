@@ -20,10 +20,57 @@ namespace EdjCase.ICP.Agent.Agents
 	/// </summary>
 	public interface IAgent
 	{
-		Task<CandidArg> CallAsync(SignedContent<CallRequest> content, Principal? effectiveCanisterId = null, CancellationToken? cancellationToken = null);
-		Task<RequestId> CallAsynchronousAsync(SignedContent<CallRequest> content, Principal? effectiveCanisterId = null, CancellationToken? cancellationToken = null);
-		Task<CandidArg> QueryAsync(SignedContent<QueryRequest> content, Principal? effectiveCanisterId = null, CancellationToken? cancellationToken = null);
-		Task<ReadStateResponse> ReadStateAsync(Principal canisterId, SignedContent<ReadStateRequest> content, CancellationToken? cancellationToken = null);
+		/// <summary>
+		/// Sends a call request to a canister with already signed content
+		/// </summary>
+		/// <param name="content">The signed content containing the call request</param>
+		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
+		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <returns>The candid arg response to the call</returns>
+		Task<CandidArg> CallAsync(
+			SignedContent<CallRequest> content,
+			Principal? effectiveCanisterId = null,
+			CancellationToken? cancellationToken = null
+		);
+
+		/// <summary>
+		/// Sends an asynchronous call request to a canister with already signed content
+		/// </summary>
+		/// <param name="content">The signed content containing the call request</param>
+		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
+		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
+		Task<RequestId> CallAsynchronousAsync(
+			SignedContent<CallRequest> content,
+			Principal? effectiveCanisterId = null,
+			CancellationToken? cancellationToken = null
+		);
+
+		/// <summary>
+		/// Sends a query request to a canister with already signed content
+		/// </summary>
+		/// <param name="content">The signed content containing the query request</param>
+		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
+		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <returns>The response data of the query call</returns>
+		Task<CandidArg> QueryAsync(
+			SignedContent<QueryRequest> content,
+			Principal? effectiveCanisterId = null,
+			CancellationToken? cancellationToken = null
+		);
+
+		/// <summary>
+		/// Reads the state of a specified canister with already signed content
+		/// </summary>
+		/// <param name="canisterId">Canister to read state for</param>
+		/// <param name="content">The signed content containing the read state request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <returns>A response that contains the certificate of the current canister state</returns>
+		Task<ReadStateResponse> ReadStateAsync(
+			Principal canisterId,
+			SignedContent<ReadStateRequest> content,
+			CancellationToken? cancellationToken = null
+		);
 
 		/// <summary>
 		/// Gets the status of the IC replica. This includes versioning information
@@ -200,7 +247,16 @@ namespace EdjCase.ICP.Agent.Agents
 			return await agent.WaitForRequestAsync(canisterId, id, cancellationToken);
 		}
 
-
+		/// <summary>
+		/// Sends a call request with already signed content to a specified canister method, waits for the request to be processed,
+		/// then returns the candid response to the call. This is a helper method built on top of `CallAsynchronousAsync`
+		/// to wait for the response so it doesn't need to be implemented manually
+		/// </summary>
+		/// <param name="agent">The agent to use for the call</param>
+		/// <param name="content">The signed content containing the call request</param>
+		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
+		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <returns>The raw candid arg response</returns>
 		public static async Task<CandidArg> CallAsynchronousAndWaitAsync(
 			this IAgent agent,
 			SignedContent<CallRequest> content,
