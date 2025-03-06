@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using EdjCase.ICP.Candid;
 using Org.BouncyCastle.Asn1.Cms;
 using EdjCase.ICP.Candid.Models.Types;
+using System.Security.Principal;
 
 namespace EdjCase.ICP.ClientGenerator
 {
@@ -229,6 +230,13 @@ namespace EdjCase.ICP.ClientGenerator
 
 			List<ClassProperty> optionalProperties = new()
 			{				
+				// public IIdentity? Identity { get; set; }
+				new ClassProperty(
+					name: "Identity",
+					type: SimpleTypeName.FromType<IIdentity>(isNullable: this.FeatureNullable),
+					access: AccessType.Public,
+					hasSetter: true
+				),
 				// public CandidConverter? Converter { get; }
 				new ClassProperty(
 					name: candidConverterProperty,
