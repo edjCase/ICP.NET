@@ -27,7 +27,7 @@ public class Program
 	[Verb("upload-asset", HelpText = "Upload a file to an asset canister.")]
 	class UploadOptions
 	{
-		[Option('u', "url", Required = false, HelpText = "The url to the boundy node", Default = "https://ic0.app")]
+		[Option('u', "url", Required = false, HelpText = "The url to the boundy node", Default = "https://icp-api.io")]
 		public string? Url { get; set; }
 
 		[Option('c', "canister-id", Required = true, HelpText = "The asset canister id to upload to")]
@@ -55,7 +55,7 @@ public class Program
 	[Verb("download-asset", HelpText = "Download a file from an asset canister.")]
 	class DownloadOptions
 	{
-		[Option('u', "url", Required = false, HelpText = "The url to the boundy node", Default = "https://ic0.app")]
+		[Option('u', "url", Required = false, HelpText = "The url to the boundy node", Default = "https://icp-api.io")]
 		public string? Url { get; set; }
 
 		[Option('c', "canister-id", Required = true, HelpText = "The asset canister id to download from")]

@@ -37,7 +37,7 @@ namespace EdjCase.ICP.Agent.Agents
 			this.skipCertificateValidation = skipCertificateValidation;
 		}
 
-		/// <param name="httpBoundryNodeUrl">Url to the boundry node to connect to. Defaults to `https://ic0.app/`</param>
+		/// <param name="httpBoundryNodeUrl">Url to the boundry node to connect to. Defaults to `https://icp-api.io/`</param>
 		/// <param name="skipCertificateValidation">If true, will skip response certificate validation. Defaults to false</param>
 		public HttpAgent(Uri? httpBoundryNodeUrl = null, bool skipCertificateValidation = false)
 		{
