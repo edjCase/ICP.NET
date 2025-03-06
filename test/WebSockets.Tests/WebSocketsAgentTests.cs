@@ -29,7 +29,6 @@ namespace WebSockets.Tests
 		[Fact]
 		public async Task ValidCallAndClose()
 		{
-			DefaultBlsCryptograhy.Bypass = true;
 			int onMessageCallCount = 0;
 			int onOpenCallCount = 0;
 			int onErrorCallCount = 0;
@@ -52,12 +51,14 @@ namespace WebSockets.Tests
 				.Returns(Task.CompletedTask);
 			clientMock
 				.SetupSequence(client => client.ReceiveAsync(It.IsAny<CancellationToken>()))
-				.ReturnsAsync(() => {
+				.ReturnsAsync(() =>
+				{
 					// Handshake: 55799({"gateway_principal": h'...'})
 					byte[] handshakeBytes = ByteUtil.FromHexString("D9D9F7A171676174657761795F7072696E636970616C581D505A46A6746E7D266C3301A70CDA43E072476D1736EACAFD7327BEF802");
 					return (handshakeBytes, false);
 				})
-				.ReturnsAsync(() => {
+				.ReturnsAsync(() =>
+				{
 					// Open
 					ClientKey clientKey = new()
 					{
@@ -79,7 +80,8 @@ namespace WebSockets.Tests
 					);
 					return (openMessageBytes, false);
 				})
-				.ReturnsAsync(() => {
+				.ReturnsAsync(() =>
+				{
 					// Message
 					ClientKey clientKey = new()
 					{
@@ -99,7 +101,8 @@ namespace WebSockets.Tests
 					);
 					return (appMessageBytes, false);
 				})
-				.ReturnsAsync(() => {
+				.ReturnsAsync(() =>
+				{
 					// Ack
 					ClientKey clientKey = new()
 					{
@@ -121,7 +124,8 @@ namespace WebSockets.Tests
 					);
 					return (openMessageBytes, false);
 				})
-				.ReturnsAsync(() => {
+				.ReturnsAsync(() =>
+				{
 					// Close
 					ClientKey clientKey = new()
 					{
@@ -148,7 +152,8 @@ namespace WebSockets.Tests
 				onMessageCallCount += 1;
 			};
 			Action onOpen = () => { onOpenCallCount += 1; };
-			Action<Exception> onError = (Exception exception) => {
+			Action<Exception> onError = (Exception exception) =>
+			{
 				Assert.Fail(exception.ToString());
 			};
 			Action onClose = () => { onCloseCallCount += 1; };
@@ -163,7 +168,8 @@ namespace WebSockets.Tests
 				onOpen,
 				onError,
 				onClose,
-				customConverter: null
+				customConverter: null,
+				skipCertificateValidation: true
 			);
 			clientNonce = agent.ClientNonce;
 			while (agent.IsOpen)
@@ -175,13 +181,11 @@ namespace WebSockets.Tests
 			Assert.Equal(1, onMessageCallCount);
 			Assert.Equal(0, onErrorCallCount);
 			Assert.Equal(1, onCloseCallCount);
-			DefaultBlsCryptograhy.Bypass = false;
 		}
 
 		[Fact]
 		public async Task InvalidAck_Close()
 		{
-			DefaultBlsCryptograhy.Bypass = true;
 			int onMessageCallCount = 0;
 			int onOpenCallCount = 0;
 			int onErrorCallCount = 0;
@@ -287,7 +291,8 @@ namespace WebSockets.Tests
 				onMessageCallCount += 1;
 			};
 			Action onOpen = () => { onOpenCallCount += 1; };
-			Action<Exception> onError = (Exception exception) => {
+			Action<Exception> onError = (Exception exception) =>
+			{
 				Assert.Contains("Ack sequence is invalid", exception.ToString());
 				onErrorCallCount += 1;
 			};
@@ -303,7 +308,8 @@ namespace WebSockets.Tests
 				onOpen,
 				onError,
 				onClose,
-				customConverter: null
+				customConverter: null,
+				skipCertificateValidation: true
 			);
 			clientNonce = agent.ClientNonce;
 			while (agent.IsOpen)
@@ -315,8 +321,6 @@ namespace WebSockets.Tests
 			Assert.Equal(1, onMessageCallCount);
 			Assert.Equal(1, onErrorCallCount);
 			Assert.Equal(0, onCloseCallCount);
-
-			DefaultBlsCryptograhy.Bypass = false;
 		}
 
 
@@ -369,19 +373,19 @@ namespace WebSockets.Tests
 			cert.ToCbor(cborWriter);
 			byte[] certBytes = cborWriter.Encode();
 
-			cborWriter = new ();
+			cborWriter = new();
 			cborWriter.WriteTag(CborTag.SelfDescribeCbor);
 			Certificate.TreeToCborInternal(cborWriter, tree);
 			byte[] treeBytes = cborWriter.Encode();
 
 
-			ClientIncomingMessage incomingMessage = new (
+			ClientIncomingMessage incomingMessage = new(
 				key: clientKeyString,
 				content: content,
 				cert: certBytes,
 				tree: treeBytes
 			);
-			cborWriter = new ();
+			cborWriter = new();
 			incomingMessage.ToCbor(cborWriter);
 			return cborWriter.Encode();
 		}

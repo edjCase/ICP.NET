@@ -14,7 +14,6 @@ namespace EdjCase.ICP.BLS
 	/// </summary>
 	internal static class DefaultBlsCryptograhy
 	{
-		public static bool Bypass = false; // TODO this isn't safe for multi-threaded use like with tests
 
 		internal static readonly byte[] DomainSeperator;
 
@@ -26,12 +25,6 @@ namespace EdjCase.ICP.BLS
 		/// <inheritdoc />
 		public static bool VerifySignature(byte[] publicKey, byte[] messageHash, byte[] signature)
 		{
-			if (DefaultBlsCryptograhy.Bypass)
-			{
-				// Always return true if bypass is enabled
-				// Used for testing and debugging
-				return true;
-			}
 			G1Affine sig = G1Affine.FromCompressed(signature);
 			G2Prepared g2Gen = G2Affine.Generator().Neg().ToProjective().ToPrepared();
 

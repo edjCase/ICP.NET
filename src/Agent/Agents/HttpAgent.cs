@@ -26,21 +26,26 @@ namespace EdjCase.ICP.Agent.Agents
 		private byte[]? rootKeyCache = null;
 
 		private readonly IHttpClient httpClient;
+		private bool skipCertificateValidation = false;
 		private bool v3CallSupported = true;
 
 		/// <param name="httpClient">Optional. Sets the http client to use, otherwise will use the default http client</param>
-		public HttpAgent(IHttpClient httpClient)
+		/// <param name="skipCertificateValidation">If true, will skip response certificate validation. Defaults to false</param>
+		public HttpAgent(IHttpClient httpClient, bool skipCertificateValidation = false)
 		{
 			this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+			this.skipCertificateValidation = skipCertificateValidation;
 		}
 
 		/// <param name="httpBoundryNodeUrl">Url to the boundry node to connect to. Defaults to `https://ic0.app/`</param>
-		public HttpAgent(Uri? httpBoundryNodeUrl = null)
+		/// <param name="skipCertificateValidation">If true, will skip response certificate validation. Defaults to false</param>
+		public HttpAgent(Uri? httpBoundryNodeUrl = null, bool skipCertificateValidation = false)
 		{
 			this.httpClient = new DefaultHttpClient(new HttpClient()
 			{
 				BaseAddress = httpBoundryNodeUrl ?? new Uri("https://ic0.app/")
 			});
+			this.skipCertificateValidation = skipCertificateValidation;
 		}
 
 
@@ -77,10 +82,13 @@ namespace EdjCase.ICP.Agent.Agents
 			var reader = new CborReader(cborBytes);
 			V3CallResponse v3CallResponse = V3CallResponse.ReadCbor(reader);
 
-			SubjectPublicKeyInfo rootPublicKey = await this.GetRootKeyAsync(cancellationToken);
-			if (!v3CallResponse.Certificate.IsValid(rootPublicKey))
+			if (!this.skipCertificateValidation)
 			{
-				throw new InvalidCertificateException("Certificate signature does not match the IC public key");
+				SubjectPublicKeyInfo rootPublicKey = await this.GetRootKeyAsync(cancellationToken);
+				if (!v3CallResponse.Certificate.IsValid(rootPublicKey))
+				{
+					throw new InvalidCertificateException("Certificate signature does not match the IC public key");
+				}
 			}
 			HashTree? requestStatusData = v3CallResponse.Certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", content.RequestId.RawValue));
 			RequestStatus? requestStatus = IAgentExtensions.ParseRequestStatus(requestStatusData);
@@ -166,10 +174,13 @@ namespace EdjCase.ICP.Agent.Agents
 			var reader = new CborReader(cborBytes);
 			ReadStateResponse response = ReadStateResponse.ReadCbor(reader);
 
-			SubjectPublicKeyInfo rootPublicKey = await this.GetRootKeyAsync(cancellationToken);
-			if (!response.Certificate.IsValid(rootPublicKey))
+			if (!this.skipCertificateValidation)
 			{
-				throw new InvalidCertificateException("Certificate signature does not match the IC public key");
+				SubjectPublicKeyInfo rootPublicKey = await this.GetRootKeyAsync(cancellationToken);
+				if (!response.Certificate.IsValid(rootPublicKey))
+				{
+					throw new InvalidCertificateException("Certificate signature does not match the IC public key");
+				}
 			}
 
 			return response;
