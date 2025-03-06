@@ -1,5 +1,6 @@
 using EdjCase.ICP.Agent;
 using EdjCase.ICP.Agent.Agents;
+using EdjCase.ICP.Agent.Agents.Http;
 using EdjCase.ICP.Agent.Identities;
 using EdjCase.ICP.Agent.Models;
 using EdjCase.ICP.Agent.Requests;
