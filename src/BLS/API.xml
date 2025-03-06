@@ -4,15 +4,6 @@
         <name>EdjCase.ICP.BLS</name>
     </assembly>
     <members>
-        <member name="T:EdjCase.ICP.BLS.BypassedBlsCryptography">
-            <summary>
-            Bls cryptography class that AWLAYS returns TRUE. This is intended only for
-            development scenarios and is never recommended
-            </summary>
-        </member>
-        <member name="M:EdjCase.ICP.BLS.BypassedBlsCryptography.VerifySignature(System.Byte[],System.Byte[],System.Byte[])">
-            <inheritdoc/>
-        </member>
         <member name="T:EdjCase.ICP.BLS.DefaultBlsCryptograhy">
             <summary>
             Represents the default implementation of the IBlsCryptography interface for BLS cryptography.
@@ -20,20 +11,6 @@
         </member>
         <member name="M:EdjCase.ICP.BLS.DefaultBlsCryptograhy.VerifySignature(System.Byte[],System.Byte[],System.Byte[])">
             <inheritdoc />
-        </member>
-        <member name="T:EdjCase.ICP.BLS.IBlsCryptography">
-            <summary>
-            An interface for all BLS crytography operations
-            </summary>
-        </member>
-        <member name="M:EdjCase.ICP.BLS.IBlsCryptography.VerifySignature(System.Byte[],System.Byte[],System.Byte[])">
-            <summary>
-            Verifies a BLS signature (ICP flavor only)
-            </summary>
-            <param name="publicKey">The signer public key</param>
-            <param name="messageHash">The SHA256 hash of the message</param>
-            <param name="signature">The signature of the message</param>
-            <returns>True if the signature is valid, otherwise false</returns>
         </member>
     </members>
 </doc>

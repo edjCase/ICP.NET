@@ -1901,11 +1901,11 @@
             <param name="bytes">Raw request id bytes</param>
             <returns>A request id object</returns>
         </member>
-        <member name="M:EdjCase.ICP.Candid.Models.RequestId.FromObject(System.Collections.Generic.IDictionary{System.String,EdjCase.ICP.Candid.Models.IHashable},EdjCase.ICP.Candid.Crypto.IHashFunction)">
+        <member name="M:EdjCase.ICP.Candid.Models.RequestId.FromObject(System.Collections.Generic.Dictionary{System.String,EdjCase.ICP.Candid.Models.IHashable},EdjCase.ICP.Candid.Crypto.IHashFunction)">
             <summary>
             Converts a hashable object into a request id
             </summary>
-            <param name="properties">The properties of the object to hash</param>
+            <param name="item">The object to hash</param>
             <param name="hashFunction">The hash function to use to generate the hash</param>
             <returns>A request id object</returns>
         </member>

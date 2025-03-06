@@ -25,7 +25,7 @@ namespace BLS.Tests
 			byte[] msg = ByteUtil.FromHexString(msgHex);
 			byte[] signature = ByteUtil.FromHexString(signatureHex);
 
-			bool isValid = new DefaultBlsCryptograhy().VerifySignature(publicKey, msg, signature);
+			bool isValid = DefaultBlsCryptograhy.VerifySignature(publicKey, msg, signature);
 			Assert.True(isValid);
 		}
 
@@ -46,7 +46,7 @@ namespace BLS.Tests
 			byte[] msg = ByteUtil.FromHexString(msgHex);
 			byte[] signature = ByteUtil.FromHexString(signatureHex);
 
-			bool isValid = new DefaultBlsCryptograhy().VerifySignature(publicKey, msg, signature);
+			bool isValid = DefaultBlsCryptograhy.VerifySignature(publicKey, msg, signature);
 			Assert.False(isValid);
 		}
 
