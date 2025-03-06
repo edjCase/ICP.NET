@@ -75,7 +75,7 @@ namespace EdjCase.ICP.ClientGenerator
 		public bool OverrideOptionalValue { get; }
 
 		/// <summary>
-		/// Optional. The url of the boundry node for the internet computer. Defaults to ic0.app
+		/// Optional. The url of the boundry node for the internet computer. Defaults to icp-api.io
 		/// </summary>
 		public Uri? BoundryNodeUrl { get; }
 
@@ -97,7 +97,7 @@ namespace EdjCase.ICP.ClientGenerator
 		/// <param name="variantsUseProperties">If true, variant classes will be generated with properties instead of methods</param>
 		/// <param name="keepCandidCase">If true, the names of properties and methods will keep the raw candid name. Otherwise they will be converted to something prettier</param>
 		/// <param name="overrideOptionalValue">If false, OptionalValue will be used for opt values, Otherwise will use just the nullable class values or nullable struct where possible. Defaults to false</param>
-		/// <param name="boundryNodeUrl">Optional. The url of the boundry node for the internet computer. Defaults to ic0.app</param>
+		/// <param name="boundryNodeUrl">Optional. The url of the boundry node for the internet computer. Defaults to icp-api.io</param>
 		/// <param name="types">Optional. Specifies options for each candid type in the definition</param>
 		public ClientGenerationOptions(
 			string name,

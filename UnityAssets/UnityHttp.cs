@@ -39,7 +39,7 @@ public class UnityHttpClient : IHttpClient
 		{
 			path = "/" + path;
 		}
-		return new Uri("https://ic0.app" + path);
+		return new Uri("https://icp-api.io" + path);
 	}
 
 	private static HttpResponse ParseResponse(UnityWebRequest request)

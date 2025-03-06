@@ -43,7 +43,7 @@ namespace EdjCase.ICP.Agent.Agents
 		{
 			this.httpClient = new DefaultHttpClient(new HttpClient()
 			{
-				BaseAddress = httpBoundryNodeUrl ?? new Uri("https://ic0.app/")
+				BaseAddress = httpBoundryNodeUrl ?? new Uri("https://icp-api.io/")
 			});
 			this.skipCertificateValidation = skipCertificateValidation;
 		}
