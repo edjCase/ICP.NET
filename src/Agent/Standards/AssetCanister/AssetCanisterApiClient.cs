@@ -251,8 +251,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<ushort> GetApiVersionAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "api_version", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "api_version", arg);
 			return reply.ToObjects<ushort>(this.Converter);
 		}
 
@@ -266,8 +265,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		{
 			GetRequest request = new(key, acceptEncodings);
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "get", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "get", arg);
 			return reply.ToObjects<GetResult>(this.Converter);
 		}
 
@@ -292,8 +290,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 			GetChunkRequest request = new(key, contentEncoding, index, sha256Opt);
 
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(request, this.Converter));
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "get_chunk", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "get_chunk", arg);
 			return reply.ToObjects<GetChunkResult>(this.Converter);
 		}
 
@@ -304,8 +301,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<List<Asset>> ListAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.EmptyRecord());
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "list", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "list", arg);
 			return reply.ToObjects<List<Asset>>(this.Converter);
 		}
 
@@ -316,8 +312,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<CertifiedTreeResult> GetCertifiedTreeAsync()
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.EmptyRecord());
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "certified_tree", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "certified_tree", arg);
 			return reply.ToObjects<CertifiedTreeResult>(this.Converter);
 		}
 
@@ -620,8 +615,7 @@ namespace EdjCase.ICP.Agent.Standards.AssetCanister
 		public async Task<GetAssetPropertiesResult> GetAssetPropertiesAsync(string key)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(key, this.Converter));
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "get_asset_properties", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "get_asset_properties", arg);
 			return reply.ToObjects<GetAssetPropertiesResult>(this.Converter);
 		}
 

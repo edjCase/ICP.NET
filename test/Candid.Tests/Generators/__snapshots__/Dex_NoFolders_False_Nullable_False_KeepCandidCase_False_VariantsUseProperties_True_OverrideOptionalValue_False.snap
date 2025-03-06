@@ -52,24 +52,21 @@ namespace Test
 		public async Task<List<Models.Balance>> GetAllBalances()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getAllBalances", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getAllBalances", arg);
 			return reply.ToObjects<List<Models.Balance>>(this.Converter);
 		}
 
 		public async Task<UnboundedUInt> GetBalance(Token arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getBalance", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getBalance", arg);
 			return reply.ToObjects<UnboundedUInt>(this.Converter);
 		}
 
 		public async Task<List<Models.Balance>> GetBalances()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getBalances", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getBalances", arg);
 			return reply.ToObjects<List<Models.Balance>>(this.Converter);
 		}
 
@@ -111,8 +108,7 @@ namespace Test
 		public async Task<Principal> Whoami()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "whoami", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "whoami", arg);
 			return reply.ToObjects<Principal>(this.Converter);
 		}
 

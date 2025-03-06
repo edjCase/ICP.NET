@@ -23,16 +23,14 @@ namespace Test
 		public async Task<Dictionary<UnboundedUInt, List<Principal>>> a()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "a", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "a", arg);
 			return reply.ToObjects<Dictionary<UnboundedUInt, List<Principal>>>(this.Converter);
 		}
 
 		public async Task<Dictionary<string, string>> b()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "b", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "b", arg);
 			return reply.ToObjects<Dictionary<string, string>>(this.Converter);
 		}
 	}

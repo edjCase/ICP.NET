@@ -64,12 +64,12 @@ namespace EdjCase.ICP.Agent.Agents
 			{
 				// If v3 is not available, fall back to v2
 				this.v3CallSupported = false;
-				return await ((IAgent)this).CallAsynchronousAndWaitAsync(content, effectiveCanisterId, cancellationToken);
+				return await this.CallAsynchronousAndWaitAsync(content, effectiveCanisterId, cancellationToken);
 			}
 			if (httpResponse.StatusCode == System.Net.HttpStatusCode.Accepted)
 			{
 				// If request takes too long, then it will return 202 Accepted and polling is required
-				return await ((IAgent)this).WaitForRequestAsync(content.Request.CanisterId, content.RequestId, cancellationToken);
+				return await this.WaitForRequestAsync(content.Request.CanisterId, content.RequestId, cancellationToken);
 			}
 			await httpResponse.ThrowIfErrorAsync();
 
@@ -83,7 +83,7 @@ namespace EdjCase.ICP.Agent.Agents
 				throw new InvalidCertificateException("Certificate signature does not match the IC public key");
 			}
 			HashTree? requestStatusData = v3CallResponse.Certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", content.RequestId.RawValue));
-			RequestStatus? requestStatus = IAgent.ParseRequestStatus(requestStatusData);
+			RequestStatus? requestStatus = IAgentExtensions.ParseRequestStatus(requestStatusData);
 			switch (requestStatus?.Type)
 			{
 				case RequestStatus.StatusType.Replied:

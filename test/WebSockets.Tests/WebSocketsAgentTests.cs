@@ -140,10 +140,6 @@ namespace WebSockets.Tests
 			clientMock
 				.SetupGet(client => client.IsOpen)
 				.Returns(() => onCloseCallCount <= 0);
-			var blsMock = new Mock<IBlsCryptography>(MockBehavior.Strict);
-			blsMock
-				.Setup(bls => bls.VerifySignature(It.IsAny<byte[]>(), It.IsAny<byte[]>(), It.IsAny<byte[]>()))
-				.Returns(true);
 
 			Action<TestMessage> onMessage = (TestMessage message) =>
 			{
@@ -162,7 +158,6 @@ namespace WebSockets.Tests
 				rootPublicKey,
 				identity,
 				clientMock.Object,
-				blsMock.Object,
 				onMessage,
 				onOpen,
 				onError,
@@ -282,10 +277,6 @@ namespace WebSockets.Tests
 			clientMock
 				.SetupGet(client => client.IsOpen)
 				.Returns(() => onCloseCallCount <= 0 && onErrorCallCount <= 0);
-			var blsMock = new Mock<IBlsCryptography>(MockBehavior.Strict);
-			blsMock
-				.Setup(bls => bls.VerifySignature(It.IsAny<byte[]>(), It.IsAny<byte[]>(), It.IsAny<byte[]>()))
-				.Returns(true);
 
 			Action<TestMessage> onMessage = (TestMessage message) =>
 			{
@@ -305,7 +296,6 @@ namespace WebSockets.Tests
 				rootPublicKey,
 				identity,
 				clientMock.Object,
-				blsMock.Object,
 				onMessage,
 				onOpen,
 				onError,

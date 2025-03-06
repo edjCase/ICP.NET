@@ -19,7 +19,7 @@
 
 <button @onclick="ReloadProposalInfo">Fetch</button>
 
-@if (this.Client.Agent.Identity == null)
+@if (this.Client.Identity == null)
 {
     <button @onclick="Login">Login</button>
 }
@@ -119,7 +119,7 @@ else if (this.MadeCall && this.ProposalId != null)
             byte[] privateKey = FromHexString(identityValues[1]);
             var identity = Ed25519Identity.FromPrivateKey(privateKey);
             DelegationChain chain = chainModel.ToCommon();
-            this.Client.Agent.Identity = new DelegationIdentity(identity, chain);
+            this.Client.Identity = new DelegationIdentity(identity, chain);
         }
         this.StateHasChanged();
     }

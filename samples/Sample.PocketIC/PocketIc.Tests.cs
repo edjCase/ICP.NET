@@ -117,8 +117,7 @@ namespace Sample.PocketIC
 					await using (HttpGateway httpGateway = await pocketIc.RunHttpGatewayAsync())
 					{
 						HttpAgent agent = httpGateway.BuildHttpAgent();
-						QueryResponse getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-						CandidArg getResponseArg = getResponse.ThrowOrGetReply();
+						CandidArg getResponseArg = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 						UnboundedUInt getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
 						Assert.Equal((UnboundedUInt)0, getResponseValue);
 
@@ -127,8 +126,7 @@ namespace Sample.PocketIC
 						CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
 						Assert.Equal(CandidArg.Empty(), incResponseArg);
 
-						getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-						getResponseArg = getResponse.ThrowOrGetReply();
+						getResponseArg = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 						getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
 						Assert.Equal((UnboundedUInt)1, getResponseValue);
 
@@ -137,8 +135,7 @@ namespace Sample.PocketIC
 						CandidArg setResponseArg = await agent.CallAsync(canisterId, "set", setRequestArg, cancellationToken: cts.Token);
 						Assert.Equal(CandidArg.Empty(), setResponseArg);
 
-						getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-						getResponseArg = getResponse.ThrowOrGetReply();
+						getResponseArg = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 						getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
 						Assert.Equal((UnboundedUInt)10, getResponseValue);
 

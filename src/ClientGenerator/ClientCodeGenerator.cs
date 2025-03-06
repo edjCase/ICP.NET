@@ -30,7 +30,7 @@ namespace EdjCase.ICP.ClientGenerator
 			ClientGenerationOptions options
 		)
 		{
-			var agent = new HttpAgent(identity: null, httpBoundryNodeUrl: options.BoundryNodeUrl);
+			IAgent agent = new HttpAgent(httpBoundryNodeUrl: options.BoundryNodeUrl);
 			var candidServicePath = StatePath.FromSegments("canister", canisterId.Raw, "metadata", "candid:service");
 			var paths = new List<StatePath>
 			{

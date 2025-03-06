@@ -33,7 +33,6 @@ namespace EdjCase.ICP.WebSockets
 		private Principal canisterId { get; }
 		private Uri gatewayUri { get; }
 		private IIdentity identity { get; }
-		private IBlsCryptography bls { get; }
 		private SubjectPublicKeyInfo RootPublicKey { get; }
 		private CandidConverter? customConverter { get; }
 		private IWebSocketClient client { get; }
@@ -50,7 +49,6 @@ namespace EdjCase.ICP.WebSockets
 			SubjectPublicKeyInfo rootPublicKey,
 			IIdentity identity,
 			IWebSocketClient client,
-			IBlsCryptography bls,
 			Action<TMessage> onMessage,
 			Action? onOpen = null,
 			Action<Exception>? onError = null,
@@ -63,7 +61,6 @@ namespace EdjCase.ICP.WebSockets
 			this.RootPublicKey = rootPublicKey ?? throw new ArgumentNullException(nameof(rootPublicKey));
 			this.identity = identity ?? throw new ArgumentNullException(nameof(identity));
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
-			this.bls = bls ?? throw new ArgumentNullException(nameof(bls));
 			this.onMessage = onMessage ?? throw new ArgumentNullException(nameof(onMessage));
 			this.onOpen = onOpen;
 			this.onError = onError;
@@ -287,7 +284,7 @@ namespace EdjCase.ICP.WebSockets
 			}
 
 
-			if (cert == null || !cert.IsValid(this.bls, this.RootPublicKey))
+			if (cert == null || !cert.IsValid(this.RootPublicKey))
 			{
 				error = "Message certificate is invalid: Invalid signature";
 				return false;
@@ -493,8 +490,8 @@ namespace EdjCase.ICP.WebSockets
 				sender,
 				ICTimestamp.Future(TimeSpan.FromSeconds(30))
 			);
-			SignedContent signedContent = this.identity
-				.SignContent(request.BuildHashableItem());
+			SignedContent<CallRequest> signedContent = this.identity
+				.SignContent(request);
 
 			CborWriter writer = new CborWriter();
 			writer.WriteStartMap(1);

@@ -23,8 +23,7 @@ namespace Test
 		public async Task<Result> a()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "a", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "a", arg);
 			return reply.ToObjects<Result>(this.Converter);
 		}
 	}

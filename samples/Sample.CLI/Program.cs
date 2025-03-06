@@ -89,7 +89,7 @@ public class Program
 					identity = IdentityUtil.FromPemFile(options.IdentityPEMFilePath, options.IdentityPassword);
 				}
 				Uri httpBoundryNodeUrl = new Uri(options.Url!);
-				var agent = new HttpAgent(identity, httpBoundryNodeUrl);
+				var agent = new HttpAgent(httpBoundryNodeUrl);
 				Samples s = new(agent);
 
 				Principal canisterId = Principal.FromText(options.CanisterId!);
@@ -111,7 +111,7 @@ public class Program
 					identity = IdentityUtil.FromPemFile(options.IdentityPEMFilePath, options.IdentityPassword);
 				}
 				Uri httpBoundryNodeUrl = new Uri(options.Url!);
-				var agent = new HttpAgent(identity, httpBoundryNodeUrl);
+				var agent = new HttpAgent(httpBoundryNodeUrl);
 				Samples s = new(agent);
 
 				Principal canisterId = Principal.FromText(options.CanisterId!);

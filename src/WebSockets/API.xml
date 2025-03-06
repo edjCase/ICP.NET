@@ -168,13 +168,6 @@
             <param name="client">The custom websocket client implementation.</param>
             <returns>The WebSocketBuilder instance.</returns>
         </member>
-        <member name="M:EdjCase.ICP.WebSockets.WebSocketBuilder`1.WithCustomBlsCryptography(EdjCase.ICP.BLS.IBlsCryptography)">
-            <summary>
-            Sets a custom BLS cryptography implementation to override the default.
-            </summary>
-            <param name="bls">The custom BLS cryptography implementation.</param>
-            <returns>The WebSocketBuilder instance.</returns>
-        </member>
         <member name="M:EdjCase.ICP.WebSockets.WebSocketBuilder`1.Build">
             <summary>
             Builds the WebSocket agent from the specified configuration.

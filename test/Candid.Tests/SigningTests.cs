@@ -41,13 +41,12 @@ namespace EdjCase.ICP.Candid.Tests
 			};
 			var chainPublicKey = SubjectPublicKeyInfo.Ed25519(ByteUtil.FromHexString("303c300c060a2b0601040183b8430102032c000a00000000000000070101a451d1829b843e2aabdd49ea590668978a73612067bdde0b8502f844452a7558"));
 			var chain = new DelegationChain(chainPublicKey, delegations);
-			var identity = new DelegationIdentity(innerIdentity, chain);
+			IIdentity identity = new DelegationIdentity(innerIdentity, chain);
 			var sender = identity.GetPublicKey().ToPrincipal();
 			var ingressExpiry = ICTimestamp.FromNanoSeconds(1654598046354206365);
 			var request = new QueryRequest(canisterId, method, arg, sender, ingressExpiry);
-			Dictionary<string, IHashable> content = request.BuildHashableItem();
 
-			SignedContent signedContent = identity.SignContent(content);
+			SignedContent<QueryRequest> signedContent = identity.SignContent(request);
 
 			string signatureHex = ByteUtil.ToHexString(signedContent.SenderSignature!);
 			Snapshot.Match(signatureHex);

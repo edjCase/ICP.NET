@@ -86,6 +86,12 @@ namespace EdjCase.ICP.Agent.Models
 		{
 			CborWriter writer = new ();
 			writer.WriteTag(CborTag.SelfDescribeCbor);
+			this.WriteCbor(writer);
+			return writer.Encode();
+		}
+
+		internal void WriteCbor(CborWriter writer)
+		{
 			writer.WriteStartMap(null);
 			writer.WriteTextString(Properties.CONTENT);
 			Dictionary<string, IHashable> hashableContent = this.Request.BuildHashableItem();
@@ -105,7 +111,7 @@ namespace EdjCase.ICP.Agent.Models
 			{
 				writer.WriteTextString(Properties.SENDER_DELEGATION);
 				writer.WriteStartArray(this.SenderDelegations.Count);
-				foreach(IHashable value in this.SenderDelegations)
+				foreach (IHashable value in this.SenderDelegations)
 				{
 					writer.WriteHashableValue(value);
 				}
@@ -117,7 +123,6 @@ namespace EdjCase.ICP.Agent.Models
 				writer.WriteByteString(this.SenderSignature);
 			}
 			writer.WriteEndMap();
-			return writer.Encode();
 		}
 
 		internal class Properties
