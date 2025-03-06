@@ -1,5 +1,6 @@
-using EdjCase.ICP.Agent.Agents;
+﻿using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Candid.Models;
+using EdjCase.ICP.Agent.Identities;
 using EdjCase.ICP.Candid;
 using System.Threading.Tasks;
 using Test;
@@ -10,19 +11,21 @@ namespace Test
 	{
 		public IAgent Agent { get; }
 		public Principal CanisterId { get; }
+		public IIdentity? Identity { get; set; }
 		public CandidConverter? Converter { get; }
 
-		public FuncTypeApiClient(IAgent agent, Principal canisterId, CandidConverter? converter = default)
+		public FuncTypeApiClient(IAgent agent, Principal canisterId, IIdentity? identity = default, CandidConverter? converter = default)
 		{
 			this.Agent = agent;
 			this.CanisterId = canisterId;
+			this.Identity = identity;
 			this.Converter = converter;
 		}
 
 		public async Task<Models.Result> A()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "a", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "a", arg, identity: this.Identity);
 			return reply.ToObjects<Models.Result>(this.Converter);
 		}
 	}

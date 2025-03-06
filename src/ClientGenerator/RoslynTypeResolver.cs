@@ -11,9 +11,8 @@ using EdjCase.ICP.Candid.Mapping;
 using EdjCase.ICP.Candid.Models.Values;
 using System.Threading.Tasks;
 using EdjCase.ICP.Candid;
-using Org.BouncyCastle.Asn1.Cms;
 using EdjCase.ICP.Candid.Models.Types;
-using System.Security.Principal;
+using EdjCase.ICP.Agent.Identities;
 
 namespace EdjCase.ICP.ClientGenerator
 {
@@ -1433,6 +1432,19 @@ namespace EdjCase.ICP.ClientGenerator
 														SyntaxFactory.Token(SyntaxKind.CommaToken),
 														SyntaxFactory.Argument(
 															SyntaxFactory.IdentifierName(argName)
+														),
+														SyntaxFactory.Token(SyntaxKind.CommaToken),
+														SyntaxFactory.Argument(
+															SyntaxFactory.MemberAccessExpression(
+																SyntaxKind.SimpleMemberAccessExpression,
+																SyntaxFactory.ThisExpression(),
+																SyntaxFactory.IdentifierName("Identity")
+															)
+														)
+														.WithNameColon(
+															SyntaxFactory.NameColon(
+																SyntaxFactory.IdentifierName("identity")
+															)
 														)
 													}
 												)
@@ -1480,6 +1492,19 @@ namespace EdjCase.ICP.ClientGenerator
 								SyntaxFactory.Token(SyntaxKind.CommaToken),
 								SyntaxFactory.Argument(
 									SyntaxFactory.IdentifierName(argName)
+								),
+								SyntaxFactory.Token(SyntaxKind.CommaToken),
+								SyntaxFactory.Argument(
+									SyntaxFactory.MemberAccessExpression(
+										SyntaxKind.SimpleMemberAccessExpression,
+										SyntaxFactory.ThisExpression(),
+										SyntaxFactory.IdentifierName("Identity")
+									)
+								)
+								.WithNameColon(
+									SyntaxFactory.NameColon(
+										SyntaxFactory.IdentifierName("identity")
+									)
 								)
 							}
 						)
@@ -1547,6 +1572,19 @@ namespace EdjCase.ICP.ClientGenerator
 								SyntaxFactory.Token(SyntaxKind.CommaToken),
 								SyntaxFactory.Argument(
 									SyntaxFactory.IdentifierName(argName)
+								),
+								SyntaxFactory.Token(SyntaxKind.CommaToken),
+								SyntaxFactory.Argument(
+									SyntaxFactory.MemberAccessExpression(
+										SyntaxKind.SimpleMemberAccessExpression,
+										SyntaxFactory.ThisExpression(),
+										SyntaxFactory.IdentifierName("Identity")
+									)
+								)
+								.WithNameColon(
+									SyntaxFactory.NameColon(
+										SyntaxFactory.IdentifierName("identity")
+									)
 								)
 							}
 						)

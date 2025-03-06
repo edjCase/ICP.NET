@@ -1,5 +1,6 @@
-using EdjCase.ICP.Agent.Agents;
+﻿using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Candid.Models;
+using EdjCase.ICP.Agent.Identities;
 using EdjCase.ICP.Candid;
 using System.Threading.Tasks;
 using Test;
@@ -13,108 +14,110 @@ namespace Test
 	{
 		public IAgent Agent { get; }
 		public Principal CanisterId { get; }
+		public IIdentity Identity { get; set; }
 		public CandidConverter Converter { get; }
 
-		public DexApiClient(IAgent agent, Principal canisterId, CandidConverter converter = default)
+		public DexApiClient(IAgent agent, Principal canisterId, IIdentity identity = default, CandidConverter converter = default)
 		{
 			this.Agent = agent;
 			this.CanisterId = canisterId;
+			this.Identity = identity;
 			this.Converter = converter;
 		}
 
 		public async Task<CancelOrderReceipt> CancelOrder(OrderId arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "cancelOrder", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "cancelOrder", arg, identity: this.Identity);
 			return reply.ToObjects<CancelOrderReceipt>(this.Converter);
 		}
 
 		public async Task Clear()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			await this.Agent.CallAsync(this.CanisterId, "clear", arg);
+			await this.Agent.CallAsync(this.CanisterId, "clear", arg, identity: this.Identity);
 		}
 
 		public async Task Credit(Principal arg0, Token arg1, UnboundedUInt arg2)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter), CandidTypedValue.FromObject(arg2, this.Converter));
-			await this.Agent.CallAsync(this.CanisterId, "credit", arg);
+			await this.Agent.CallAsync(this.CanisterId, "credit", arg, identity: this.Identity);
 		}
 
 		public async Task<DepositReceipt> Deposit(Token arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "deposit", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "deposit", arg, identity: this.Identity);
 			return reply.ToObjects<DepositReceipt>(this.Converter);
 		}
 
 		public async Task<List<Balance>> GetAllBalances()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getAllBalances", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getAllBalances", arg, identity: this.Identity);
 			return reply.ToObjects<List<Balance>>(this.Converter);
 		}
 
 		public async Task<UnboundedUInt> GetBalance(Token arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getBalance", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getBalance", arg, identity: this.Identity);
 			return reply.ToObjects<UnboundedUInt>(this.Converter);
 		}
 
 		public async Task<List<Balance>> GetBalances()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getBalances", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "getBalances", arg, identity: this.Identity);
 			return reply.ToObjects<List<Balance>>(this.Converter);
 		}
 
 		public async Task<List<byte>> GetDepositAddress()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "getDepositAddress", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "getDepositAddress", arg, identity: this.Identity);
 			return reply.ToObjects<List<byte>>(this.Converter);
 		}
 
 		public async Task<OptionalValue<Order>> GetOrder(OrderId arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "getOrder", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "getOrder", arg, identity: this.Identity);
 			return reply.ToObjects<OptionalValue<Order>>(this.Converter);
 		}
 
 		public async Task<List<Order>> GetOrders()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "getOrders", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "getOrders", arg, identity: this.Identity);
 			return reply.ToObjects<List<Order>>(this.Converter);
 		}
 
 		public async Task<string> GetSymbol(Token arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "getSymbol", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "getSymbol", arg, identity: this.Identity);
 			return reply.ToObjects<string>(this.Converter);
 		}
 
 		public async Task<OrderPlacementReceipt> PlaceOrder(Token arg0, UnboundedUInt arg1, Token arg2, UnboundedUInt arg3)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter), CandidTypedValue.FromObject(arg2, this.Converter), CandidTypedValue.FromObject(arg3, this.Converter));
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "placeOrder", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "placeOrder", arg, identity: this.Identity);
 			return reply.ToObjects<OrderPlacementReceipt>(this.Converter);
 		}
 
 		public async Task<Principal> Whoami()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "whoami", arg);
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "whoami", arg, identity: this.Identity);
 			return reply.ToObjects<Principal>(this.Converter);
 		}
 
 		public async Task<WithdrawReceipt> Withdraw(Token arg0, UnboundedUInt arg1, Principal arg2)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter), CandidTypedValue.FromObject(arg2, this.Converter));
-			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "withdraw", arg);
+			CandidArg reply = await this.Agent.CallAsync(this.CanisterId, "withdraw", arg, identity: this.Identity);
 			return reply.ToObjects<WithdrawReceipt>(this.Converter);
 		}
 	}
