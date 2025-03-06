@@ -121,22 +121,29 @@
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>The root public key bytes </returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.ReadStateAsync(EdjCase.ICP.Candid.Models.Principal,System.Collections.Generic.List{EdjCase.ICP.Candid.Models.StatePath},EdjCase.ICP.Agent.Identities.IIdentity,System.Nullable{System.Threading.CancellationToken})">
+        <member name="T:EdjCase.ICP.Agent.Agents.IAgentExtensions">
+            <summary>
+            Extension methods for the `IAgent` interface
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.ReadStateAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.Collections.Generic.List{EdjCase.ICP.Candid.Models.StatePath},EdjCase.ICP.Agent.Identities.IIdentity,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Gets the state of a specified canister with the subset of state information
             specified by the paths parameter
             </summary>
+            <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister to read state for</param>
             <param name="paths">The state paths to get information for. Other state data will be pruned if not specified</param>
             <param name="identity">Optional. Identity to sign the request with</param>
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>A response that contains the certificate of the current canister state</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a call request to a specified canister method and gets the response candid arg back using /v3/../call
             and falls back to /v2/../call if the v3 is not available
             </summary>
+            <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister to read state for</param>
             <param name="method">The name of the method to call on the canister</param>
             <param name="arg">The candid arg to send with the request</param>
@@ -146,10 +153,11 @@
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.QueryAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,System.Byte[],EdjCase.ICP.Agent.Identities.IIdentity,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.QueryAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,System.Byte[],EdjCase.ICP.Agent.Identities.IIdentity,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a query request to a specified canister method
             </summary>
+            <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister to read state for</param>
             <param name="method">The name of the method to call on the canister</param>
             <param name="arg">The candid arg to send with the request</param>
@@ -159,12 +167,13 @@
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>The response data of the query call</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsynchronousAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a call request to a specified canister method and gets back an id of the
             request that is being processed using /v2/../call. This call does NOT wait for the request to be complete.
             Either check the status with `GetRequestStatusAsync` or use the `CallV2AndWaitAsync` method
             </summary>
+            <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister to read state for</param>
             <param name="method">The name of the method to call on the canister</param>
             <param name="arg">The candid arg to send with the request</param>
@@ -174,12 +183,13 @@
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsynchronousAndWaitAsync(EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAndWaitAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a call request to a specified canister method, waits for the request to be processed,
             the returns the candid response to the call. This is helper method built on top of `CallAsynchronousAsync`
             to wait for the response so it doesn't need to be implemented manually
             </summary>
+            <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister to read state for</param>
             <param name="method">The name of the method to call on the canister</param>
             <param name="arg">The candid arg to send with the request</param>
@@ -189,22 +199,24 @@
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>The raw candid arg response</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.GetRequestStatusAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.Agent.Identities.IIdentity,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.GetRequestStatusAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.Agent.Identities.IIdentity,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Gets the status of a request that is being processed by the specified canister
             </summary>
+            <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister where the request was sent to</param>
             <param name="id">Id of the request to get a status for</param>
             <param name="identity">Optional. Identity to sign the request with</param>
             <param name="cancellationToken">Optional. Token to cancel request</param>
             <returns>A status variant of the request. If request is not found, will return null</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.WaitForRequestAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.WaitForRequestAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Waits for a request to be processed and returns the candid response to the call. This is a helper
             method built on top of `GetRequestStatusAsync` to wait for the response so it doesn't need to be
             implemented manually
             </summary>
+            <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister to read state for</param>
             <param name="requestId">The unique identifier for the request</param>
             <param name="cancellationToken">Optional. Token to cancel request</param>
