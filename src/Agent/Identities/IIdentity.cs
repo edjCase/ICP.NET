@@ -43,19 +43,18 @@ namespace EdjCase.ICP.Agent.Identities
 		/// <summary>
 		/// Signs the hashable content
 		/// </summary>
-		/// <param name="content">The data that needs to be signed</param>
+		/// <param name="request">The data that needs to be signed</param>
 		/// <returns>The content with signature(s) from the identity</returns>
-		public SignedContent<TRequest> SignContent<TRequest>(TRequest content)
+		public SignedRequest<TRequest> Sign<TRequest>(TRequest request)
 			where TRequest : IRepresentationIndependentHashItem
 		{
 			SubjectPublicKeyInfo senderPublicKey = this.GetPublicKey();
 			var sha256 = SHA256HashFunction.Create();
-			byte[] contentHash = content.BuildHashableItem().ToHashable().ComputeHash(sha256);
-			RequestId requestId = RequestId.FromBytes(contentHash);
+			RequestId requestId = RequestId.FromObject(request.BuildHashableItem(), sha256);
 			byte[] domainSeparator = Encoding.UTF8.GetBytes("\x0Aic-request");
-			byte[] senderSignature = this.Sign(domainSeparator.Concat(contentHash).ToArray());
+			byte[] senderSignature = this.Sign([.. domainSeparator, .. requestId.RawValue]);
 			List<SignedDelegation>? senderDelegations = this.GetSenderDelegations();
-			return new SignedContent<TRequest>(requestId, content, senderPublicKey, senderDelegations, senderSignature);
+			return new SignedRequest<TRequest>(request, senderPublicKey, senderDelegations, senderSignature, precomputedRequestId: requestId);
 		}
 	}
 }

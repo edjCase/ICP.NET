@@ -1413,7 +1413,7 @@
         </member>
         <member name="T:EdjCase.ICP.Candid.Models.HashTree.EncodedValue">
             <summary>
-            A helper class that wraps around a byte array, giving functions to convert 
+            A helper class that wraps around a byte array, giving functions to convert
             to common types like text and numbers
             </summary>
         </member>
@@ -1482,12 +1482,31 @@
             </summary>
             <param name="utf8Value">The UTF8 string value to use with the encoded value</param>
         </member>
+        <member name="M:EdjCase.ICP.Candid.Models.HashTree.EncodedValue.op_Implicit(EdjCase.ICP.Candid.Models.HashTree.EncodedValue)~EdjCase.ICP.Candid.Models.UnboundedUInt">
+            <summary>
+            A helper method to implicitly convert an encoded value to an unbounded uint
+            </summary>
+            <param name="value">The encoded value to get the raw value from</param>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.HashTree.EncodedValue.op_Implicit(EdjCase.ICP.Candid.Models.UnboundedUInt)~EdjCase.ICP.Candid.Models.HashTree.EncodedValue">
+            <summary>
+            A helper method to implicitly convert an unbounded uint to an encoded value
+            </summary>
+            <param name="value">The unbounded uint value to use with the encoded value</param>
+        </member>
         <member name="M:EdjCase.ICP.Candid.Models.HashTree.EncodedValue.Utf8Value(System.String)">
             <summary>
             Creates an encoded value from a utf8 string value
             </summary>
             <param name="value">UTF8 encoded string</param>
             <returns>UTF8 encoded value</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Candid.Models.HashTree.EncodedValue.NatValue(EdjCase.ICP.Candid.Models.UnboundedUInt)">
+            <summary>
+            Creates an encoded value from an unbounded uint value
+            </summary>
+            <param name="value">Unbounded uint value</param>
+            <returns>Unbounded uint encoded value</returns>
         </member>
         <member name="M:EdjCase.ICP.Candid.Models.HashTree.Equals(EdjCase.ICP.Candid.Models.HashTree)">
             <inheritdoc />

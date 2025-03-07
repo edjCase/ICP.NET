@@ -1,3 +1,5 @@
+using EdjCase.ICP.Agent.Identities;
+using EdjCase.ICP.Candid.Crypto;
 using EdjCase.ICP.Candid.Models;
 using System;
 using System.Collections.Generic;
@@ -9,18 +11,15 @@ namespace EdjCase.ICP.Agent.Models
 	/// <summary>
 	/// A model containing content and the signature information of it
 	/// </summary>
-	public class SignedContent<TRequest> : IRepresentationIndependentHashItem
+	public class SignedRequest<TRequest> : IRepresentationIndependentHashItem
 		where TRequest : IRepresentationIndependentHashItem
 	{
-		/// <summary>
-		/// The hash of the content used for request identification
-		/// </summary>
-		public RequestId RequestId { get; }
+		private RequestId? requestIdCache;
 
 		/// <summary>
 		/// The request that is signed
 		/// </summary>
-		public TRequest Request { get; }
+		public TRequest Content { get; }
 
 		/// <summary>
 		/// Public key used to authenticate this request, unless anonymous, then null
@@ -38,25 +37,34 @@ namespace EdjCase.ICP.Agent.Models
 		/// </summary>
 		public byte[]? SenderSignature { get; }
 
-		/// <param name="requestId">The hash of the content used for request identification</param>
-		/// <param name="request">The content that is signed in the form of key value pairs</param>
+		/// <param name="content">The content that is signed in the form of key value pairs</param>
 		/// <param name="senderPublicKey">Public key used to authenticate this request, unless anonymous, then null</param>
 		/// <param name="delegations">Optional. A chain of delegations, starting with the one signed by sender_pubkey
 		/// and ending with the one delegating to the key relating to sender_sig.</param>
+		/// <param name="precomputedRequestId">Optional. Precomputed request id to use, otherwise will build it</param>
 		/// <param name="senderSignature">Signature to authenticate this request, unless anonymous, then null</param>
-		public SignedContent(
-			RequestId requestId,
-			TRequest request,
+		public SignedRequest(
+			TRequest content,
 			SubjectPublicKeyInfo? senderPublicKey,
 			List<SignedDelegation>? delegations,
-			byte[]? senderSignature
+			byte[]? senderSignature,
+			RequestId? precomputedRequestId = null
 		)
 		{
-			this.RequestId = requestId ?? throw new ArgumentNullException(nameof(requestId));
-			this.Request = request ?? throw new ArgumentNullException(nameof(request));
+			this.Content = content ?? throw new ArgumentNullException(nameof(content));
 			this.SenderPublicKey = senderPublicKey;
 			this.SenderDelegations = delegations;
 			this.SenderSignature = senderSignature;
+			this.requestIdCache = precomputedRequestId;
+		}
+		/// <summary>
+		/// Get the unique id for the request, which is hash of the content
+		/// Builds the id on the first call and caches it for future calls
+		/// </summary>
+		/// <returns>The id for the request</returns>
+		public RequestId GetOrBuildRequestId()
+		{
+			return this.requestIdCache ?? RequestId.FromObject(this.Content.BuildHashableItem(), SHA256HashFunction.Create());
 		}
 
 		/// <inheritdoc />
@@ -64,7 +72,7 @@ namespace EdjCase.ICP.Agent.Models
 		{
 			var properties = new Dictionary<string, IHashable>
 			{
-				{Properties.CONTENT, this.Request.BuildHashableItem().ToHashable()}
+				{Properties.CONTENT, this.Content.BuildHashableItem().ToHashable()}
 			};
 			if (this.SenderPublicKey != null)
 			{
@@ -93,11 +101,12 @@ namespace EdjCase.ICP.Agent.Models
 			return writer.Encode();
 		}
 
+
 		internal void WriteCbor(CborWriter writer)
 		{
 			writer.WriteStartMap(null);
 			writer.WriteTextString(Properties.CONTENT);
-			Dictionary<string, IHashable> hashableContent = this.Request.BuildHashableItem();
+			Dictionary<string, IHashable> hashableContent = this.Content.BuildHashableItem();
 			writer.WriteStartMap(hashableContent.Count);
 			foreach ((string key, IHashable value) in hashableContent)
 			{

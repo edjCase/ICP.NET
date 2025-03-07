@@ -17,7 +17,7 @@ namespace EdjCase.ICP.Agent.Agents.Http
 		/// Sends a GET http request and awaits the response
 		/// </summary>
 		/// <param name="url">The url to send the GET request to</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>The http response</returns>
 		Task<HttpResponse> GetAsync(string url, CancellationToken? cancellationToken = null);
 
@@ -26,7 +26,7 @@ namespace EdjCase.ICP.Agent.Agents.Http
 		/// </summary>
 		/// <param name="url">The url to send the POST request to</param>
 		/// <param name="cborBody">The CBOR encoded body to send</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>The http response</returns>
 		Task<HttpResponse> PostAsync(string url, byte[] cborBody, CancellationToken? cancellationToken = null);
 	}

@@ -25,10 +25,10 @@ namespace EdjCase.ICP.Agent.Agents
 		/// </summary>
 		/// <param name="content">The signed content containing the call request</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>The candid arg response to the call</returns>
 		Task<CandidArg> CallAsync(
-			SignedContent<CallRequest> content,
+			SignedRequest<CallRequest> content,
 			Principal? effectiveCanisterId = null,
 			CancellationToken? cancellationToken = null
 		);
@@ -38,10 +38,10 @@ namespace EdjCase.ICP.Agent.Agents
 		/// </summary>
 		/// <param name="content">The signed content containing the call request</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
 		Task<RequestId> CallAsynchronousAsync(
-			SignedContent<CallRequest> content,
+			SignedRequest<CallRequest> content,
 			Principal? effectiveCanisterId = null,
 			CancellationToken? cancellationToken = null
 		);
@@ -51,10 +51,10 @@ namespace EdjCase.ICP.Agent.Agents
 		/// </summary>
 		/// <param name="content">The signed content containing the query request</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>The response data of the query call</returns>
 		Task<CandidArg> QueryAsync(
-			SignedContent<QueryRequest> content,
+			SignedRequest<QueryRequest> content,
 			Principal? effectiveCanisterId = null,
 			CancellationToken? cancellationToken = null
 		);
@@ -64,11 +64,11 @@ namespace EdjCase.ICP.Agent.Agents
 		/// </summary>
 		/// <param name="canisterId">Canister to read state for</param>
 		/// <param name="content">The signed content containing the read state request</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>A response that contains the certificate of the current canister state</returns>
 		Task<ReadStateResponse> ReadStateAsync(
 			Principal canisterId,
-			SignedContent<ReadStateRequest> content,
+			SignedRequest<ReadStateRequest> content,
 			CancellationToken? cancellationToken = null
 		);
 
@@ -82,7 +82,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <summary>
 		/// Gets the root public key of the current Internet Computer network
 		/// </summary>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>The root public key bytes </returns>
 		Task<SubjectPublicKeyInfo> GetRootKeyAsync(CancellationToken? cancellationToken = null);
 	}
@@ -100,18 +100,22 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="canisterId">Canister to read state for</param>
 		/// <param name="paths">The state paths to get information for. Other state data will be pruned if not specified</param>
 		/// <param name="identity">Optional. Identity to sign the request with</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+		/// <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
 		/// <returns>A response that contains the certificate of the current canister state</returns>
 		public static async Task<ReadStateResponse> ReadStateAsync(
 			this IAgent agent,
 			Principal canisterId,
 			List<StatePath> paths,
 			IIdentity? identity = null,
-			CancellationToken? cancellationToken = null)
+			CancellationToken? cancellationToken = null,
+			ICTimestamp? ingressExpiry = null
+		)
 		{
-			SignedContent<ReadStateRequest> content = SignContent(
+			SignedRequest<ReadStateRequest> content = SignRequest(
 				identity,
-				(sender, ingressExpiry) => new ReadStateRequest(paths, sender, ingressExpiry)
+				(sender, ingressExpiry) => new ReadStateRequest(paths, sender, ingressExpiry),
+				ingressExpiry
 			);
 			return await agent.ReadStateAsync(canisterId, content, cancellationToken);
 		}
@@ -128,7 +132,8 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="identity">Optional. Identity to sign the request with</param>
 		/// <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+		/// <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
 		/// <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
 		public static async Task<CandidArg> CallAsync(
 			this IAgent agent,
@@ -138,15 +143,17 @@ namespace EdjCase.ICP.Agent.Agents
 			IIdentity? identity = null,
 			byte[]? nonce = null,
 			Principal? effectiveCanisterId = null,
-			CancellationToken? cancellationToken = null
+			CancellationToken? cancellationToken = null,
+			ICTimestamp? ingressExpiry = null
 		)
 		{
-			SignedContent<CallRequest> content = SignContent(
+			SignedRequest<CallRequest> content = SignRequest(
 				identity,
 				(sender, ingressExpiry) =>
 				{
 					return new CallRequest(canisterId, method, arg, sender, ingressExpiry, nonce);
-				}
+				},
+				ingressExpiry
 			);
 			return await agent.CallAsync(content, effectiveCanisterId, cancellationToken);
 		}
@@ -162,7 +169,8 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
 		/// <param name="identity">Optional. Identity to sign the request with</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+		/// <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
 		/// <returns>The response data of the query call</returns>
 		public static async Task<CandidArg> QueryAsync(
 			this IAgent agent,
@@ -172,12 +180,14 @@ namespace EdjCase.ICP.Agent.Agents
 			byte[]? nonce = null,
 			IIdentity? identity = null,
 			Principal? effectiveCanisterId = null,
-			CancellationToken? cancellationToken = null
+			CancellationToken? cancellationToken = null,
+			ICTimestamp? ingressExpiry = null
 		)
 		{
-			SignedContent<QueryRequest> content = SignContent(
+			SignedRequest<QueryRequest> content = SignRequest(
 				identity,
-				(sender, ingressExpiry) => new QueryRequest(canisterId, method, arg, sender, ingressExpiry, nonce)
+				(sender, ingressExpiry) => new QueryRequest(canisterId, method, arg, sender, ingressExpiry, nonce),
+				ingressExpiry
 			);
 			return await agent.QueryAsync(content, effectiveCanisterId, cancellationToken);
 		}
@@ -195,7 +205,8 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="identity">Optional. Identity to sign the request with</param>
 		/// <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+		/// <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
 		/// <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
 		public static async Task<RequestId> CallAsynchronousAsync(
 			this IAgent agent,
@@ -205,15 +216,17 @@ namespace EdjCase.ICP.Agent.Agents
 			IIdentity? identity = null,
 			byte[]? nonce = null,
 			Principal? effectiveCanisterId = null,
-			CancellationToken? cancellationToken = null
+			CancellationToken? cancellationToken = null,
+			ICTimestamp? ingressExpiry = null
 		)
 		{
-			SignedContent<CallRequest> content = SignContent(
+			SignedRequest<CallRequest> content = SignRequest(
 				identity,
 				(sender, ingressExpiry) =>
 				{
 					return new CallRequest(canisterId, method, arg, sender, ingressExpiry, nonce);
-				}
+				},
+				ingressExpiry
 			);
 			return await agent.CallAsynchronousAsync(content, effectiveCanisterId, cancellationToken);
 		}
@@ -231,7 +244,8 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="identity">Optional. Identity to sign the request with</param>
 		/// <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+		/// <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
 		/// <returns>The raw candid arg response</returns>
 		public static async Task<CandidArg> CallAsynchronousAndWaitAsync(
 			this IAgent agent,
@@ -241,9 +255,20 @@ namespace EdjCase.ICP.Agent.Agents
 			IIdentity? identity = null,
 			byte[]? nonce = null,
 			Principal? effectiveCanisterId = null,
-			CancellationToken? cancellationToken = null)
+			CancellationToken? cancellationToken = null,
+			ICTimestamp? ingressExpiry = null
+		)
 		{
-			RequestId id = await agent.CallAsynchronousAsync(canisterId, method, arg, identity, nonce, effectiveCanisterId, cancellationToken);
+			RequestId id = await agent.CallAsynchronousAsync(
+				canisterId,
+				method,
+				arg,
+				identity,
+				nonce,
+				effectiveCanisterId,
+				cancellationToken,
+				ingressExpiry
+			);
 			return await agent.WaitForRequestAsync(canisterId, id, cancellationToken);
 		}
 
@@ -255,16 +280,17 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="agent">The agent to use for the call</param>
 		/// <param name="content">The signed content containing the call request</param>
 		/// <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>The raw candid arg response</returns>
 		public static async Task<CandidArg> CallAsynchronousAndWaitAsync(
 			this IAgent agent,
-			SignedContent<CallRequest> content,
+			SignedRequest<CallRequest> content,
 			Principal? effectiveCanisterId = null,
-			CancellationToken? cancellationToken = null)
+			CancellationToken? cancellationToken = null
+		)
 		{
 			RequestId id = await agent.CallAsynchronousAsync(content, effectiveCanisterId, cancellationToken);
-			return await agent.WaitForRequestAsync(content.Request.CanisterId, id, cancellationToken);
+			return await agent.WaitForRequestAsync(content.Content.CanisterId, id, cancellationToken);
 		}
 
 
@@ -275,19 +301,25 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="canisterId">Canister where the request was sent to</param>
 		/// <param name="id">Id of the request to get a status for</param>
 		/// <param name="identity">Optional. Identity to sign the request with</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+		/// <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
 		/// <returns>A status variant of the request. If request is not found, will return null</returns>
 		public static async Task<RequestStatus?> GetRequestStatusAsync(
 			this IAgent agent,
 			Principal canisterId,
 			RequestId id,
 			IIdentity? identity = null,
-			CancellationToken? cancellationToken = null
+			CancellationToken? cancellationToken = null,
+			ICTimestamp? ingressExpiry = null
 		)
 		{
 			var pathRequestStatus = StatePath.FromSegments("request_status", id.RawValue);
 			var paths = new List<StatePath> { pathRequestStatus };
-			SignedContent<ReadStateRequest> signedContent = SignContent(identity, (sender, ingressExpiry) => new ReadStateRequest(paths, sender, ingressExpiry));
+			SignedRequest<ReadStateRequest> signedContent = SignRequest(
+				identity,
+				(sender, ingressExpiry) => new ReadStateRequest(paths, sender, ingressExpiry),
+				ingressExpiry
+			);
 			ReadStateResponse response = await agent.ReadStateAsync(canisterId, signedContent, cancellationToken);
 			HashTree? requestStatus = response.Certificate.Tree.GetValueOrDefault(pathRequestStatus);
 			return ParseRequestStatus(requestStatus);
@@ -301,7 +333,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <param name="agent">The agent to use for the call</param>
 		/// <param name="canisterId">Canister to read state for</param>
 		/// <param name="requestId">The unique identifier for the request</param>
-		/// <param name="cancellationToken">Optional. Token to cancel request</param>
+		/// <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
 		/// <returns>The raw candid arg response</returns>
 		public static async Task<CandidArg> WaitForRequestAsync(
 			this IAgent agent,
@@ -364,9 +396,10 @@ namespace EdjCase.ICP.Agent.Agents
 		}
 
 
-		private static SignedContent<TRequest> SignContent<TRequest>(
+		private static SignedRequest<TRequest> SignRequest<TRequest>(
 			IIdentity? identity,
-			Func<Principal, ICTimestamp, TRequest> getRequest
+			Func<Principal, ICTimestamp, TRequest> getRequest,
+			ICTimestamp? ingressExpiry = null
 		)
 			where TRequest : IRepresentationIndependentHashItem
 		{
@@ -381,15 +414,13 @@ namespace EdjCase.ICP.Agent.Agents
 				SubjectPublicKeyInfo publicKey = identity.GetPublicKey();
 				principal = publicKey.ToPrincipal();
 			}
-			TRequest request = getRequest(principal, ICTimestamp.Future(TimeSpan.FromMinutes(3)));
+			TRequest request = getRequest(principal, ingressExpiry ?? ICTimestamp.Future(TimeSpan.FromMinutes(3)));
 
 			if (identity == null)
 			{
-				var sha256 = SHA256HashFunction.Create();
-				RequestId requestId = RequestId.FromObject(request.BuildHashableItem(), sha256);
-				return new SignedContent<TRequest>(requestId, request, null, null, null);
+				return new SignedRequest<TRequest>(request, null, null, null);
 			}
-			return identity.SignContent(request);
+			return identity.Sign(request);
 
 		}
 	}

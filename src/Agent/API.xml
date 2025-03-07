@@ -4,37 +4,6 @@
         <name>EdjCase.ICP.Agent</name>
     </assembly>
     <members>
-        <member name="T:EdjCase.ICP.Agent.Agents.HttpAgent">
-            <summary>
-            An `IAgent` implementation using HTTP to make requests to the IC
-            </summary>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.#ctor(EdjCase.ICP.Agent.Agents.Http.IHttpClient,System.Boolean)">
-            <param name="httpClient">Optional. Sets the http client to use, otherwise will use the default http client</param>
-            <param name="skipCertificateValidation">If true, will skip response certificate validation. Defaults to false</param>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.#ctor(System.Uri,System.Boolean)">
-            <param name="httpBoundryNodeUrl">Url to the boundry node to connect to. Defaults to `https://icp-api.io/`</param>
-            <param name="skipCertificateValidation">If true, will skip response certificate validation. Defaults to false</param>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallAsync(EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallAsynchronousAsync(EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.QueryAsync(EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.QueryRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.ReadStateAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.ReadStateRequest},System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetRootKeyAsync(System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetReplicaStatusAsync(System.Nullable{System.Threading.CancellationToken})">
-            <inheritdoc/>
-        </member>
         <member name="T:EdjCase.ICP.Agent.Agents.Http.DefaultHttpClient">
             <summary>
             The default http client to use with the built in `HttpClient`
@@ -62,7 +31,7 @@
             Sends a GET http request and awaits the response
             </summary>
             <param name="url">The url to send the GET request to</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>The http response</returns>
         </member>
         <member name="M:EdjCase.ICP.Agent.Agents.Http.IHttpClient.PostAsync(System.String,System.Byte[],System.Nullable{System.Threading.CancellationToken})">
@@ -71,7 +40,7 @@
             </summary>
             <param name="url">The url to send the POST request to</param>
             <param name="cborBody">The CBOR encoded body to send</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>The http response</returns>
         </member>
         <member name="T:EdjCase.ICP.Agent.Agents.Http.HttpResponse">
@@ -103,46 +72,77 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:EdjCase.ICP.Agent.Agents.HttpAgent">
+            <summary>
+            An `IAgent` implementation using HTTP to make requests to the IC
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.#ctor(EdjCase.ICP.Agent.Agents.Http.IHttpClient,System.Boolean)">
+            <param name="httpClient">Optional. Sets the http client to use, otherwise will use the default http client</param>
+            <param name="skipCertificateValidation">If true, will skip response certificate validation. Defaults to false</param>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.#ctor(System.Uri,System.Boolean)">
+            <param name="httpBoundryNodeUrl">Url to the boundry node to connect to. Defaults to `https://icp-api.io/`</param>
+            <param name="skipCertificateValidation">If true, will skip response certificate validation. Defaults to false</param>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallAsync(EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.CallAsynchronousAsync(EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.QueryAsync(EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.QueryRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.ReadStateAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.ReadStateRequest},System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetRootKeyAsync(System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Agents.HttpAgent.GetReplicaStatusAsync(System.Nullable{System.Threading.CancellationToken})">
+            <inheritdoc/>
+        </member>
         <member name="T:EdjCase.ICP.Agent.Agents.IAgent">
             <summary>
             An agent is used to communicate with the Internet Computer with certain protocols that
             are specific to an `IAgent` implementation
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsync(EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsync(EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a call request to a canister with already signed content
             </summary>
             <param name="content">The signed content containing the call request</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>The candid arg response to the call</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsynchronousAsync(EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.CallAsynchronousAsync(EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends an asynchronous call request to a canister with already signed content
             </summary>
             <param name="content">The signed content containing the call request</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.QueryAsync(EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.QueryRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.QueryAsync(EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.QueryRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a query request to a canister with already signed content
             </summary>
             <param name="content">The signed content containing the query request</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>The response data of the query call</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.ReadStateAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.ReadStateRequest},System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgent.ReadStateAsync(EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.ReadStateRequest},System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Reads the state of a specified canister with already signed content
             </summary>
             <param name="canisterId">Canister to read state for</param>
             <param name="content">The signed content containing the read state request</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>A response that contains the certificate of the current canister state</returns>
         </member>
         <member name="M:EdjCase.ICP.Agent.Agents.IAgent.GetReplicaStatusAsync(System.Nullable{System.Threading.CancellationToken})">
@@ -156,7 +156,7 @@
             <summary>
             Gets the root public key of the current Internet Computer network
             </summary>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>The root public key bytes </returns>
         </member>
         <member name="T:EdjCase.ICP.Agent.Agents.IAgentExtensions">
@@ -164,7 +164,7 @@
             Extension methods for the `IAgent` interface
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.ReadStateAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.Collections.Generic.List{EdjCase.ICP.Candid.Models.StatePath},EdjCase.ICP.Agent.Identities.IIdentity,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.ReadStateAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.Collections.Generic.List{EdjCase.ICP.Candid.Models.StatePath},EdjCase.ICP.Agent.Identities.IIdentity,System.Nullable{System.Threading.CancellationToken},EdjCase.ICP.Candid.Models.ICTimestamp)">
             <summary>
             Gets the state of a specified canister with the subset of state information
             specified by the paths parameter
@@ -173,10 +173,11 @@
             <param name="canisterId">Canister to read state for</param>
             <param name="paths">The state paths to get information for. Other state data will be pruned if not specified</param>
             <param name="identity">Optional. Identity to sign the request with</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+            <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
             <returns>A response that contains the certificate of the current canister state</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken},EdjCase.ICP.Candid.Models.ICTimestamp)">
             <summary>
             Sends a call request to a specified canister method and gets the response candid arg back using /v3/../call
             and falls back to /v2/../call if the v3 is not available
@@ -188,10 +189,11 @@
             <param name="identity">Optional. Identity to sign the request with</param>
             <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+            <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
             <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.QueryAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,System.Byte[],EdjCase.ICP.Agent.Identities.IIdentity,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.QueryAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,System.Byte[],EdjCase.ICP.Agent.Identities.IIdentity,EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken},EdjCase.ICP.Candid.Models.ICTimestamp)">
             <summary>
             Sends a query request to a specified canister method
             </summary>
@@ -202,10 +204,11 @@
             <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
             <param name="identity">Optional. Identity to sign the request with</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+            <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
             <returns>The response data of the query call</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken},EdjCase.ICP.Candid.Models.ICTimestamp)">
             <summary>
             Sends a call request to a specified canister method and gets back an id of the
             request that is being processed using /v2/../call. This call does NOT wait for the request to be complete.
@@ -218,10 +221,11 @@
             <param name="identity">Optional. Identity to sign the request with</param>
             <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+            <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
             <returns>The id of the request that can be used to look up its status with `GetRequestStatusAsync`</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAndWaitAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAndWaitAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,System.String,EdjCase.ICP.Candid.Models.CandidArg,EdjCase.ICP.Agent.Identities.IIdentity,System.Byte[],EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken},EdjCase.ICP.Candid.Models.ICTimestamp)">
             <summary>
             Sends a call request to a specified canister method, waits for the request to be processed,
             the returns the candid response to the call. This is helper method built on top of `CallAsynchronousAsync`
@@ -234,10 +238,11 @@
             <param name="identity">Optional. Identity to sign the request with</param>
             <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+            <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
             <returns>The raw candid arg response</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAndWaitAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Agent.Models.SignedContent{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.CallAsynchronousAndWaitAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Agent.Models.SignedRequest{EdjCase.ICP.Agent.Requests.CallRequest},EdjCase.ICP.Candid.Models.Principal,System.Nullable{System.Threading.CancellationToken})">
             <summary>
             Sends a call request with already signed content to a specified canister method, waits for the request to be processed,
             then returns the candid response to the call. This is a helper method built on top of `CallAsynchronousAsync`
@@ -246,10 +251,10 @@
             <param name="agent">The agent to use for the call</param>
             <param name="content">The signed content containing the call request</param>
             <param name="effectiveCanisterId">Optional. Specifies the relevant canister id if calling the root canister</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>The raw candid arg response</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.GetRequestStatusAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.Agent.Identities.IIdentity,System.Nullable{System.Threading.CancellationToken})">
+        <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.GetRequestStatusAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,EdjCase.ICP.Agent.Identities.IIdentity,System.Nullable{System.Threading.CancellationToken},EdjCase.ICP.Candid.Models.ICTimestamp)">
             <summary>
             Gets the status of a request that is being processed by the specified canister
             </summary>
@@ -257,7 +262,8 @@
             <param name="canisterId">Canister where the request was sent to</param>
             <param name="id">Id of the request to get a status for</param>
             <param name="identity">Optional. Identity to sign the request with</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
+            <param name="ingressExpiry">Optional. The expiration of the request if not processed in time</param>
             <returns>A status variant of the request. If request is not found, will return null</returns>
         </member>
         <member name="M:EdjCase.ICP.Agent.Agents.IAgentExtensions.WaitForRequestAsync(EdjCase.ICP.Agent.Agents.IAgent,EdjCase.ICP.Candid.Models.Principal,EdjCase.ICP.Candid.Models.RequestId,System.Nullable{System.Threading.CancellationToken})">
@@ -269,7 +275,7 @@
             <param name="agent">The agent to use for the call</param>
             <param name="canisterId">Canister to read state for</param>
             <param name="requestId">The unique identifier for the request</param>
-            <param name="cancellationToken">Optional. Token to cancel request</param>
+            <param name="cancellationToken">Optional. Token to cancel waiting on the response</param>
             <returns>The raw candid arg response</returns>
         </member>
         <member name="T:EdjCase.ICP.Agent.AlgorithmIdentifier">
@@ -597,11 +603,11 @@
             <param name="data">The byte data to sign</param>
             <returns>The signature bytes of the specified data bytes</returns>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Identities.IIdentity.SignContent``1(``0)">
+        <member name="M:EdjCase.ICP.Agent.Identities.IIdentity.Sign``1(``0)">
             <summary>
             Signs the hashable content
             </summary>
-            <param name="content">The data that needs to be signed</param>
+            <param name="request">The data that needs to be signed</param>
             <returns>The content with signature(s) from the identity</returns>
         </member>
         <member name="T:EdjCase.ICP.Agent.Identities.Secp256k1Identity">
@@ -770,54 +776,6 @@
             <param name="senders">Optional. List of pricipals where requests can originate from</param>
             <returns>A delegation chain signed by the delegating identity</returns>
         </member>
-        <member name="T:EdjCase.ICP.Agent.Models.SignedContent`1">
-            <summary>
-            A model containing content and the signature information of it
-            </summary>
-        </member>
-        <member name="P:EdjCase.ICP.Agent.Models.SignedContent`1.RequestId">
-            <summary>
-            The hash of the content used for request identification
-            </summary>
-        </member>
-        <member name="P:EdjCase.ICP.Agent.Models.SignedContent`1.Request">
-            <summary>
-            The request that is signed
-            </summary>
-        </member>
-        <member name="P:EdjCase.ICP.Agent.Models.SignedContent`1.SenderPublicKey">
-            <summary>
-            Public key used to authenticate this request, unless anonymous, then null
-            </summary>
-        </member>
-        <member name="P:EdjCase.ICP.Agent.Models.SignedContent`1.SenderDelegations">
-            <summary>
-            Optional. A chain of delegations, starting with the one signed by sender_pubkey
-            and ending with the one delegating to the key relating to sender_sig.
-            </summary>
-        </member>
-        <member name="P:EdjCase.ICP.Agent.Models.SignedContent`1.SenderSignature">
-            <summary>
-            Signature to authenticate this request, unless anonymous, then null
-            </summary>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Models.SignedContent`1.#ctor(EdjCase.ICP.Candid.Models.RequestId,`0,EdjCase.ICP.Agent.SubjectPublicKeyInfo,System.Collections.Generic.List{EdjCase.ICP.Agent.Models.SignedDelegation},System.Byte[])">
-            <param name="requestId">The hash of the content used for request identification</param>
-            <param name="request">The content that is signed in the form of key value pairs</param>
-            <param name="senderPublicKey">Public key used to authenticate this request, unless anonymous, then null</param>
-            <param name="delegations">Optional. A chain of delegations, starting with the one signed by sender_pubkey
-            and ending with the one delegating to the key relating to sender_sig.</param>
-            <param name="senderSignature">Signature to authenticate this request, unless anonymous, then null</param>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Models.SignedContent`1.BuildHashableItem">
-            <inheritdoc />
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Models.SignedContent`1.ToCborBytes">
-            <summary>
-            Serializes this signed content object to CBOR (Concise Binary Object Representation) format.
-            </summary>
-            <returns>A byte array containing the CBOR-encoded representation of this object.</returns>
-        </member>
         <member name="T:EdjCase.ICP.Agent.Models.SignedDelegation">
             <summary>
             A delegation that has been signed by an identity
@@ -861,6 +819,56 @@
         </member>
         <member name="M:EdjCase.ICP.Agent.Models.SignedDelegation.ComputeHash(EdjCase.ICP.Candid.Crypto.IHashFunction)">
             <inheritdoc />
+        </member>
+        <member name="T:EdjCase.ICP.Agent.Models.SignedRequest`1">
+            <summary>
+            A model containing content and the signature information of it
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.Agent.Models.SignedRequest`1.Content">
+            <summary>
+            The request that is signed
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.Agent.Models.SignedRequest`1.SenderPublicKey">
+            <summary>
+            Public key used to authenticate this request, unless anonymous, then null
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.Agent.Models.SignedRequest`1.SenderDelegations">
+            <summary>
+            Optional. A chain of delegations, starting with the one signed by sender_pubkey
+            and ending with the one delegating to the key relating to sender_sig.
+            </summary>
+        </member>
+        <member name="P:EdjCase.ICP.Agent.Models.SignedRequest`1.SenderSignature">
+            <summary>
+            Signature to authenticate this request, unless anonymous, then null
+            </summary>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Models.SignedRequest`1.#ctor(`0,EdjCase.ICP.Agent.SubjectPublicKeyInfo,System.Collections.Generic.List{EdjCase.ICP.Agent.Models.SignedDelegation},System.Byte[],EdjCase.ICP.Candid.Models.RequestId)">
+            <param name="content">The content that is signed in the form of key value pairs</param>
+            <param name="senderPublicKey">Public key used to authenticate this request, unless anonymous, then null</param>
+            <param name="delegations">Optional. A chain of delegations, starting with the one signed by sender_pubkey
+            and ending with the one delegating to the key relating to sender_sig.</param>
+            <param name="precomputedRequestId">Optional. Precomputed request id to use, otherwise will build it</param>
+            <param name="senderSignature">Signature to authenticate this request, unless anonymous, then null</param>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Models.SignedRequest`1.GetOrBuildRequestId">
+            <summary>
+            Get the unique id for the request, which is hash of the content
+            Builds the id on the first call and caches it for future calls
+            </summary>
+            <returns>The id for the request</returns>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Models.SignedRequest`1.BuildHashableItem">
+            <inheritdoc />
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Models.SignedRequest`1.ToCborBytes">
+            <summary>
+            Serializes this signed content object to CBOR (Concise Binary Object Representation) format.
+            </summary>
+            <returns>A byte array containing the CBOR-encoded representation of this object.</returns>
         </member>
         <member name="T:EdjCase.ICP.Agent.Requests.CallRequest">
             <summary>
@@ -1270,7 +1278,7 @@
         </member>
         <member name="P:EdjCase.ICP.Agent.Responses.V3CallResponse.Status">
             <summary>
-            The status of the call ('replied', 'rejected', 'done)
+            The status of the call ('replied', 'rejected', etc..)
             </summary>
         </member>
         <member name="P:EdjCase.ICP.Agent.Responses.V3CallResponse.Certificate">
@@ -1278,8 +1286,8 @@
             The certificate data of the current canister state
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.Agent.Responses.V3CallResponse.#ctor(System.String,EdjCase.ICP.Agent.Models.Certificate)">
-            <param name="status">The status of the call ('replied', 'rejected', 'done)</param>
+        <member name="M:EdjCase.ICP.Agent.Responses.V3CallResponse.#ctor(EdjCase.ICP.Agent.Responses.RequestStatus.StatusType,EdjCase.ICP.Agent.Models.Certificate)">
+            <param name="status">The status of the call ('replied', 'rejected', etc..)</param>
             <param name="certificate">The certificate data of the current canister state</param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>

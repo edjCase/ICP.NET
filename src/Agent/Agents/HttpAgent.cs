@@ -48,27 +48,28 @@ namespace EdjCase.ICP.Agent.Agents
 
 		/// <inheritdoc/>
 		public async Task<CandidArg> CallAsync(
-			SignedContent<CallRequest> content,
+			SignedRequest<CallRequest> request,
 			Principal? effectiveCanisterId = null,
 			CancellationToken? cancellationToken = null
 		)
 		{
-			effectiveCanisterId ??= content.Request.CanisterId;
+			effectiveCanisterId ??= request.Content.CanisterId;
 			string url = this.GetCallUrl(effectiveCanisterId, this.v3CallSupported);
 
-			HttpResponse httpResponse = await this.SendAsync(url, content, cancellationToken);
+			HttpResponse httpResponse = await this.SendAsync(url, request, cancellationToken);
 
 
 			if (httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
 			{
 				// If v3 is not available, fall back to v2
 				this.v3CallSupported = false;
-				return await this.CallAsynchronousAndWaitAsync(content, effectiveCanisterId, cancellationToken);
+				return await this.CallAsynchronousAndWaitAsync(request, effectiveCanisterId, cancellationToken);
 			}
+			RequestId requestId = request.GetOrBuildRequestId();
 			if (httpResponse.StatusCode == System.Net.HttpStatusCode.Accepted)
 			{
 				// If request takes too long, then it will return 202 Accepted and polling is required
-				return await this.WaitForRequestAsync(content.Request.CanisterId, content.RequestId, cancellationToken);
+				return await this.WaitForRequestAsync(request.Content.CanisterId, requestId, cancellationToken);
 			}
 			await httpResponse.ThrowIfErrorAsync();
 
@@ -84,7 +85,7 @@ namespace EdjCase.ICP.Agent.Agents
 					throw new InvalidCertificateException("Certificate signature does not match the IC public key");
 				}
 			}
-			HashTree? requestStatusData = v3CallResponse.Certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", content.RequestId.RawValue));
+			HashTree? requestStatusData = v3CallResponse.Certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", requestId.RawValue));
 			RequestStatus? requestStatus = IAgentExtensions.ParseRequestStatus(requestStatusData);
 			switch (requestStatus?.Type)
 			{
@@ -106,15 +107,15 @@ namespace EdjCase.ICP.Agent.Agents
 
 		/// <inheritdoc/>
 		public async Task<RequestId> CallAsynchronousAsync(
-			SignedContent<CallRequest> content,
+			SignedRequest<CallRequest> request,
 			Principal? effectiveCanisterId = null,
 			CancellationToken? cancellationToken = null
 		)
 		{
-			effectiveCanisterId ??= content.Request.CanisterId;
+			effectiveCanisterId ??= request.Content.CanisterId;
 			string url = this.GetCallUrl(effectiveCanisterId, false);
 
-			HttpResponse httpResponse = await this.SendAsync(url, content, cancellationToken);
+			HttpResponse httpResponse = await this.SendAsync(url, request, cancellationToken);
 
 			await httpResponse.ThrowIfErrorAsync();
 			if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK)
@@ -136,18 +137,18 @@ namespace EdjCase.ICP.Agent.Agents
 				}
 				throw new CallRejectedException(response.Code, response.Message, response.ErrorCode);
 			}
-			return content.RequestId;
+			return request.GetOrBuildRequestId();
 		}
 
 		/// <inheritdoc/>
 		public async Task<CandidArg> QueryAsync(
-			SignedContent<QueryRequest> content,
+			SignedRequest<QueryRequest> request,
 			Principal? effectiveCanisterId = null,
 			CancellationToken? cancellationToken = null
 		)
 		{
-			effectiveCanisterId ??= content.Request.CanisterId;
-			HttpResponse httpResponse = await this.SendAsync($"/api/v2/canister/{effectiveCanisterId.ToText()}/query", content, cancellationToken);
+			effectiveCanisterId ??= request.Content.CanisterId;
+			HttpResponse httpResponse = await this.SendAsync($"/api/v2/canister/{effectiveCanisterId.ToText()}/query", request, cancellationToken);
 			await httpResponse.ThrowIfErrorAsync();
 			byte[] cborBytes = await httpResponse.GetContentAsync();
 			return QueryResponse.ReadCbor(new CborReader(cborBytes)).ThrowOrGetReply();
@@ -156,7 +157,7 @@ namespace EdjCase.ICP.Agent.Agents
 		/// <inheritdoc/>
 		public async Task<ReadStateResponse> ReadStateAsync(
 			Principal canisterId,
-			SignedContent<ReadStateRequest> content,
+			SignedRequest<ReadStateRequest> content,
 			CancellationToken? cancellationToken = null
 		)
 		{
@@ -243,12 +244,12 @@ namespace EdjCase.ICP.Agent.Agents
 
 		private async Task<HttpResponse> SendAsync<TRequest>(
 			string url,
-			SignedContent<TRequest> content,
+			SignedRequest<TRequest> request,
 			CancellationToken? cancellationToken = null
 		)
 			where TRequest : IRepresentationIndependentHashItem
 		{
-			byte[] cborBody = content.ToCborBytes();
+			byte[] cborBody = request.ToCborBytes();
 #if DEBUG
 			string hex = ByteUtil.ToHexString(cborBody);
 #endif

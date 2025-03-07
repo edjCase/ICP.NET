@@ -257,7 +257,7 @@ namespace EdjCase.ICP.Candid.Models
 		}
 
 		/// <summary>
-		/// A helper class that wraps around a byte array, giving functions to convert 
+		/// A helper class that wraps around a byte array, giving functions to convert
 		/// to common types like text and numbers
 		/// </summary>
 		public class EncodedValue : IEquatable<EncodedValue>
@@ -337,7 +337,8 @@ namespace EdjCase.ICP.Candid.Models
 				if (ReferenceEquals(other, null))
 				{
 					return false;
-				};
+				}
+				;
 				return this.Value.AsSpan().SequenceEqual(other);
 			}
 
@@ -404,6 +405,24 @@ namespace EdjCase.ICP.Candid.Models
 			}
 
 			/// <summary>
+			/// A helper method to implicitly convert an encoded value to an unbounded uint
+			/// </summary>
+			/// <param name="value">The encoded value to get the raw value from</param>
+			public static implicit operator UnboundedUInt(EncodedValue value)
+			{
+				return value.AsNat();
+			}
+
+			/// <summary>
+			/// A helper method to implicitly convert an unbounded uint to an encoded value
+			/// </summary>
+			/// <param name="value">The unbounded uint value to use with the encoded value</param>
+			public static implicit operator EncodedValue(UnboundedUInt value)
+			{
+				return EncodedValue.NatValue(value);
+			}
+
+			/// <summary>
 			/// Creates an encoded value from a utf8 string value
 			/// </summary>
 			/// <param name="value">UTF8 encoded string</param>
@@ -411,6 +430,16 @@ namespace EdjCase.ICP.Candid.Models
 			public static EncodedValue Utf8Value(string value)
 			{
 				return Encoding.UTF8.GetBytes(value);
+			}
+
+			/// <summary>
+			/// Creates an encoded value from an unbounded uint value
+			/// </summary>
+			/// <param name="value">Unbounded uint value</param>
+			/// <returns>Unbounded uint encoded value</returns>
+			public static EncodedValue NatValue(UnboundedUInt value)
+			{
+				return LEB128.EncodeUnsigned(value);
 			}
 
 
@@ -480,7 +509,8 @@ namespace EdjCase.ICP.Candid.Models
 			if (ReferenceEquals(other, null))
 			{
 				return false;
-			};
+			}
+			;
 			if (this.Type != other.Type)
 			{
 				return false;

@@ -46,7 +46,7 @@ namespace EdjCase.ICP.Candid.Tests
 			var ingressExpiry = ICTimestamp.FromNanoSeconds(1654598046354206365);
 			var request = new QueryRequest(canisterId, method, arg, sender, ingressExpiry);
 
-			SignedContent<QueryRequest> signedContent = identity.SignContent(request);
+			SignedRequest<QueryRequest> signedContent = identity.Sign(request);
 
 			string signatureHex = ByteUtil.ToHexString(signedContent.SenderSignature!);
 			Snapshot.Match(signatureHex);

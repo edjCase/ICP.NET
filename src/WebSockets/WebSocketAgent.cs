@@ -496,8 +496,8 @@ namespace EdjCase.ICP.WebSockets
 				sender,
 				ICTimestamp.Future(TimeSpan.FromSeconds(30))
 			);
-			SignedContent<CallRequest> signedContent = this.identity
-				.SignContent(request);
+			SignedRequest<CallRequest> signedContent = this.identity
+				.Sign(request);
 
 			CborWriter writer = new CborWriter();
 			writer.WriteStartMap(1);
