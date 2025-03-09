@@ -151,6 +151,9 @@ namespace EdjCase.ICP.Agent.Agents
 			HttpResponse httpResponse = await this.SendAsync($"/api/v2/canister/{effectiveCanisterId.ToText()}/query", request, cancellationToken);
 			await httpResponse.ThrowIfErrorAsync();
 			byte[] cborBytes = await httpResponse.GetContentAsync();
+#if DEBUG
+			string hex = ByteUtil.ToHexString(cborBytes);
+#endif
 			return QueryResponse.ReadCbor(new CborReader(cborBytes)).ThrowOrGetReply();
 		}
 

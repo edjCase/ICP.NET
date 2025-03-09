@@ -69,7 +69,7 @@ namespace EdjCase.ICP.Agent.Agents.Http
 		/// <returns></returns>
 		public async ValueTask ThrowIfErrorAsync()
 		{
-			bool non2XXStatusCode = this.StatusCode >= HttpStatusCode.Ambiguous && this.StatusCode < HttpStatusCode.OK;
+			bool non2XXStatusCode = this.StatusCode >= HttpStatusCode.Ambiguous || this.StatusCode < HttpStatusCode.OK;
 			if (non2XXStatusCode)
 			{
 				byte[] bytes = await this.GetContentAsync();
