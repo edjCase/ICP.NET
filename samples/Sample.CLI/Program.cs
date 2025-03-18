@@ -27,7 +27,7 @@ public class Program
 	[Verb("upload-asset", HelpText = "Upload a file to an asset canister.")]
 	class UploadOptions
 	{
-		[Option('u', "url", Required = false, HelpText = "The url to the boundy node", Default = "https://ic0.app")]
+		[Option('u', "url", Required = false, HelpText = "The url to the boundy node", Default = "https://icp-api.io")]
 		public string? Url { get; set; }
 
 		[Option('c', "canister-id", Required = true, HelpText = "The asset canister id to upload to")]
@@ -55,7 +55,7 @@ public class Program
 	[Verb("download-asset", HelpText = "Download a file from an asset canister.")]
 	class DownloadOptions
 	{
-		[Option('u', "url", Required = false, HelpText = "The url to the boundy node", Default = "https://ic0.app")]
+		[Option('u', "url", Required = false, HelpText = "The url to the boundy node", Default = "https://icp-api.io")]
 		public string? Url { get; set; }
 
 		[Option('c', "canister-id", Required = true, HelpText = "The asset canister id to download from")]
@@ -89,7 +89,7 @@ public class Program
 					identity = IdentityUtil.FromPemFile(options.IdentityPEMFilePath, options.IdentityPassword);
 				}
 				Uri httpBoundryNodeUrl = new Uri(options.Url!);
-				var agent = new HttpAgent(identity, httpBoundryNodeUrl);
+				var agent = new HttpAgent(httpBoundryNodeUrl);
 				Samples s = new(agent);
 
 				Principal canisterId = Principal.FromText(options.CanisterId!);
@@ -111,7 +111,7 @@ public class Program
 					identity = IdentityUtil.FromPemFile(options.IdentityPEMFilePath, options.IdentityPassword);
 				}
 				Uri httpBoundryNodeUrl = new Uri(options.Url!);
-				var agent = new HttpAgent(identity, httpBoundryNodeUrl);
+				var agent = new HttpAgent(httpBoundryNodeUrl);
 				Samples s = new(agent);
 
 				Principal canisterId = Principal.FromText(options.CanisterId!);
@@ -160,7 +160,7 @@ public class Program
 			string outputFilePath
 		)
 		{
-			AssetCanisterApiClient client = new(this.agent, canisterId);
+			AssetCanisterApiClient client = new(this.agent, canisterId, identity: null);
 
 			Console.WriteLine($"Downloading asset '{key}'...");
 			(byte[] assetBytes, string contentEncoding) = await client.DownloadAssetAsync(key);
@@ -210,7 +210,7 @@ public class Program
 			string filePath
 		)
 		{
-			var client = new AssetCanisterApiClient(this.agent, canisterId);
+			var client = new AssetCanisterApiClient(this.agent, canisterId, identity: null);
 
 			Console.WriteLine($"Uploading chunks for asset '{key}'...");
 			Stream? contentStream = null;

@@ -12,8 +12,9 @@ namespace EdjCase.ICP.BLS
 	/// <summary>
 	/// Represents the default implementation of the IBlsCryptography interface for BLS cryptography.
 	/// </summary>
-	public class DefaultBlsCryptograhy : IBlsCryptography
+	internal static class DefaultBlsCryptograhy
 	{
+
 		internal static readonly byte[] DomainSeperator;
 
 		static DefaultBlsCryptograhy()
@@ -22,7 +23,7 @@ namespace EdjCase.ICP.BLS
 		}
 
 		/// <inheritdoc />
-		public bool VerifySignature(byte[] publicKey, byte[] messageHash, byte[] signature)
+		public static bool VerifySignature(byte[] publicKey, byte[] messageHash, byte[] signature)
 		{
 			G1Affine sig = G1Affine.FromCompressed(signature);
 			G2Prepared g2Gen = G2Affine.Generator().Neg().ToProjective().ToPrepared();
@@ -34,10 +35,10 @@ namespace EdjCase.ICP.BLS
 				(sig, g2Gen),
 				(msg, pk)
 			};
-			return this.VerifyInternal(pairs);
+			return VerifyInternal(pairs);
 		}
 
-		private bool VerifyInternal(
+		private static bool VerifyInternal(
 			(G1Affine G1, G2Prepared G2)[] pairs
 		)
 		{

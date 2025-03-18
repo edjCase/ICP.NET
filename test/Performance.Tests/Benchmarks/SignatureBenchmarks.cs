@@ -13,14 +13,12 @@ namespace Performance.Tests.Benchmarks
 {
 	public class SignatureBenchmarks
 	{
-		private readonly DefaultBlsCryptograhy bls;
 		private readonly byte[] publicKey;
 		private readonly byte[] msgHash;
 		private readonly byte[] signature;
 
 		public SignatureBenchmarks()
 		{
-			this.bls = new DefaultBlsCryptograhy();
 			//this.publicKey = ByteUtil.FromHexString("a7623a93cdb56c4d23d99c14216afaab3dfd6d4f9eb3db23d038280b6d5cb2caaee2a19dd92c9df7001dede23bf036bc0f33982dfb41e8fa9b8e96b5dc3e83d55ca4dd146c7eb2e8b6859cb5a5db815db86810b8d12cee1588b5dbf34a4dc9a5");
 			//this.msgHash = ByteUtil.FromHexString("hello");
 			//this.signature = ByteUtil.FromHexString("b89e13a212c830586eaa9ad53946cd968718ebecc27eda849d9232673dcd4f440e8b5df39bf14a88048c15e16cbcaabe");
@@ -32,7 +30,7 @@ namespace Performance.Tests.Benchmarks
 		[Benchmark]
 		public void Verify()
 		{
-			this.bls.VerifySignature(this.publicKey, this.msgHash, this.signature);
+			DefaultBlsCryptograhy.VerifySignature(this.publicKey, this.msgHash, this.signature);
 		}
 
 	}

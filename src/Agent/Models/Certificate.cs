@@ -41,13 +41,12 @@ namespace EdjCase.ICP.Agent.Models
 		}
 
 		/// <summary>
-		/// Checks the validity of the certificate based off the 
+		/// Checks the validity of the certificate based off the
 		/// specified root public key
 		/// </summary>
-		/// <param name="bls">BLS crytography implementation to verify signature</param>
 		/// <param name="rootPublicKey">The root public key (DER encoded) of the internet computer network</param>
 		/// <returns>True if the certificate is valid, otherwise false</returns>
-		public bool IsValid(IBlsCryptography bls, SubjectPublicKeyInfo rootPublicKey)
+		public bool IsValid(SubjectPublicKeyInfo rootPublicKey)
 		{
 			/*
 				verify_cert(cert) =
@@ -61,14 +60,14 @@ namespace EdjCase.ICP.Agent.Models
 			if (this.Delegation != null)
 			{
 				// override the root key to the delegated one
-				if (!this.Delegation.Certificate.IsValid(bls, rootPublicKey))
+				if (!this.Delegation.Certificate.IsValid(rootPublicKey))
 				{
 					// If delegation is not valid, then the cert is also not valid
 					return false;
 				}
 				rootPublicKey = this.Delegation.GetPublicKey();
 			}
-			return bls.VerifySignature(rootPublicKey.PublicKey, rootHash, this.Signature);
+			return DefaultBlsCryptograhy.VerifySignature(rootPublicKey.PublicKey, rootHash, this.Signature);
 		}
 
 		internal static Certificate FromCbor(CborReader reader)

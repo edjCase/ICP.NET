@@ -41,8 +41,7 @@ namespace EdjCase.ICP.Agent.Requests
 		public ICTimestamp IngressExpiry { get; }
 
 		/// <summary>
-		/// Optional. Arbitrary user-provided data, typically randomly generated. 
-		/// This can be used to create distinct requests with otherwise identical fields.
+		/// Optional. If specified will make the request unique even with the same arguments
 		/// </summary>
 		public byte[]? Nonce { get; }
 
@@ -51,12 +50,14 @@ namespace EdjCase.ICP.Agent.Requests
 		/// <param name="arg">Arguments to pass to the canister method</param>
 		/// <param name="sender">The user who issued the request</param>
 		/// <param name="ingressExpiry"> The expiration of the request to avoid replay attacks</param>
+		/// <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
 		public QueryRequest(
 			Principal canisterId,
 			string method,
 			CandidArg arg,
 			Principal sender,
-			ICTimestamp ingressExpiry
+			ICTimestamp ingressExpiry,
+			byte[]? nonce = null
 		)
 		{
 			this.CanisterId = canisterId ?? throw new ArgumentNullException(nameof(canisterId));
@@ -64,6 +65,7 @@ namespace EdjCase.ICP.Agent.Requests
 			this.Arg = arg ?? throw new ArgumentNullException(nameof(arg));
 			this.Sender = sender ?? throw new ArgumentNullException(nameof(sender));
 			this.IngressExpiry = ingressExpiry ?? throw new ArgumentNullException(nameof(ingressExpiry));
+			this.Nonce = nonce;
 		}
 
 		/// <inheritdoc />

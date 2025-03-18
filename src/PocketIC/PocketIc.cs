@@ -984,12 +984,10 @@ namespace EdjCase.ICP.PocketIC
 		/// <summary>
 		/// Creates a new HTTP agent configured to use this gateway
 		/// </summary>
-		/// <param name="identity">Optional identity to use for the agent, otherwise will use anonymous identity</param>
 		/// <returns>A configured HTTP agent</returns>
-		public HttpAgent BuildHttpAgent(IIdentity? identity = null)
+		public HttpAgent BuildHttpAgent()
 		{
 			return new HttpAgent(
-				identity: identity,
 				httpBoundryNodeUrl: this.Url
 			);
 		}

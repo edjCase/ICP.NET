@@ -59,7 +59,7 @@ candid-client-generator gen ./
   Files generated in a sub-folder will have a more specific namespace to match. This namespace can be overidden per client.
 - `output-directory` - (Text) OPTIONAL. Directory to put all generated files. Each client will have a sub-folder within the output directory that will match the client name. If not specified, the working directory will be used
 - `no-folders` - (Bool) OPTIONAL. If true, no sub-folders will be generated for the clients or the models within the clients. All generated files will be in a flat structure. Defaults to false
-- `url` - (Text) OPTIONAL. Sets the boundry node url to use for making calls to canisters on the IC. Can be set to a local developer instance/localhost. Defaults to 'https://ic0.app/'. This setting is only useful for clients of generation type `canister`
+- `url` - (Text) OPTIONAL. Sets the boundry node url to use for making calls to canisters on the IC. Can be set to a local developer instance/localhost. Defaults to 'https://icp-api.io/'. This setting is only useful for clients of generation type `canister`
 - `feature-nullable` - (Bool) Optional. Sets whether to use the C# nullable feature when generating the client (like `object?`). Defaults to true
 - `variants-use-properties` - (Bool) Optional. If true, the generated variant classes will use properties instead of methods for data access. Defaults to false
 - `keep-candid-case` - (Bool) Optional. If true, the names of properties and methods will keep the raw candid name. Otherwise they will be converted to something prettier. Defaults to false

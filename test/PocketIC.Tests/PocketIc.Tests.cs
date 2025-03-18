@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Agent.Responses;
+using EdjCase.ICP.BLS;
 using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.PocketIC.Client;
 using EdjCase.ICP.PocketIC.Models;
@@ -23,6 +24,7 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 	{
 		this.fixture = fixture;
 	}
+
 
 	[Fact]
 	public async Task Test()
@@ -176,8 +178,7 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 				await using (HttpGateway httpGateway = await pocketIc.RunHttpGatewayAsync())
 				{
 					HttpAgent agent = httpGateway.BuildHttpAgent();
-					QueryResponse getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-					CandidArg getResponseArg = getResponse.ThrowOrGetReply();
+					CandidArg getResponseArg = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 					UnboundedUInt getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
 					Assert.Equal((UnboundedUInt)2, getResponseValue);
 
@@ -185,8 +186,7 @@ public class PocketIcTests : IClassFixture<PocketIcServerFixture>
 					CandidArg incResponseArg = await agent.CallAsync(canisterId, "inc", CandidArg.Empty(), cancellationToken: cts.Token);
 					Assert.Equal(CandidArg.Empty(), incResponseArg);
 
-					getResponse = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
-					getResponseArg = getResponse.ThrowOrGetReply();
+					getResponseArg = await agent.QueryAsync(canisterId, "get", CandidArg.Empty());
 					getResponseValue = getResponseArg.ToObjects<UnboundedUInt>();
 					Assert.Equal((UnboundedUInt)3, getResponseValue);
 

@@ -18,7 +18,7 @@ Required:
 - file_path - The path of the file to upload
 
 Optional:
-- ic_url - Defaults to ic0.app. Use if wanting to use local (e.g http://127.0.0.1:4943)
+- ic_url - Defaults to icp-api.io. Use if wanting to use local (e.g http://127.0.0.1:4943)
 - pem_file_path - Use to set identity of upload request. Defaults to anonymous identity
 - pem_password - Use if the pem_file_path is set and it is encrypted
 ```
@@ -36,7 +36,7 @@ Required:
 - output_file_path - The path of the file to download to
 
 Optional:
-- ic_url - Defaults to ic0.app. Use if wanting to use local (e.g http://127.0.0.1:4943)
+- ic_url - Defaults to icp-api.io. Use if wanting to use local (e.g http://127.0.0.1:4943)
 - pem_file_path - Use to set identity of upload request. Defaults to anonymous identity
 - pem_password - Use if the pem_file_path is set and it is encrypted
 ```

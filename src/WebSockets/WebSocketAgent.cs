@@ -33,7 +33,6 @@ namespace EdjCase.ICP.WebSockets
 		private Principal canisterId { get; }
 		private Uri gatewayUri { get; }
 		private IIdentity identity { get; }
-		private IBlsCryptography bls { get; }
 		private SubjectPublicKeyInfo RootPublicKey { get; }
 		private CandidConverter? customConverter { get; }
 		private IWebSocketClient client { get; }
@@ -41,6 +40,7 @@ namespace EdjCase.ICP.WebSockets
 		private ulong outgoingSequenceNumber = 1;
 		private ulong incomingSequenceNumber = 1;
 		private SHA256HashFunction sha256 = SHA256HashFunction.Create();
+		private bool skipCertificateValidation { get; }
 
 		public bool IsOpen => this.client.IsOpen;
 
@@ -50,12 +50,12 @@ namespace EdjCase.ICP.WebSockets
 			SubjectPublicKeyInfo rootPublicKey,
 			IIdentity identity,
 			IWebSocketClient client,
-			IBlsCryptography bls,
 			Action<TMessage> onMessage,
 			Action? onOpen = null,
 			Action<Exception>? onError = null,
 			Action? onClose = null,
-			CandidConverter? customConverter = null
+			CandidConverter? customConverter = null,
+			bool skipCertificateValidation = false
 		)
 		{
 			this.canisterId = canisterId ?? throw new ArgumentNullException(nameof(canisterId));
@@ -63,12 +63,12 @@ namespace EdjCase.ICP.WebSockets
 			this.RootPublicKey = rootPublicKey ?? throw new ArgumentNullException(nameof(rootPublicKey));
 			this.identity = identity ?? throw new ArgumentNullException(nameof(identity));
 			this.client = client ?? throw new ArgumentNullException(nameof(client));
-			this.bls = bls ?? throw new ArgumentNullException(nameof(bls));
 			this.onMessage = onMessage ?? throw new ArgumentNullException(nameof(onMessage));
 			this.onOpen = onOpen;
 			this.onError = onError;
 			this.onClose = onClose;
 			this.customConverter = customConverter;
+			this.skipCertificateValidation = skipCertificateValidation;
 		}
 
 		public async Task ConnectAsync(
@@ -287,10 +287,13 @@ namespace EdjCase.ICP.WebSockets
 			}
 
 
-			if (cert == null || !cert.IsValid(this.bls, this.RootPublicKey))
+			if (!this.skipCertificateValidation)
 			{
-				error = "Message certificate is invalid: Invalid signature";
-				return false;
+				if (cert == null || !cert.IsValid(this.RootPublicKey))
+				{
+					error = "Message certificate is invalid: Invalid signature";
+					return false;
+				}
 			}
 			HashTree? witness = cert!.Tree.GetValueOrDefault(
 				"canister",
@@ -493,8 +496,8 @@ namespace EdjCase.ICP.WebSockets
 				sender,
 				ICTimestamp.Future(TimeSpan.FromSeconds(30))
 			);
-			SignedContent signedContent = this.identity
-				.SignContent(request.BuildHashableItem());
+			SignedRequest<CallRequest> signedContent = this.identity
+				.Sign(request);
 
 			CborWriter writer = new CborWriter();
 			writer.WriteStartMap(1);

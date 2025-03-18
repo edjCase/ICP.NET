@@ -1,5 +1,6 @@
 
 
+using EdjCase.ICP.BLS;
 using System;
 
 namespace EdjCase.ICP.PocketIC.Tests;

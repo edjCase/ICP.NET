@@ -1285,11 +1285,10 @@
             The URL of the HTTP gateway
             </summary>
         </member>
-        <member name="M:EdjCase.ICP.PocketIC.HttpGateway.BuildHttpAgent(EdjCase.ICP.Agent.Identities.IIdentity)">
+        <member name="M:EdjCase.ICP.PocketIC.HttpGateway.BuildHttpAgent">
             <summary>
             Creates a new HTTP agent configured to use this gateway
             </summary>
-            <param name="identity">Optional identity to use for the agent, otherwise will use anonymous identity</param>
             <returns>A configured HTTP agent</returns>
         </member>
         <member name="M:EdjCase.ICP.PocketIC.HttpGateway.DisposeAsync">

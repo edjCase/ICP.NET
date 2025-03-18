@@ -31,7 +31,7 @@ namespace EdjCase.ICP.Agent.Requests
 		/// </summary>
 		public ICTimestamp IngressExpiry { get; }
 		/// <summary>
-		/// Optional. Arbitrary user-provided data, typically randomly generated. This can be used to create distinct requests with otherwise identical fields.
+		/// Optional. If specified will make the request unique even with the same arguments.
 		/// </summary>
 		public byte[]? Nonce { get; }
 
@@ -40,7 +40,7 @@ namespace EdjCase.ICP.Agent.Requests
 		/// <param name="arg">Argument to pass to the canister method</param>
 		/// <param name="sender">The user who issued the request</param>
 		/// <param name="ingressExpiry">An upper limit on the validity of the request, expressed in nanoseconds since 1970-01-01</param>
-		/// <param name="nonce">Optional. Arbitrary user-provided data, typically randomly generated. This can be used to create distinct requests with otherwise identical fields.</param>
+		/// <param name="nonce">Optional. If specified will make the request unique even with the same arguments</param>
 		public CallRequest(
 			Principal canisterId,
 			string method,

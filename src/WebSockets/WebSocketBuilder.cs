@@ -20,7 +20,6 @@ namespace EdjCase.ICP.WebSockets
 		private Uri gatewayUri { get; }
 		private IIdentity? identity { get; set; }
 		private IWebSocketClient? client { get; set; }
-		private IBlsCryptography? bls { get; set; }
 		private SubjectPublicKeyInfo? rootPublicKey { get; set; }
 		private CandidConverter? customConverter { get; set; }
 		private Action<TMessage>? onMessage { get; set; }
@@ -147,17 +146,6 @@ namespace EdjCase.ICP.WebSockets
 		}
 
 		/// <summary>
-		/// Sets a custom BLS cryptography implementation to override the default.
-		/// </summary>
-		/// <param name="bls">The custom BLS cryptography implementation.</param>
-		/// <returns>The WebSocketBuilder instance.</returns>
-		public WebSocketBuilder<TMessage> WithCustomBlsCryptography(IBlsCryptography bls)
-		{
-			this.bls = bls;
-			return this;
-		}
-
-		/// <summary>
 		/// Builds the WebSocket agent from the specified configuration.
 		/// Will NOT connect the agent to the WebSocket gateway
 		/// </summary>
@@ -182,17 +170,12 @@ namespace EdjCase.ICP.WebSockets
 			{
 				this.client = new WebSocketClient();
 			}
-			if (this.bls == null)
-			{
-				this.bls = new DefaultBlsCryptograhy();
-			}
 			return new WebSocketAgent<TMessage>(
 				this.canisterId,
 				this.gatewayUri,
 				this.rootPublicKey,
 				this.identity,
 				this.client,
-				this.bls,
 				this.onMessage,
 				this.onOpen,
 				this.onError,

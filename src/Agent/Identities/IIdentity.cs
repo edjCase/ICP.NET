@@ -38,28 +38,23 @@ namespace EdjCase.ICP.Agent.Identities
 		/// <param name="data">The byte data to sign</param>
 		/// <returns>The signature bytes of the specified data bytes</returns>
 		public byte[] Sign(byte[] data);
-	}
 
-	/// <summary>
-	/// Extension methods for the IIdentity interface
-	/// </summary>
-	public static class IIdentityExtensions
-	{
+
 		/// <summary>
 		/// Signs the hashable content
 		/// </summary>
-		/// <param name="identity">The identity to sign the content with</param>
-		/// <param name="content">The data that needs to be signed</param>
+		/// <param name="request">The data that needs to be signed</param>
 		/// <returns>The content with signature(s) from the identity</returns>
-		public static SignedContent SignContent(this IIdentity identity, Dictionary<string, IHashable> content)
+		public SignedRequest<TRequest> Sign<TRequest>(TRequest request)
+			where TRequest : IRepresentationIndependentHashItem
 		{
-			SubjectPublicKeyInfo senderPublicKey = identity.GetPublicKey();
+			SubjectPublicKeyInfo senderPublicKey = this.GetPublicKey();
 			var sha256 = SHA256HashFunction.Create();
-			byte[] contentHash = content.ToHashable().ComputeHash(sha256);
+			RequestId requestId = RequestId.FromObject(request.BuildHashableItem(), sha256);
 			byte[] domainSeparator = Encoding.UTF8.GetBytes("\x0Aic-request");
-			byte[] senderSignature = identity.Sign(domainSeparator.Concat(contentHash).ToArray());
-			List<SignedDelegation>? senderDelegations = identity.GetSenderDelegations();
-			return new SignedContent(content, senderPublicKey, senderDelegations, senderSignature);
+			byte[] senderSignature = this.Sign([.. domainSeparator, .. requestId.RawValue]);
+			List<SignedDelegation>? senderDelegations = this.GetSenderDelegations();
+			return new SignedRequest<TRequest>(request, senderPublicKey, senderDelegations, senderSignature, precomputedRequestId: requestId);
 		}
 	}
 }

@@ -32,24 +32,21 @@ namespace Sample.Shared.AddressBook
 		public async Task<OptionalValue<Address>> _get_address(string name)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(name, this.Converter));
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "get_address", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "get_address", arg);
 			return reply.ToObjects<OptionalValue<Address>>(this.Converter);
 		}
 
 		public async Task<SelfRef> _get_self()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "get_self", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "get_self", arg);
 			return reply.ToObjects<SelfRef>(this.Converter);
 		}
 
 		public async Task<Dict> _get_dict()
 		{
 			CandidArg arg = CandidArg.FromCandid();
-			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "get_dict", arg);
-			CandidArg reply = response.ThrowOrGetReply();
+			CandidArg reply = await this.Agent.QueryAsync(this.CanisterId, "get_dict", arg);
 			return reply.ToObjects<Dict>(this.Converter);
 		}
 	}

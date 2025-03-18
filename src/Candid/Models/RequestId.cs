@@ -34,12 +34,12 @@ namespace EdjCase.ICP.Candid.Models
 		/// <summary>
 		/// Converts a hashable object into a request id
 		/// </summary>
-		/// <param name="properties">The properties of the object to hash</param>
+		/// <param name="item">The object to hash</param>
 		/// <param name="hashFunction">The hash function to use to generate the hash</param>
 		/// <returns>A request id object</returns>
-		public static RequestId FromObject(IDictionary<string, IHashable> properties, IHashFunction hashFunction)
+		public static RequestId FromObject(Dictionary<string, IHashable> item, IHashFunction hashFunction)
 		{
-			var orderedProperties = properties
+			byte[] bytes = item
 				.Where(o => o.Value != null) // Remove empty/null ones
 				.Select(o =>
 				{
@@ -48,8 +48,7 @@ namespace EdjCase.ICP.Candid.Models
 
 					return (KeyHash: keyDigest, ValueHash: valueDigest);
 				}) // Hash key and value bytes
-				.OrderBy(o => o.KeyHash, new HashComparer()); // Keys in order
-			byte[] bytes = orderedProperties
+				.OrderBy(o => o.KeyHash, new HashComparer()) // Keys in order
 				.SelectMany(o => o.KeyHash.Concat(o.ValueHash))
 				.ToArray(); // Create single byte[] by concatinating them all together
 			return new RequestId(hashFunction.ComputeHash(bytes));

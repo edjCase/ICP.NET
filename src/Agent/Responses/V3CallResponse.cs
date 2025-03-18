@@ -12,20 +12,20 @@ namespace EdjCase.ICP.Agent.Responses
 	public class V3CallResponse
 	{
 		/// <summary>
-		/// The status of the call ('replied', 'rejected', 'done)
+		/// The status of the call ('replied', 'rejected', etc..)
 		/// </summary>
-		public string Status { get; }
+		public RequestStatus.StatusType Status { get; }
 		/// <summary>
 		/// The certificate data of the current canister state
 		/// </summary>
 		public Certificate Certificate { get; }
 
-		/// <param name="status">The status of the call ('replied', 'rejected', 'done)</param>
+		/// <param name="status">The status of the call ('replied', 'rejected', etc..)</param>
 		/// <param name="certificate">The certificate data of the current canister state</param>
 		/// <exception cref="ArgumentNullException"></exception>
-		public V3CallResponse(string status, Certificate certificate)
+		public V3CallResponse(RequestStatus.StatusType status, Certificate certificate)
 		{
-			this.Status = status ?? throw new ArgumentNullException(nameof(status));
+			this.Status = status;
 			this.Certificate = certificate ?? throw new ArgumentNullException(nameof(certificate));
 		}
 
@@ -37,7 +37,7 @@ namespace EdjCase.ICP.Agent.Responses
 				throw new CborContentException("Expected self describe tag");
 			}
 			Certificate? certificate = null;
-			string? status = null;
+			string? statusString = null;
 			reader.ReadStartMap();
 			while (reader.PeekState() != CborReaderState.EndMap)
 			{
@@ -49,7 +49,7 @@ namespace EdjCase.ICP.Agent.Responses
 						certificate = Certificate.FromCbor(certReader);
 						break;
 					case "status":
-						status = reader.ReadTextString();
+						statusString = reader.ReadTextString();
 						break;
 					default:
 						Debug.WriteLine($"Unknown field '{field}' in v3 call response");
@@ -59,7 +59,7 @@ namespace EdjCase.ICP.Agent.Responses
 			}
 			reader.ReadEndMap();
 
-			if (status == null)
+			if (statusString == null)
 			{
 				throw new CborContentException("Missing field: status");
 			}
@@ -67,6 +67,11 @@ namespace EdjCase.ICP.Agent.Responses
 			if (certificate == null)
 			{
 				throw new CborContentException("Missing field: certificate");
+			}
+
+			if (!Enum.TryParse<RequestStatus.StatusType>(statusString, true, out var status))
+			{
+				throw new CborContentException($"Invalid status: {statusString}");
 			}
 
 			return new V3CallResponse(status, certificate);
