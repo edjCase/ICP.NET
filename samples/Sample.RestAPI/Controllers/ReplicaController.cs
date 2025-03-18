@@ -1,6 +1,8 @@
 using EdjCase.ICP.Agent.Agents;
 using EdjCase.ICP.Agent.Responses;
+using EdjCase.ICP.Candid.Models;
 using Microsoft.AspNetCore.Mvc;
+using Sample.Shared.Governance.Models;
 
 namespace Sample.RestAPI.Controllers
 {
@@ -25,6 +27,20 @@ namespace Sample.RestAPI.Controllers
 		{
 			StatusResponse status = await this.Agent.GetReplicaStatusAsync();
 			return this.Ok(status);
+		}
+
+		[Route("canisterState/{canisterIdText}")]
+		[HttpGet]
+		public async Task<IActionResult> GetA(string canisterIdText)
+		{
+			Principal canisterId = Principal.FromText(canisterIdText);
+			var candidServicePath = StatePath.FromSegments("canister", canisterId.Raw, "metadata", "candid:service");
+			var paths = new List<StatePath>
+			{
+				candidServicePath
+			};
+			ReadStateResponse response = await this.Agent.ReadStateAsync(canisterId, paths);
+			return this.Ok(response);
 		}
 	}
 

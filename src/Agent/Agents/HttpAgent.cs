@@ -169,6 +169,9 @@ namespace EdjCase.ICP.Agent.Agents
 
 			await httpResponse.ThrowIfErrorAsync();
 			byte[] cborBytes = await httpResponse.GetContentAsync();
+#if DEBUG
+			string cborHex = ByteUtil.ToHexString(cborBytes);
+#endif
 			var reader = new CborReader(cborBytes);
 			ReadStateResponse response = ReadStateResponse.ReadCbor(reader);
 
