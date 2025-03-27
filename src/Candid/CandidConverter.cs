@@ -1,3 +1,4 @@
+using EdjCase.ICP.Candid.Exceptions;
 using EdjCase.ICP.Candid.Mapping;
 using EdjCase.ICP.Candid.Mapping.Mappers;
 using EdjCase.ICP.Candid.Models;
@@ -51,7 +52,14 @@ namespace EdjCase.ICP.Candid
 			}
 			ICandidValueMapper mapper = this.ResolveMapper(obj.GetType());
 
-			return mapper!.Map(obj, this);
+			try
+			{
+				return mapper!.Map(obj, this);
+			}
+			catch (Exception e)
+			{
+				throw new Exception($"Failed to convert object '{obj.GetType().FullName}' to candid value", e);
+			}
 		}
 
 		/// <summary>
@@ -64,7 +72,7 @@ namespace EdjCase.ICP.Candid
 			where T : notnull
 		{
 			CandidValue value = this.FromObjectInternal<T>(obj, out ICandidValueMapper mapper);
-			CandidType type = mapper.GetMappedCandidType(typeof(T)) ?? throw new InvalidOperationException("Type does not map");
+			CandidType type = mapper.GetMappedCandidType(typeof(T)) ?? throw new InvalidOperationException($"Type '{typeof(T).FullName}' does not map to a candid type");
 			return new CandidTypedValue(value, type);
 		}
 
@@ -73,7 +81,14 @@ namespace EdjCase.ICP.Candid
 		{
 			mapper = this.ResolveMapper(typeof(T));
 
-			return mapper!.Map(obj, this);
+			try
+			{
+				return mapper.Map(obj, this);
+			}
+			catch (Exception e)
+			{
+				throw new Exception($"Failed to convert object '{typeof(T).FullName}' to candid value", e);
+			}
 		}
 
 		/// <summary>
@@ -108,7 +123,14 @@ namespace EdjCase.ICP.Candid
 		public object ToObject(Type objType, CandidValue value)
 		{
 			ICandidValueMapper mapper = this.ResolveMapper(objType);
-			return mapper!.Map(value, this);
+			try
+			{
+				return mapper!.Map(value, this);
+			}
+			catch (Exception e)
+			{
+				throw new Exception($"Failed to convert candid value '{value}' to object of type {objType.FullName}", e);
+			}
 		}
 
 		/// <summary>
@@ -158,5 +180,5 @@ namespace EdjCase.ICP.Candid
 
 	}
 
-	
+
 }

@@ -802,6 +802,32 @@ namespace EdjCase.ICP.Candid.Tests
 			Assert.Equal(raw2.Value, actual2.Value);
 		}
 
+		[Fact]
+		public void ToObject__Invalid_Map_Text_Record__Throws()
+		{
+			CandidRecord recordValue = new (new Dictionary<CandidTag, CandidValue>
+			{
+				["test"] = CandidValue.Text("test")
+			});
+			Assert.Throws<Exception>(() => CandidConverter.Default.ToObject<string>(recordValue));
+		}
+
+		[Fact]
+		public void ToObject__Invalid_Map_Record_Field__Throws()
+		{
+			CandidTag stringFieldName = CandidTag.FromName("StringField");
+			CandidTag intFieldName = CandidTag.FromName("IntField");
+			var fields = new Dictionary<CandidTag, CandidValue>
+			{
+				{stringFieldName, new CandidOptional(CandidValue.Int64(1))}, // Wrong type/value
+				{intFieldName, CandidValue.Int32(2)}
+			};
+			CandidRecord recordValue = new (fields);
+
+
+			Assert.Throws<Exception>(() => CandidConverter.Default.ToObject<RecordClass>(recordValue));
+		}
+
 
 		private void Test<T>(T raw, CandidTypedValue candid, Func<T, T, bool> areEqual)
 			where T : notnull
