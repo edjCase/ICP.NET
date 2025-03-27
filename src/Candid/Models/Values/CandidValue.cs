@@ -99,6 +99,16 @@ namespace EdjCase.ICP.Candid.Models.Values
 			return this.As<CandidPrimitive>(CandidValueType.Primitive);
 		}
 
+		private CandidPrimitive AsPrimitiveSafeError(PrimitiveType primitiveType)
+		{
+			CandidPrimitive? p = this.AsSafe<CandidPrimitive>(CandidValueType.Primitive);
+			if (p is null)
+			{
+				throw new InvalidOperationException($"Cannot convert candid type '{this.Type}' to candid primitive type '{primitiveType}'");
+			}
+			return p;
+		}
+
 		/// <summary>
 		/// Casts the candid value to a vector type. If the type is not a vector, will throw an exception
 		/// </summary>
@@ -254,7 +264,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A text value</returns>
 		public string? AsText()
 		{
-			return this.AsPrimitive().AsText();
+			return this.AsPrimitiveSafeError(PrimitiveType.Text).AsText();
 		}
 
 		/// <summary>
@@ -264,7 +274,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>An unbounded nat value</returns>
 		public UnboundedUInt AsNat()
 		{
-			return this.AsPrimitive().AsNat();
+			return this.AsPrimitiveSafeError(PrimitiveType.Nat).AsNat();
 		}
 
 		/// <summary>
@@ -274,7 +284,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A nat8 value</returns>
 		public byte AsNat8()
 		{
-			return this.AsPrimitive().AsNat8();
+			return this.AsPrimitiveSafeError(PrimitiveType.Nat8).AsNat8();
 		}
 
 		/// <summary>
@@ -284,7 +294,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A nat16 value</returns>
 		public ushort AsNat16()
 		{
-			return this.AsPrimitive().AsNat16();
+			return this.AsPrimitiveSafeError(PrimitiveType.Nat16).AsNat16();
 		}
 
 		/// <summary>
@@ -294,7 +304,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A nat32 value</returns>
 		public uint AsNat32()
 		{
-			return this.AsPrimitive().AsNat32();
+			return this.AsPrimitiveSafeError(PrimitiveType.Nat32).AsNat32();
 		}
 
 		/// <summary>
@@ -304,7 +314,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A nat64 value</returns>
 		public ulong AsNat64()
 		{
-			return this.AsPrimitive().AsNat64();
+			return this.AsPrimitiveSafeError(PrimitiveType.Nat64).AsNat64();
 		}
 
 		/// <summary>
@@ -314,7 +324,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>An unbounded int value</returns>
 		public UnboundedInt AsInt()
 		{
-			return this.AsPrimitive().AsInt();
+			return this.AsPrimitiveSafeError(PrimitiveType.Int).AsInt();
 		}
 
 		/// <summary>
@@ -324,7 +334,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>An int8 value</returns>
 		public sbyte AsInt8()
 		{
-			return this.AsPrimitive().AsInt8();
+			return this.AsPrimitiveSafeError(PrimitiveType.Int8).AsInt8();
 		}
 
 
@@ -335,7 +345,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>An int16 value</returns>
 		public short AsInt16()
 		{
-			return this.AsPrimitive().AsInt16();
+			return this.AsPrimitiveSafeError(PrimitiveType.Int16).AsInt16();
 		}
 
 
@@ -346,7 +356,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>An int32 value</returns>
 		public int AsInt32()
 		{
-			return this.AsPrimitive().AsInt32();
+			return this.AsPrimitiveSafeError(PrimitiveType.Int32).AsInt32();
 		}
 
 
@@ -357,7 +367,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>An int64 value</returns>
 		public long AsInt64()
 		{
-			return this.AsPrimitive().AsInt64();
+			return this.AsPrimitiveSafeError(PrimitiveType.Int64).AsInt64();
 		}
 
 		/// <summary>
@@ -367,7 +377,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A float32 value</returns>
 		public float AsFloat32()
 		{
-			return this.AsPrimitive().AsFloat32();
+			return this.AsPrimitiveSafeError(PrimitiveType.Float32).AsFloat32();
 		}
 
 		/// <summary>
@@ -377,7 +387,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A float64 value</returns>
 		public double AsFloat64()
 		{
-			return this.AsPrimitive().AsFloat64();
+			return this.AsPrimitiveSafeError(PrimitiveType.Float64).AsFloat64();
 		}
 
 		/// <summary>
@@ -387,7 +397,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A bool value</returns>
 		public bool AsBool()
 		{
-			return this.AsPrimitive().AsBool();
+			return this.AsPrimitiveSafeError(PrimitiveType.Bool).AsBool();
 		}
 
 		/// <summary>
@@ -397,7 +407,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 		/// <returns>A principal value</returns>
 		public Principal? AsPrincipal()
 		{
-			return this.AsPrimitive().AsPrincipal();
+			return this.AsPrimitiveSafeError(PrimitiveType.Principal).AsPrincipal();
 		}
 
 		/// <summary>
@@ -611,6 +621,17 @@ namespace EdjCase.ICP.Candid.Models.Values
 		private T As<T>(CandidValueType type)
 			where T : CandidValue
 		{
+			T? value = this.AsSafe<T>(type);
+			if (value is null)
+			{
+				throw new InvalidOperationException($"Cannot convert candid type '{this.Type}' to candid type '{type}'");
+			}
+			return value;
+		}
+
+		private T? AsSafe<T>(CandidValueType type)
+			where T : CandidValue
+		{
 			if (this.Type != type)
 			{
 				if (this.Type == CandidValueType.Optional)
@@ -620,7 +641,7 @@ namespace EdjCase.ICP.Candid.Models.Values
 
 					return o.Value.As<T>(type);
 				}
-				throw new InvalidOperationException($"Cannot convert candid type '{this.Type}' to candid type '{type}'");
+				return null;
 			}
 			return (T)this;
 		}
