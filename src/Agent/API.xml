@@ -1228,20 +1228,24 @@
             Model for a reponse to a read state request
             </summary>
         </member>
+        <member name="F:EdjCase.ICP.Agent.Responses.V3CallResponse.StatusType.Replied">
+            <summary>
+            The request has been processed and it has reply data
+            </summary>
+        </member>
         <member name="P:EdjCase.ICP.Agent.Responses.V3CallResponse.Status">
             <summary>
-            The status of the call ('replied', 'rejected', 'done)
+            The status of the call ('replied', 'non_replicated_rejection')
             </summary>
         </member>
-        <member name="P:EdjCase.ICP.Agent.Responses.V3CallResponse.Certificate">
+        <member name="M:EdjCase.ICP.Agent.Responses.V3CallResponse.#ctor(EdjCase.ICP.Agent.Responses.V3CallResponse.StatusType,System.Object)">
+            <param name="status">The status of the call ('replied', 'non_replicated_rejection')</param>
+            <param name="value">The certificate data of the current canister state</param>
+        </member>
+        <member name="M:EdjCase.ICP.Agent.Responses.V3CallResponse.AsReplied">
             <summary>
-            The certificate data of the current canister state
+            Returns the 'replied' certificate IF the status is 'replied', otherwise throws exception
             </summary>
-        </member>
-        <member name="M:EdjCase.ICP.Agent.Responses.V3CallResponse.#ctor(System.String,EdjCase.ICP.Agent.Models.Certificate)">
-            <param name="status">The status of the call ('replied', 'rejected', 'done)</param>
-            <param name="certificate">The certificate data of the current canister state</param>
-            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="T:EdjCase.ICP.Agent.Standards.AssetCanister.AssetCanisterApiClient">
             <summary>
