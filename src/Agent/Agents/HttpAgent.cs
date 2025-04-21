@@ -103,13 +103,25 @@ namespace EdjCase.ICP.Agent.Agents
 			byte[] cborBytes = await httpResponse.GetContentAsync();
 			var reader = new CborReader(cborBytes);
 			V3CallResponse v3CallResponse = V3CallResponse.ReadCbor(reader);
+			Certificate certificate;
+			switch (v3CallResponse.Status)
+			{
+				case V3CallResponse.StatusType.Replied:
+					certificate = v3CallResponse.AsReplied();
+					break;
+				case V3CallResponse.StatusType.NonReplicatedRejection:
+					CallRejectedResponse callRejectedResponse = v3CallResponse.AsNonReplicatedRejection();
+					throw new CallRejectedException(callRejectedResponse.Code, callRejectedResponse.Message, callRejectedResponse.ErrorCode);
+				default:
+					throw new NotImplementedException($"Invalid v3 call response status '{v3CallResponse.Status}'");
+			}
 
 			SubjectPublicKeyInfo rootPublicKey = await this.GetRootKeyAsync(cancellationToken);
-			if (!v3CallResponse.Certificate.IsValid(this.bls, rootPublicKey))
+			if (!certificate.IsValid(this.bls, rootPublicKey))
 			{
 				throw new InvalidCertificateException("Certificate signature does not match the IC public key");
 			}
-			HashTree? requestStatusData = v3CallResponse.Certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", requestId.RawValue));
+			HashTree? requestStatusData = certificate.Tree.GetValueOrDefault(StatePath.FromSegments("request_status", requestId.RawValue));
 			RequestStatus? requestStatus = ParseRequestStatus(requestStatusData);
 			switch (requestStatus?.Type)
 			{
